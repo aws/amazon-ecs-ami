@@ -1,0 +1,7 @@
+ami_version        = "20211011"
+source_ami_al2     = "amzn2-ami-minimal-hvm-2.0.20211001.1-x86_64-ebs"
+source_ami_al2arm  = "amzn2-ami-minimal-hvm-2.0.20211001.1-arm64-ebs"
+ecs_agent_version  = "1.55.3"
+ecs_init_rev       = "1"
+docker_version     = "20.10.7"
+containerd_version = "1.4.6"
