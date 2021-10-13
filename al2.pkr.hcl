@@ -71,18 +71,6 @@ build {
     ]
   }
 
-  provisioner "file" {
-    source      = "files/repos/amzn2-extras.repo"
-    destination = "/tmp/amzn2-extras.repo"
-  }
-
-  provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mv /tmp/amzn2-extras.repo /etc/yum.repos.d/amzn2-extras.repo"
-    ]
-  }
-
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
@@ -105,6 +93,20 @@ build {
   provisioner "shell" {
     script           = "scripts/install-docker.sh"
     environment_vars = ["DOCKER_VERSION=${var.docker_version}", "CONTAINERD_VERSION=${var.containerd_version}"]
+  }
+
+  # the ordering matters here, this repo is installed after docker is installed
+  # so that the docker extras repo is overwritten in the final AMI.
+  provisioner "file" {
+    source      = "files/repos/amzn2-extras.repo"
+    destination = "/tmp/amzn2-extras.repo"
+  }
+
+  provisioner "shell" {
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo mv /tmp/amzn2-extras.repo /etc/yum.repos.d/amzn2-extras.repo"
+    ]
   }
 
   provisioner "shell" {

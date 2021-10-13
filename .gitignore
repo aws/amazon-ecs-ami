@@ -1,3 +1,5 @@
 packer
 manifest.json
 overrides.auto.pkrvars.hcl
+shfmt
+shellcheck
