@@ -1,0 +1,6 @@
+echo -e "
+   __|  __|  __|
+   _|  (   \__ \   Amazon ECS-Optimized
+ ____|\___|____/
+
+For documentation, visit http://aws.amazon.com/documentation/ecs"

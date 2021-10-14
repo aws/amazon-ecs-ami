@@ -1,0 +1,29 @@
+[amzn2extra-ecs-source]
+enabled = 0
+name = Amazon Extras source repo for ecs
+mirrorlist = $awsproto://$amazonlinux.$awsregion.$awsdomain/$releasever/extras/ecs/latest/SRPMS/mirror.list
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-amazon-linux-2
+priority = 10
+skip_if_unavailable = 1
+report_instanceid = yes
+ 
+[amzn2extra-ecs-debuginfo]
+enabled = 0
+name = Amazon Extras debuginfo repo for ecs
+mirrorlist = $awsproto://$amazonlinux.$awsregion.$awsdomain/$releasever/extras/ecs/latest/debuginfo/$basearch/mirror.list
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-amazon-linux-2
+priority = 10
+skip_if_unavailable = 1
+report_instanceid = yes
+ 
+[amzn2extra-ecs]
+enabled = 1
+name = Amazon Extras repo for ecs
+mirrorlist = $awsproto://$amazonlinux.$awsregion.$awsdomain/$releasever/extras/ecs/latest/$basearch/mirror.list
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-amazon-linux-2
+priority = 10
+skip_if_unavailable = 1
+report_instanceid = yes
