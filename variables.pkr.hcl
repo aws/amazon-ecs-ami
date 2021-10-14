@@ -80,5 +80,4 @@ variable "ami_name_prefix_al1" {
 variable "source_ami_al1" {
   type        = string
   description = "Amazon Linux 1 source AMI to build from."
-  default     = "amzn-ami-minimal-hvm-2018.03.0.20210721.0-x86_64-ebs"
 }
