@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-if [[ "$AMI_TYPE" != "al2inf" ]]; then
+if [[ $AMI_TYPE != "al2inf" ]]; then
     exit 0
 fi
 
