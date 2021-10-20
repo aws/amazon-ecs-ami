@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -ex
 
+if [ -n "$AIR_GAPPED" ]; then
+    echo "Air-gapped region, exec feature is not supported"
+    exit 0
+fi
+
 BINARY_PATH="/var/lib/ecs/deps/execute-command/bin/${EXEC_SSM_VERSION}"
 CERTS_PATH="/var/lib/ecs/deps/execute-command/certs"
 ARCHITECTURE="$(uname -m)"

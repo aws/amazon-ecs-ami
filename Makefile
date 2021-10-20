@@ -68,13 +68,16 @@ shfmt:
 	curl -fLSs ${SHFMT_URL} -o ./shfmt
 	chmod +x ./shfmt
 
+.PHONY: fmt
+fmt: packer shfmt
+	./packer fmt .
+	./shfmt -l -s -w -i 4 ./*.sh ./*/*.sh ./*/*/*.sh
+
 .PHONY: static-check
 static-check: packer-fmt shfmt shellcheck
 	REGION=us-west-2 make validate
-	./shfmt -d -s -w -i 4 ./scripts/*.sh
-	./shfmt -d -s -w -i 4 ./scripts/*/*.sh
-	./shellcheck --severity=error --exclude=SC2045 ./scripts/*.sh
-	./shellcheck --severity=error --exclude=SC2045 ./scripts/*/*.sh
+	./shfmt -d -s -w -i 4 ./*.sh ./*/*.sh ./*/*/*.sh
+	./shellcheck --severity=error --exclude=SC2045 ./*.sh ./*/*.sh ./*/*/*.sh
 
 .PHONY: clean
 clean:
