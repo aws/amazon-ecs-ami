@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -ex
 
+if [ -n "$AIR_GAPPED" ]; then
+    echo "Air-gapped region, assuming ecs-init and dependencies will be in additional-packages/ directory"
+    exit 0
+fi
+
 WORK_DIR="$(mktemp -d)"
 trap "rm -rf ${WORK_DIR}" EXIT
 

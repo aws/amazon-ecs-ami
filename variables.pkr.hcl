@@ -81,3 +81,9 @@ variable "source_ami_al1" {
   type        = string
   description = "Amazon Linux 1 source AMI to build from."
 }
+
+variable "air_gapped" {
+  type        = string
+  description = "If this build is for an air-gapped region, set to 'true'"
+  default     = ""
+}

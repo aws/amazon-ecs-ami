@@ -7,7 +7,7 @@ gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-amazon-linux-2
 priority = 10
 skip_if_unavailable = 1
 report_instanceid = yes
- 
+
 [amzn2extra-ecs-debuginfo]
 enabled = 0
 name = Amazon Extras debuginfo repo for ecs
@@ -17,7 +17,7 @@ gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-amazon-linux-2
 priority = 10
 skip_if_unavailable = 1
 report_instanceid = yes
- 
+
 [amzn2extra-ecs]
 enabled = 1
 name = Amazon Extras repo for ecs
