@@ -79,7 +79,7 @@ build {
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
-      "sudo yum install -y docker-${var.docker_version} ${local.packages}"
+      "sudo yum install -y docker-${var.docker_version} ${local.packages} docker-storage-setup"
     ]
   }
 
