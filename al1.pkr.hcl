@@ -59,8 +59,8 @@ build {
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
-      "sudo mv /tmp/ecs-custom-motd /etc/update-motd.d/ecs-custom-motd",
-      "sudo chmod 755 /etc/update-motd.d/ecs-custom-motd"
+      "sudo mv /tmp/ecs-custom-motd /etc/update-motd.d/30-banner",
+      "sudo chmod 755 /etc/update-motd.d/30-banner"
     ]
   }
 
@@ -79,13 +79,8 @@ build {
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
-      "sudo yum install -y docker-${var.docker_version} ${local.packages} docker-storage-setup"
+      "sudo yum install -y docker-${var.docker_version_al1} ecs-init-${var.ecs_version_al1} ${local.packages} docker-storage-setup"
     ]
-  }
-
-  provisioner "shell" {
-    script           = "scripts/install-ecs-init.sh"
-    environment_vars = ["REGION=${var.region}", "AGENT_VERSION=${var.ecs_agent_version}", "INIT_REV=${var.ecs_init_rev}", "AL_NAME=amzn1"]
   }
 
   provisioner "shell" {
