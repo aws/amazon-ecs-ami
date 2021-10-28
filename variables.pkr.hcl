@@ -82,6 +82,18 @@ variable "source_ami_al1" {
   description = "Amazon Linux 1 source AMI to build from."
 }
 
+variable "docker_version_al1" {
+  type        = string
+  description = "Docker version to build AL1 AMI with."
+  default     = "20.10.7"
+}
+
+variable "ecs_version_al1" {
+  type        = string
+  description = "ECS version to build AL1 AMI with."
+  default     = "1.51.0"
+}
+
 variable "air_gapped" {
   type        = string
   description = "If this build is for an air-gapped region, set to 'true'"
