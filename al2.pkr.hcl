@@ -30,6 +30,7 @@ build {
   sources = [
     "source.amazon-ebs.al2",
     "source.amazon-ebs.al2arm",
+    "source.amazon-ebs.al2gpu",
     "source.amazon-ebs.al2inf"
   ]
 
@@ -144,6 +145,14 @@ build {
   provisioner "shell" {
     environment_vars = ["AMI_TYPE=${source.name}"]
     script           = "scripts/enable-ecs-agent-inferentia-support.sh"
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "AMI_TYPE=${source.name}",
+      "AIR_GAPPED=${var.air_gapped}"
+    ]
+    script = "scripts/enable-ecs-agent-gpu-support.sh"
   }
 
   provisioner "shell" {
