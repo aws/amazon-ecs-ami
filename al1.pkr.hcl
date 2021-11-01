@@ -88,8 +88,12 @@ build {
   }
 
   provisioner "shell" {
-    script           = "scripts/install-exec-dependencies.sh"
-    environment_vars = ["REGION=${var.region}", "EXEC_SSM_VERSION=${var.exec_ssm_version}"]
+    script = "scripts/install-exec-dependencies.sh"
+    environment_vars = [
+      "REGION=${var.region}",
+      "EXEC_SSM_VERSION=${var.exec_ssm_version}",
+      "AIR_GAPPED=${var.air_gapped}"
+    ]
   }
 
   provisioner "shell" {
