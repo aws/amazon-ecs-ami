@@ -93,8 +93,12 @@ build {
   }
 
   provisioner "shell" {
-    script           = "scripts/install-docker.sh"
-    environment_vars = ["DOCKER_VERSION=${var.docker_version}", "CONTAINERD_VERSION=${var.containerd_version}"]
+    script = "scripts/install-docker.sh"
+    environment_vars = [
+      "DOCKER_VERSION=${var.docker_version}",
+      "CONTAINERD_VERSION=${var.containerd_version}",
+      "AIR_GAPPED=${var.air_gapped}"
+    ]
   }
 
   # the ordering matters here, this repo is installed after docker is installed
@@ -112,8 +116,14 @@ build {
   }
 
   provisioner "shell" {
-    script           = "scripts/install-ecs-init.sh"
-    environment_vars = ["REGION=${var.region}", "AGENT_VERSION=${var.ecs_agent_version}", "INIT_REV=${var.ecs_init_rev}", "AL_NAME=amzn2"]
+    script = "scripts/install-ecs-init.sh"
+    environment_vars = [
+      "REGION=${var.region}",
+      "AGENT_VERSION=${var.ecs_agent_version}",
+      "INIT_REV=${var.ecs_init_rev}",
+      "AL_NAME=amzn2",
+      "AIR_GAPPED=${var.air_gapped}"
+    ]
   }
 
   provisioner "file" {
@@ -129,8 +139,12 @@ build {
   }
 
   provisioner "shell" {
-    script           = "scripts/install-exec-dependencies.sh"
-    environment_vars = ["REGION=${var.region}", "EXEC_SSM_VERSION=${var.exec_ssm_version}"]
+    script = "scripts/install-exec-dependencies.sh"
+    environment_vars = [
+      "REGION=${var.region}",
+      "EXEC_SSM_VERSION=${var.exec_ssm_version}",
+      "AIR_GAPPED=${var.air_gapped}"
+    ]
   }
 
   provisioner "shell" {
