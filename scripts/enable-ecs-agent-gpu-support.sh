@@ -7,7 +7,7 @@ fi
 
 GPG_CHECK=1
 # don't do the gpg check in air-gapped regions
-if [ -n $AIR_GAPPED ]; then
+if [ -n "$AIR_GAPPED" ]; then
     GPG_CHECK=0
 fi
 tmpfile=$(mktemp)
