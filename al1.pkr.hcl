@@ -20,8 +20,8 @@ source "amazon-ebs" "al1" {
   tags = {
     os_version          = "Amazon Linux"
     source_image_name   = "{{ .SourceAMIName }}"
-    ecs_runtime_version = "Docker version ${var.docker_version}"
-    ecs_agent_version   = "${var.ecs_agent_version}"
+    ecs_runtime_version = "Docker version ${var.docker_version_al1}"
+    ecs_agent_version   = "${var.ecs_version_al1}"
     ami_type            = "al1"
     ami_version         = "2018.03.${var.ami_version}"
   }
