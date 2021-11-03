@@ -1,5 +1,9 @@
+locals {
+  ami_name_al1 = "${var.ami_name_prefix_al1}${var.ami_version}-amazon-ecs-optimized"
+}
+
 source "amazon-ebs" "al1" {
-  ami_name        = "${local.prefix}${var.ami_name_prefix_al1}${var.ami_version}-amazon-ecs-optimized${local.suffix}"
+  ami_name        = "${local.ami_name_al1}"
   ami_description = "Amazon Linux AMI amzn-ami-2018.03.${var.ami_version} x86_64 ECS HVM GP2"
   instance_type   = "c5.large"
   launch_block_device_mappings {
