@@ -1,5 +1,9 @@
+locals {
+  ami_name_al2arm = "${var.ami_name_prefix_al2}-hvm-2.0.${var.ami_version}-arm64-ebs"
+}
+
 source "amazon-ebs" "al2arm" {
-  ami_name        = "${local.prefix}${var.ami_name_prefix_al2}-hvm-2.0.${var.ami_version}-arm64-ebs${local.suffix}"
+  ami_name        = "${local.ami_name_al2arm}"
   ami_description = "Amazon Linux AMI 2.0.${var.ami_version} arm64 ECS HVM GP2"
   instance_type   = "m6g.xlarge"
   launch_block_device_mappings {

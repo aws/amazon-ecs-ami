@@ -8,15 +8,13 @@ packer {
 }
 
 locals {
-  prefix   = "NEAT-"
-  suffix   = formatdate("-YYYY-MM-DD'T'hh-mm-ss", timestamp())
   packages = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent"
 }
 
 variable "ami_name_prefix_al2" {
   type        = string
   description = "Outputted AMI name prefix."
-  default     = "custom-amzn2-ami-ecs"
+  default     = "unofficial-amzn2-ami-ecs"
 }
 
 variable "ami_version" {
@@ -74,7 +72,7 @@ variable "source_ami_al2arm" {
 variable "ami_name_prefix_al1" {
   type        = string
   description = "Outputted AMI name prefix."
-  default     = "custom-amzn-ami-2018.03."
+  default     = "unofficial-amzn-ami-2018.03."
 }
 
 variable "source_ami_al1" {
