@@ -3,15 +3,33 @@ set -eio pipefail
 
 usage() {
     echo "Usage:"
-    echo "  $0 AGENT_VERSION"
+    echo "  $0 ECS_INIT_VERSION"
+    echo "Example:"
+    echo "  $0 1.55.0-1"
 }
 
-readonly agent_version="$1"
-if [ -z "$agent_version" ]; then
-    echo "ERROR: Agent version is required."
+error() {
+    local msg="$1"
+    echo "ERROR: $msg"
     usage
     exit 1
+}
+
+readonly ecs_init_version="$1"
+if [ -z "$ecs_init_version" ]; then
+    error "ecs-init version is required."
 fi
+
+agent_version=$(echo "$ecs_init_version" | awk -F "-" '{ print $1 }')
+ecs_init_rev=$(echo "$ecs_init_version" | awk -F "-" '{ print $2 }')
+readonly agent_version ecs_init_rev
+if [ -z "$ecs_init_rev" ]; then
+    error "ecs-init rev was empty, did you forget the dash in ECS_INIT_VERSION? ie, 1.55.0-1"
+fi
+if [ -z "$agent_version" ]; then
+    error "agent version was empty, seems that your ECS_INIT_VERSION was malformed, it should look like: 1.55.0-1"
+fi
+
 # this can be any region, as we use it to grab the latest AL2 AMI name so it should be the same across regions.
 readonly region="us-west-2"
 
@@ -27,11 +45,11 @@ ami_name_al1=$(aws ec2 describe-images --region "$region" --owner amazon --image
 readonly ami_name_arm ami_name_x86 ami_name_al1
 
 cat >|release.auto.pkrvars.hcl <<EOF
-ami_version        = "$(date --utc +%Y%m%d)"
+ami_version        = "$(date -d "+ 2 days" --utc +%Y%m%d)"
 source_ami_al2     = "$ami_name_x86"
 source_ami_al2arm  = "$ami_name_arm"
 ecs_agent_version  = "$agent_version"
-ecs_init_rev       = "1"
+ecs_init_rev       = "$ecs_init_rev"
 docker_version     = "20.10.7"
 containerd_version = "1.4.6"
 source_ami_al1     = "$ami_name_al1"
