@@ -83,7 +83,7 @@ build {
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
-      "sudo yum install -y docker-${var.docker_version_al1} ecs-init-${var.ecs_version_al1} ${local.packages} docker-storage-setup"
+      "sudo yum install -y docker-${var.docker_version_al1} ecs-init-${var.ecs_version_al1} ${local.packages_al1}"
     ]
   }
 
@@ -114,6 +114,13 @@ build {
 
   provisioner "shell" {
     script = "scripts/append-efs-client-info.sh"
+  }
+
+  provisioner "shell" {
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo usermod -a -G docker ec2-user"
+    ]
   }
 
   provisioner "shell" {

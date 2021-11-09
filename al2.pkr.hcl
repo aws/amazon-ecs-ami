@@ -46,7 +46,8 @@ build {
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
-      "sudo mv /tmp/90_ecs.cfg /etc/cloud/cloud.cfg.d/90_ecs.cfg"
+      "sudo mv /tmp/90_ecs.cfg /etc/cloud/cloud.cfg.d/90_ecs.cfg",
+      "sudo chown root:root /etc/cloud/cloud.cfg.d/90_ecs.cfg"
     ]
   }
 
@@ -157,6 +158,13 @@ build {
       "AIR_GAPPED=${var.air_gapped}"
     ]
     script = "scripts/enable-ecs-agent-gpu-support.sh"
+  }
+
+  provisioner "shell" {
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo usermod -a -G docker ec2-user"
+    ]
   }
 
   provisioner "shell" {
