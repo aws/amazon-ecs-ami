@@ -3,9 +3,9 @@ set -eio pipefail
 
 usage() {
     echo "Usage:"
-    echo "  $0 ECS_INIT_VERSION"
+    echo "  $0 ECS_INIT_VERSION AMI_VERSION"
     echo "Example:"
-    echo "  $0 1.55.0-1"
+    echo "  $0 1.55.0-1 20210902"
 }
 
 error() {
@@ -18,6 +18,10 @@ error() {
 readonly ecs_init_version="$1"
 if [ -z "$ecs_init_version" ]; then
     error "ecs-init version is required."
+fi
+readonly ami_version="$2"
+if [ -z "$ami_version" ]; then
+    error "ami version is required."
 fi
 
 agent_version=$(echo "$ecs_init_version" | awk -F "-" '{ print $1 }')
@@ -45,7 +49,7 @@ ami_name_al1=$(aws ec2 describe-images --region "$region" --owner amazon --image
 readonly ami_name_arm ami_name_x86 ami_name_al1
 
 cat >|release.auto.pkrvars.hcl <<EOF
-ami_version        = "$(date -d "+ 2 days" --utc +%Y%m%d)"
+ami_version        = "$ami_version"
 source_ami_al2     = "$ami_name_x86"
 source_ami_al2arm  = "$ami_name_arm"
 ecs_agent_version  = "$agent_version"
