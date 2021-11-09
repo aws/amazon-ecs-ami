@@ -8,7 +8,8 @@ packer {
 }
 
 locals {
-  packages = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent"
+  packages_al1 = "amazon-efs-utils ec2-net-utils acpid irqbalance numactl rng-tools docker-storage-setup"
+  packages     = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent yum-plugin-upgrade-helper"
 }
 
 variable "ami_name_prefix_al2" {
