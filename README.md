@@ -1,7 +1,5 @@
 # ECS-optimized AMI Build Recipes
 
-**PREVIEW** This project is currently in preview and is not tested or ready for production.
-
 This is a [packer](https://packer.io) recipe for creating an ECS-optimized AMI.
 It will create a private AMI in whatever account you are running it in.
 
