@@ -2,6 +2,9 @@ PACKER_VERSION := 1.7.4
 KERNEL := $(shell uname -s | tr A-Z a-z)
 ARCH := $(shell uname -m)
 
+ifeq (${ARCH},arm64)
+	ARCH_ALT=arm64
+endif
 ifeq (${ARCH},aarch64)
 	ARCH_ALT=arm64
 endif
