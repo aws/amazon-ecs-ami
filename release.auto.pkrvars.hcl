@@ -1,4 +1,4 @@
-ami_version        = "20211120"
+ami_version        = "20211115"
 source_ami_al2     = "amzn2-ami-minimal-hvm-2.0.20211103.0-x86_64-ebs"
 source_ami_al2arm  = "amzn2-ami-minimal-hvm-2.0.20211103.0-arm64-ebs"
 ecs_agent_version  = "1.57.0"

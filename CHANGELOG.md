@@ -1,9 +1,5 @@
 # Changelog
 
-## 20211120
-
-- initial source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20211015.1-x86_64-ebs
-
 ## 20211115
 
 - initial ecs version: 1.57.0-1
