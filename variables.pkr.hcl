@@ -98,3 +98,9 @@ variable "air_gapped" {
   description = "If this build is for an air-gapped region, set to 'true'"
   default     = ""
 }
+
+variable "ecs_init_url_al2" {
+  type        = string
+  description = "Specify a particular ECS init URL to install. If empty it will use the standard path."
+  default     = ""
+}
