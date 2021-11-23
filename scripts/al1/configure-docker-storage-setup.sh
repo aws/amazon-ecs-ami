@@ -22,6 +22,3 @@ LV_ERROR_WHEN_FULL=yes
 EXTRA_DOCKER_STORAGE_OPTIONS="--storage-opt dm.fs=ext4 --storage-opt dm.use_deferred_deletion=true"
 EOF
 sudo mv /tmp/docker-storage-setup /etc/sysconfig/docker-storage-setup
-
-sudo /usr/bin/docker-storage-setup
-
