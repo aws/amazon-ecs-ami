@@ -143,15 +143,17 @@ qX2yy/UX5nSPU492e2CdZ1UhoU0SRFY3bxKHKB7SDbVeav+K5g==
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
 
-ARCH=$(uname -m)
-
-host_suffix=""
-if grep -q "^cn-" <<<"$REGION"; then
-    host_suffix=".cn"
+if [ -z "$ECS_INIT_URL" ]; then
+    ARCH=$(uname -m)
+    host_suffix=""
+    if grep -q "^cn-" <<<"$REGION"; then
+        host_suffix=".cn"
+    fi
+    ECS_INIT_URL="https://s3.$REGION.amazonaws.com${host_suffix}/amazon-ecs-agent-$REGION/ecs-init-$AGENT_VERSION-$INIT_REV.$AL_NAME.$ARCH.rpm"
 fi
 
-curl -fLSs -o "$WORK_DIR/ecs-init.rpm" "https://s3.$REGION.amazonaws.com${host_suffix}/amazon-ecs-agent-$REGION/ecs-init-$AGENT_VERSION-$INIT_REV.$AL_NAME.$ARCH.rpm"
-curl -fLSs -o "$WORK_DIR/ecs-init.rpm.asc" "https://s3.$REGION.amazonaws.com${host_suffix}/amazon-ecs-agent-$REGION/ecs-init-$AGENT_VERSION-$INIT_REV.$AL_NAME.$ARCH.rpm.asc"
+curl -fLSs -o "$WORK_DIR/ecs-init.rpm" "$ECS_INIT_URL"
+curl -fLSs -o "$WORK_DIR/ecs-init.rpm.asc" "${ECS_INIT_URL}.asc"
 gpg --import "$WORK_DIR/amazon-ecs-agent.gpg"
 gpg --verify "$WORK_DIR/ecs-init.rpm.asc" "$WORK_DIR/ecs-init.rpm"
 

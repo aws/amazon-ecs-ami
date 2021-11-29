@@ -126,7 +126,8 @@ build {
       "AGENT_VERSION=${var.ecs_agent_version}",
       "INIT_REV=${var.ecs_init_rev}",
       "AL_NAME=amzn2",
-      "AIR_GAPPED=${var.air_gapped}"
+      "AIR_GAPPED=${var.air_gapped}",
+      "ECS_INIT_URL=${var.ecs_init_url_al2}"
     ]
   }
 
