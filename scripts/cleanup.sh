@@ -6,11 +6,11 @@ sudo yum clean all
 function cleanup() {
     FILES=("$@")
     for FILE in "${FILES[@]}"; do
-        if [[ -f $FILE ]]; then
+        if sudo test -f $FILE; then
             echo "Deleting $FILE"
             sudo shred -zuf $FILE
         fi
-        if [[ -f $FILE ]]; then
+        if sudo test -f $FILE; then
             echo "Failed to delete '$FILE'. Failing."
             exit 1
         fi
@@ -19,7 +19,6 @@ function cleanup() {
 
 # Clean up for cloud-init files
 CLOUD_INIT_FILES=(
-    "/etc/sudoers.d/90-cloud-init-users"
     "/etc/locale.conf"
     "/var/log/cloud-init.log"
     "/var/log/cloud-init-output.log"
@@ -68,7 +67,7 @@ for user in $USERS; do
     sudo find /home/"$user"/.ssh/authorized_keys -type f -exec shred -zuf {} \;
 done
 for user in $USERS; do
-    if [[ -f /home/"$user"/.ssh/authorized_keys ]]; then
+    if sudo test -f /home/"$user"/.ssh/authorized_keys; then
         echo Failed to delete /home/"$user"/.ssh/authorized_keys
         exit 1
     fi
@@ -110,11 +109,11 @@ if [[ $(sudo find /var/log/amazon/ssm -type f | sudo wc -l) -gt 0 ]]; then
     echo "Failed to delete /var/log/amazon/ssm"
     exit 1
 fi
-if [[ -d "/var/log/amazon/ssm" ]]; then
+if sudo test -d "/var/log/amazon/ssm"; then
     echo "Deleting /var/log/amazon/ssm/*"
     sudo rm -rf /var/log/amazon/ssm
 fi
-if [[ -d "/var/log/amazon/ssm" ]]; then
+if sudo test -d "/var/log/amazon/ssm"; then
     echo "Failed to delete /var/log/amazon/ssm"
     exit 1
 fi
@@ -152,7 +151,7 @@ fi
 
 # Shredding is not guaranteed to work well on rolling logs
 
-if [[ -f "/var/lib/rsyslog/imjournal.state" ]]; then
+if sudo test -f "/var/lib/rsyslog/imjournal.state"; then
     echo "Deleting /var/lib/rsyslog/imjournal.state"
     sudo shred -zuf /var/lib/rsyslog/imjournal.state
     sudo rm -f /var/lib/rsyslog/imjournal.state
