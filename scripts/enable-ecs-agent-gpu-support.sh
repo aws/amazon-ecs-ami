@@ -30,8 +30,7 @@ sudo rm /etc/yum.repos.d/amzn2-nvidia-tmp.repo
 
 sudo yum install -y kernel-devel-$(uname -r) \
     system-release-nvidia \
-    nvidia-driver-latest-dkms \
-    kmod-nvidia-latest-dkms \
+    nvidia-fabric-manager \
     pciutils \
     xorg-x11-server-Xorg \
     docker-runtime-nvidia \
@@ -39,7 +38,7 @@ sudo yum install -y kernel-devel-$(uname -r) \
     libnvidia-container \
     libnvidia-container-tools \
     nvidia-container-runtime-hook \
-    cuda-drivers-fabricmanager \
+    cuda-drivers \
     cuda
 
 # The Fabric Manager service needs be started and enabled on EC2 P4d instances
