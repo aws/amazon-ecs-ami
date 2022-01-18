@@ -5,6 +5,10 @@ if [[ $AMI_TYPE != "al2inf" ]]; then
     exit 0
 fi
 
+# docs about installing neuron docker environment on inferentia instances:
+# https://awsdocs-neuron.readthedocs-hosted.com/en/latest/neuron-deploy/tutorials/tutorial-docker-env-setup.html
+# https://awsdocs-neuron.readthedocs-hosted.com/en/latest/neuron-intro/mxnet-setup/mxnet-install.html#install-neuron-mxnet
+
 # Copy the neuron repo
 cat >/tmp/neuron.repo <<EOF
 [neuron]
@@ -19,7 +23,16 @@ EOF
 
 sudo mv /tmp/neuron.repo /etc/yum.repos.d/neuron.repo
 
-sudo yum install -y pciutils aws-neuron-runtime-base aws-neuron-tools oci-add-hooks
+# Install OS headers
+sudo yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
+
+# Install Neuron Driver
+sudo yum install -y aws-neuron-dkms
+# Install Neuron Tools
+sudo yum install -y aws-neuron-tools
+sudo yum install -y aws-neuron-runtime-base
+
+sudo yum install -y pciutils oci-add-hooks
 
 NEURON_RUNTIME=/etc/docker-runtimes.d/neuron
 # Add env variable to identify if inf is supported on this ami
