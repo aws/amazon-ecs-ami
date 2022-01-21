@@ -34,6 +34,9 @@ sudo yum install -y aws-neuron-runtime-base
 
 sudo yum install -y pciutils oci-add-hooks
 
+# disable neuron package upgrades by deleting the yum repo
+sudo rm /etc/yum.repos.d/neuron.repo
+
 NEURON_RUNTIME=/etc/docker-runtimes.d/neuron
 # Add env variable to identify if inf is supported on this ami
 mkdir -p /tmp/ecs
