@@ -61,6 +61,14 @@ al2gpu: check-region init validate release.auto.pkrvars.hcl
 al2inf: check-region init validate release.auto.pkrvars.hcl
 	./packer build -only="amazon-ebs.al2inf" -var "region=${REGION}" .
 
+.PHONY: al2022
+al2022: check-region init validate release.auto.pkrvars.hcl
+	./packer build -only="amazon-ebs.al2022" -var "region=${REGION}" .
+
+.PHONY: al2022arm
+al2022arm: check-region init validate release.auto.pkrvars.hcl
+	./packer build -only="amazon-ebs.al2022arm" -var "region=${REGION}" .
+
 shellcheck:
 	curl -fLSs ${SHELLCHECK_URL} -o /tmp/shellcheck.tar.xz
 	tar -xvf /tmp/shellcheck.tar.xz -C /tmp --strip-components=1
