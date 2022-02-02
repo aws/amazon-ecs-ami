@@ -6,5 +6,9 @@ if [ -n "$AIR_GAPPED" ]; then
     exit 0
 fi
 
-sudo amazon-linux-extras enable docker
+if command -v amazon-linux-extras; then
+    # enable docker "extras" repo when available
+    sudo amazon-linux-extras enable docker
+fi
+
 sudo yum install -y "docker-$DOCKER_VERSION" "containerd-$CONTAINERD_VERSION"

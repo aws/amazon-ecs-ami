@@ -46,15 +46,23 @@ ami_id_arm=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-
 ami_name_arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_arm" --query 'Images[0].Name' --output text)
 ami_id_al1=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn-ami-minimal-hvm-x86_64-ebs --query 'Parameters[0].[Value]' --output text)
 ami_name_al1=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al1" --query 'Images[0].Name' --output text)
-readonly ami_name_arm ami_name_x86 ami_name_al1
+
+# AL2022 (use describe-images for now until al2022 SSM parameters are ready)
+ami_id_al2022_x86=$(aws ec2 describe-images --region us-west-2 --owners amazon --filters "Name=name,Values=al2022-ami-minimal-2022.0.*" "Name=architecture,Values=x86_64" --query "reverse(sort_by(Images, &CreationDate))[0].ImageId" --output text)
+ami_name_al2022_x86=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2022_x86" --query 'Images[0].Name' --output text)
+ami_id_al2022_arm=$(aws ec2 describe-images --region us-west-2 --owners amazon --filters "Name=name,Values=al2022-ami-minimal-2022.0.*" "Name=architecture,Values=arm64" --query "reverse(sort_by(Images, &CreationDate))[0].ImageId" --output text)
+ami_name_al2022_arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2022_arm" --query 'Images[0].Name' --output text)
+readonly ami_name_arm ami_name_x86 ami_name_al1 ami_name_al2022_arm ami_name_al2022_x86
 
 cat >|release.auto.pkrvars.hcl <<EOF
-ami_version        = "$ami_version"
-source_ami_al2     = "$ami_name_x86"
-source_ami_al2arm  = "$ami_name_arm"
-ecs_agent_version  = "$agent_version"
-ecs_init_rev       = "$ecs_init_rev"
-docker_version     = "20.10.7"
-containerd_version = "1.4.6"
-source_ami_al1     = "$ami_name_al1"
+ami_version          = "$ami_version"
+source_ami_al2       = "$ami_name_x86"
+source_ami_al2arm    = "$ami_name_arm"
+ecs_agent_version    = "$agent_version"
+ecs_init_rev         = "$ecs_init_rev"
+docker_version       = "20.10.7"
+containerd_version   = "1.4.6"
+source_ami_al1       = "$ami_name_al1"
+source_ami_al2022    = "$ami_name_al2022_x86"
+source_ami_al2022arm = "$ami_name_al2022_arm"
 EOF
