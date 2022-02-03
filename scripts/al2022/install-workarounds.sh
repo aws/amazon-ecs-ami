@@ -2,7 +2,7 @@
 set -ex
 
 # update to AL2022 release that has latest repos
-sudo dnf update -y --releasever=2022.0.20220125
+sudo dnf update -y --releasever=2022.0.20220202
 
 # install ssm (required until amazon-ssm-agent package is available in al2022 repos)
 ARCH=$(uname -m)
