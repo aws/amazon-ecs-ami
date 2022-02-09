@@ -1,5 +1,13 @@
 # Changelog
 
+## 20220209
+
+- ecs version to 1.59.0-1
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20220207.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220207.1-arm64-ebs
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220207.0-x86_64-ebs
+- bug fix: inferentia AMI: disable broken neuron package upgrades [#27](https://github.com/aws/amazon-ecs-ami/pull/27)
+
 ## 20220121
 
 - ecs version to 1.58.0-2
