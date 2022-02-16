@@ -51,30 +51,8 @@ build {
     ]
   }
 
-  provisioner "file" {
-    source      = "files/29-ecs-banner-begin.sh.amzn2"
-    destination = "/tmp/29-ecs-banner-begin"
-  }
-
   provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mv /tmp/29-ecs-banner-begin /etc/update-motd.d/29-ecs-banner-begin",
-      "sudo chmod 755 /etc/update-motd.d/29-ecs-banner-begin"
-    ]
-  }
-
-  provisioner "file" {
-    source      = "files/31-ecs-banner-finish.sh.amzn2"
-    destination = "/tmp/31-ecs-banner-finish"
-  }
-
-  provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mv /tmp/31-ecs-banner-finish /etc/update-motd.d/31-ecs-banner-finish",
-      "sudo chmod 755 /etc/update-motd.d/31-ecs-banner-finish"
-    ]
+    script = "scripts/al2022/setup-motd.sh"
   }
 
   provisioner "shell" {
