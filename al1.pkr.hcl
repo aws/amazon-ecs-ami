@@ -23,7 +23,8 @@ source "amazon-ebs" "al1" {
     filters = {
       name = "${var.source_ami_al1}"
     }
-    owners = ["amazon"]
+    owners      = ["amazon"]
+    most_recent = true
   }
   user_data_file = "scripts/al1/user_data.sh"
   ssh_username   = "ec2-user"
