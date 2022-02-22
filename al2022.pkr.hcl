@@ -83,23 +83,22 @@ build {
     ]
   }
 
+  provisioner "shell" {
+    script = "scripts/al2022/install-workarounds.sh"
+  }
+
   provisioner "file" {
     source      = "additional-packages/"
     destination = "/tmp/additional-packages"
   }
 
-  # no packages available in al2022 repo yet, skipping this step
-  #  provisioner "shell" {
-  #    inline_shebang = "/bin/sh -ex"
-  #    inline = [
-  #      "sudo dnf install -y ${local.packages}"
-  #    ]
-  #  }
-
   provisioner "shell" {
-    script = "scripts/al2022/install-workarounds.sh"
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo dnf install -y ${local.packages_al2022}"
+    ]
   }
-
+  
   provisioner "shell" {
     script = "scripts/install-docker.sh"
     environment_vars = [
@@ -116,6 +115,7 @@ build {
       "AGENT_VERSION=${var.ecs_agent_version}",
       "INIT_REV=${var.ecs_init_rev}",
       "AL_NAME=amzn2",
+      "ECS_INIT_URL=${var.ecs_init_url_al2022}",
       "AIR_GAPPED=${var.air_gapped}"
     ]
   }
@@ -123,8 +123,6 @@ build {
   provisioner "shell" {
     script = "scripts/append-efs-client-info.sh"
   }
-
-
 
   ### exec
   provisioner "shell" {
