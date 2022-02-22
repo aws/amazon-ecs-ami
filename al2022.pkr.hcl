@@ -17,7 +17,8 @@ source "amazon-ebs" "al2022" {
     filters = {
       name = "${var.source_ami_al2022}"
     }
-    owners = ["amazon"]
+    owners      = ["amazon"]
+    most_recent = true
   }
   user_data_file = "scripts/al2022/user-data.sh"
   ssh_username   = "ec2-user"
@@ -98,7 +99,7 @@ build {
       "sudo dnf install -y ${local.packages_al2022}"
     ]
   }
-  
+
   provisioner "shell" {
     script = "scripts/install-docker.sh"
     environment_vars = [

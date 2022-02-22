@@ -40,12 +40,14 @@ readonly region="us-west-2"
 set -x
 
 # get the latest source AMI names
+# AL1
+ami_id_al1=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn-ami-minimal-hvm-x86_64-ebs --query 'Parameters[0].[Value]' --output text)
+ami_name_al1=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al1" --query 'Images[0].Name' --output text)
+# AL2
 ami_id_al2_x86=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn2-ami-minimal-hvm-x86_64-ebs --query 'Parameters[0].[Value]' --output text)
 ami_name_al2_x86=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2_x86" --query 'Images[0].Name' --output text)
 ami_id_al2_arm=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn2-ami-minimal-hvm-arm64-ebs --query 'Parameters[0].[Value]' --output text)
 ami_name_al2_arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2_arm" --query 'Images[0].Name' --output text)
-ami_id_al1=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn-ami-minimal-hvm-x86_64-ebs --query 'Parameters[0].[Value]' --output text)
-ami_name_al1=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al1" --query 'Images[0].Name' --output text)
 
 # AL2022 (use describe-images for now until al2022 SSM parameters are ready)
 ami_id_al2022_x86=$(aws ec2 describe-images --region us-west-2 --owners amazon --filters "Name=name,Values=al2022-ami-minimal-2022.0.*" "Name=architecture,Values=x86_64" --query "reverse(sort_by(Images, &CreationDate))[0].ImageId" --output text)

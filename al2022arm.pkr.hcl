@@ -17,12 +17,13 @@ source "amazon-ebs" "al2022arm" {
     filters = {
       name = "${var.source_ami_al2022arm}"
     }
-    owners = ["amazon"]
+    owners      = ["amazon"]
+    most_recent = true
   }
   user_data_file = "scripts/al2022/user-data.sh"
   ssh_username   = "ec2-user"
   tags = {
-    os_version          = "Amazon Linux 2"
+    os_version          = "Amazon Linux 2022"
     source_image_name   = "{{ .SourceAMIName }}"
     ecs_runtime_version = "Docker version ${var.docker_version}"
     ecs_agent_version   = "${var.ecs_agent_version}"
