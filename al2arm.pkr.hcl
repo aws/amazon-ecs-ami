@@ -17,7 +17,8 @@ source "amazon-ebs" "al2arm" {
     filters = {
       name = "${var.source_ami_al2arm}"
     }
-    owners = ["amazon"]
+    owners      = ["amazon"]
+    most_recent = true
   }
   ssh_username = "ec2-user"
   tags = {
