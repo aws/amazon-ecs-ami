@@ -2,7 +2,8 @@
 set -ex
 
 # update to AL2022 release that has latest repos
-sudo dnf update -y --releasever=2022.0.20220202
+# (get the latest version from dnf check-release-update)
+sudo dnf update -y --releasever=2022.0.20220204
 
 # install ssm (required until amazon-ssm-agent package is available in al2022 repos)
 ARCH=$(uname -m)
@@ -14,13 +15,6 @@ case $ARCH in
     sudo yum install -y "https://s3.us-west-2.amazonaws.com/amazon-ssm-us-west-2/latest/linux_arm64/amazon-ssm-agent.rpm"
     ;;
 esac
-
-# EFS install (this is required until efs-utils is available in al2022 repos)
-sudo yum install -y git rpm-build make
-git clone https://github.com/aws/efs-utils
-cd efs-utils/
-sudo make rpm
-sudo yum install -y ./build/amazon-efs-utils*rpm
 
 # workaround awslogs setup (this is only required for functional testing)
 

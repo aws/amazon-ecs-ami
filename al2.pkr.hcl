@@ -93,7 +93,7 @@ build {
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
-      "sudo yum install -y ${local.packages}"
+      "sudo yum install -y ${local.packages_al2}"
     ]
   }
 
