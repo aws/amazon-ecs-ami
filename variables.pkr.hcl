@@ -9,8 +9,8 @@ packer {
 
 locals {
   packages_al1    = "amazon-efs-utils ec2-net-utils acpid irqbalance numactl rng-tools docker-storage-setup"
-  packages        = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent yum-plugin-upgrade-helper"
-  packages_al2022 = ""
+  packages_al2    = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent yum-plugin-upgrade-helper"
+  packages_al2022 = "amazon-efs-utils"
 }
 
 variable "ami_name_prefix_al2" {
@@ -118,6 +118,12 @@ variable "air_gapped" {
 
 variable "ecs_init_url_al2" {
   type        = string
-  description = "Specify a particular ECS init URL to install. If empty it will use the standard path."
+  description = "Specify a particular ECS init URL for AL2 to install. If empty it will use the standard path."
+  default     = ""
+}
+
+variable "ecs_init_url_al2022" {
+  type        = string
+  description = "Specify a particular ECS init URL for AL2022 to install. If empty it will use the standard path."
   default     = ""
 }
