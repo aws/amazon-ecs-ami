@@ -1,5 +1,13 @@
 # Changelog
 
+## 20220304
+
+- ecs version to 1.60.0-1
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20220218.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220218.1-arm64-ebs
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220209.0-x86_64-ebs
+- enhancement: set most_recent = true for source_ami_filter in order to avoid packer failures when duplicated AMIs exist [#34](https://github.com/aws/amazon-ecs-ami/pull/34)
+
 ## 20220209
 
 - ecs version to 1.59.0-1
