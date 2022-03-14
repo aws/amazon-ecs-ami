@@ -3,7 +3,14 @@ set -ex
 
 # update to AL2022 release that has latest repos
 # (get the latest version from dnf check-release-update)
-sudo dnf update -y --releasever=2022.0.20220204
+INFOFILE=$(mktemp)
+trap "rm -f $INFOFILE" EXIT
+
+sudo dnf check-release-update >$INFOFILE 2>&1
+RELEASESERVER=$(cat $INFOFILE | grep "releasever*" | tail -1 | awk '{print $3}')
+if [ -n "$RELEASESERVER" ]; then
+    sudo dnf update -y $RELEASESERVER
+fi
 
 # install ssm (required until amazon-ssm-agent package is available in al2022 repos)
 ARCH=$(uname -m)
@@ -26,3 +33,6 @@ sudo yum install -y pip
 pip install awscli-cwlogs
 # copy the cwlogs python package from python2 to python3
 sudo cp -r /usr/lib/python2.7/site-packages/cwlogs /usr/lib/python3.9/site-packages/
+
+# clean up
+sudo rm $INFOFILE
