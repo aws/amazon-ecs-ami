@@ -127,3 +127,15 @@ variable "ecs_init_url_al2022" {
   description = "Specify a particular ECS init URL for AL2022 to install. If empty it will use the standard path."
   default     = ""
 }
+
+variable "pgp_key_file" {
+  type        = string
+  description = "Specify a file under /files/keys dir to be used as the ECS public pgp key for verifying init rpm integrity. If empty it will use the key taken from https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-install.html"
+  default     = "amazon-ecs-agent.gpg"
+}
+
+variable "ecs_init_local_override" {
+  type        = string
+  description = "Specify a local init rpm under /additional-packages to be used for building AL2 and AL2022 AMIs. If empty it will use ecs_init_url if specified, otherwise the standard path"
+  default     = ""
+}
