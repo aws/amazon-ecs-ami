@@ -1,5 +1,12 @@
 # Changelog
 
+## 20220318
+
+- ecs version: 1.60.0-1
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220315.0-x86_64-ebs 
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20220316.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220316.0-arm64-ebs
+
 ## 20220304
 
 - ecs version to 1.60.0-1
