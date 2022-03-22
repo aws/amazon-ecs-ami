@@ -63,6 +63,13 @@ build {
   }
 
   provisioner "shell" {
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo dnf update -y --releasever=${var.distribution_release_al2022}"
+    ]
+  }
+
+  provisioner "shell" {
     script = "scripts/al2022/install-workarounds.sh"
   }
 

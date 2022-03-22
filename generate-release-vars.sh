@@ -39,22 +39,29 @@ readonly region="us-west-2"
 
 set -x
 
-# get the latest source AMI names
+# Get the latest source AMI names
 # AL1
 ami_id_al1=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn-ami-minimal-hvm-x86_64-ebs --query 'Parameters[0].[Value]' --output text)
 ami_name_al1=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al1" --query 'Images[0].Name' --output text)
+
 # AL2
 ami_id_al2_x86=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn2-ami-minimal-hvm-x86_64-ebs --query 'Parameters[0].[Value]' --output text)
 ami_name_al2_x86=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2_x86" --query 'Images[0].Name' --output text)
 ami_id_al2_arm=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn2-ami-minimal-hvm-arm64-ebs --query 'Parameters[0].[Value]' --output text)
 ami_name_al2_arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2_arm" --query 'Images[0].Name' --output text)
 
-# AL2022 (use describe-images for now until al2022 SSM parameters are ready)
-ami_id_al2022_x86=$(aws ec2 describe-images --region us-west-2 --owners amazon --filters "Name=name,Values=al2022-ami-minimal-2022.0.*" "Name=architecture,Values=x86_64" --query "reverse(sort_by(Images, &CreationDate))[0].ImageId" --output text)
+# AL2022
+ami_id_al2022_x86=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/al2022-ami-minimal-kernel-default-x86_64 --query 'Parameters[0].[Value]' --output text)
 ami_name_al2022_x86=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2022_x86" --query 'Images[0].Name' --output text)
-ami_id_al2022_arm=$(aws ec2 describe-images --region us-west-2 --owners amazon --filters "Name=name,Values=al2022-ami-minimal-2022.0.*" "Name=architecture,Values=arm64" --query "reverse(sort_by(Images, &CreationDate))[0].ImageId" --output text)
+
+# AL2022 ARM (use describe-images for now until al2022 ARM SSM parameters are ready)
+ami_id_al2022_arm=$(aws ec2 describe-images --region "$region" --owners amazon --filters "Name=name,Values=al2022-ami-minimal-2022.0.*" "Name=architecture,Values=arm64" --query "reverse(sort_by(Images, &CreationDate))[0].ImageId" --output text)
 ami_name_al2022_arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2022_arm" --query 'Images[0].Name' --output text)
-readonly ami_name_al2_arm ami_name_x86 ami_name_al1 ami_name_al2022_arm ami_name_al2022_x86
+
+# Get the latest AL2022 distribution release
+distribution_release_al2022=$(curl "https://al2022-repos-us-west-2-9761ab97.s3.dualstack.us-west-2.amazonaws.com/core/releasemd.xml" | grep -o 'release version="[^"]*"' | cut -f2 -d '"' | sort -r | head -1)
+
+readonly ami_name_al2_arm ami_name_x86 ami_name_al1 ami_name_al2022_arm ami_name_al2022_x86 distribution_release_al2022
 
 cat >|release.auto.pkrvars.hcl <<EOF
 ami_version          = "$ami_version"
@@ -67,4 +74,5 @@ source_ami_al2       = "$ami_name_al2_x86"
 source_ami_al2arm    = "$ami_name_al2_arm"
 source_ami_al2022    = "$ami_name_al2022_x86"
 source_ami_al2022arm = "$ami_name_al2022_arm"
+distribution_release_al2022  = "$distribution_release_al2022"
 EOF
