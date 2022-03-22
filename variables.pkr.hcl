@@ -87,6 +87,11 @@ variable "source_ami_al2022arm" {
   description = "Amazon Linux 2022 ARM source AMI to build from."
 }
 
+variable "distribution_release_al2022" {
+  type        = string
+  description = "Amazon Linux 2022 distribution release."
+}
+
 variable "ami_name_prefix_al1" {
   type        = string
   description = "Outputted AMI name prefix."
