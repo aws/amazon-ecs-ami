@@ -128,7 +128,8 @@ build {
       "INIT_REV=${var.ecs_init_rev}",
       "AL_NAME=amzn2",
       "AIR_GAPPED=${var.air_gapped}",
-      "ECS_INIT_URL=${var.ecs_init_url_al2}"
+      "ECS_INIT_URL=${var.ecs_init_url_al2}",
+      "ECS_INIT_LOCAL_OVERRIDE=${var.ecs_init_local_override}"
     ]
   }
 
