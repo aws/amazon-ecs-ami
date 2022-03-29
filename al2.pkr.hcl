@@ -120,11 +120,6 @@ build {
     ]
   }
 
-  provisioner "file" {
-    source      = "files/keys/${var.pgp_key_file}"
-    destination = "/tmp/${var.pgp_key_file}"
-  }
-
   provisioner "shell" {
     script = "scripts/install-ecs-init.sh"
     environment_vars = [
@@ -134,7 +129,6 @@ build {
       "AL_NAME=amzn2",
       "AIR_GAPPED=${var.air_gapped}",
       "ECS_INIT_URL=${var.ecs_init_url_al2}",
-      "PGP_KEY_FILE=${var.pgp_key_file}",
       "ECS_INIT_LOCAL_OVERRIDE=${var.ecs_init_local_override}"
     ]
   }
