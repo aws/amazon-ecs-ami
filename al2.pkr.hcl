@@ -171,6 +171,13 @@ build {
   }
 
   provisioner "shell" {
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo amazon-linux-extras install kernel-ng"
+    ]
+  }
+
+  provisioner "shell" {
     script = "scripts/enable-services.sh"
   }
 
