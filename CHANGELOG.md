@@ -1,5 +1,12 @@
 # Changelog
 
+## 20220411
+
+- ecs version: 1.61.0-1
+- source al2022 ami: al2022-ami-minimal-2022.0.20220315.0-kernel-5.15-x86_64
+- distribution al2022 release: 2022.0.20220315
+- enhancement: AL2022 preview AMIs added [#43](https://github.com/aws/amazon-ecs-ami/pull/43)
+
 ## 20220328
 
 - ecs version: 1.60.1-1
