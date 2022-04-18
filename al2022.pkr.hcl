@@ -100,7 +100,7 @@ build {
       "REGION=${var.region}",
       "AGENT_VERSION=${var.ecs_agent_version}",
       "INIT_REV=${var.ecs_init_rev}",
-      "AL_NAME=amzn2",
+      "AL_NAME=amzn2022",
       "ECS_INIT_URL=${var.ecs_init_url_al2022}",
       "AIR_GAPPED=${var.air_gapped}",
       "ECS_INIT_LOCAL_OVERRIDE=${var.ecs_init_local_override}"
