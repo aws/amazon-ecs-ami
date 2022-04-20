@@ -1,5 +1,13 @@
 # Changelog
 
+## 20220421
+
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20220406.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220406.1-arm64-ebs
+- Enhancement: Update exec ssm agent version to 3.1.1260.0 and the sha256 checksums [#45](https://github.com/aws/amazon-ecs-ami/pull/45)
+- Bugfix: Fixed AL_NAME for AL2022 scripts [#46](https://github.com/aws/amazon-ecs-ami/pull/46)
+- Bugfix: Add nvidia-driver-latest-dkms package [#47](https://github.com/aws/amazon-ecs-ami/pull/47)
+
 ## 20220411
 
 - ecs version: 1.61.0-1
