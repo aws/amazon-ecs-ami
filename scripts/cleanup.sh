@@ -77,6 +77,7 @@ INSTANCE_LOG_FILES=(
     "/var/log/audit/audit.log"
     "/var/log/boot.log"
     "/var/log/dmesg"
+    "/var/log/messages"
     "/var/log/cron"
 )
 echo "Cleaning up instance log files"
