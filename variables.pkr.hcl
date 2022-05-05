@@ -61,6 +61,18 @@ variable "containerd_version" {
   description = "Containerd version to build AMI with."
 }
 
+variable "docker_version_al2022" {
+  type        = string
+  description = "Docker version to build AL2022 AMI with."
+  default     = "20.10.7"
+}
+
+variable "containerd_version_al2022" {
+  type        = string
+  description = "Containerd version to build AL2022 AMI with."
+  default     = "1.4.6"
+}
+
 variable "exec_ssm_version" {
   type        = string
   default     = "3.1.1260.0"
@@ -106,7 +118,7 @@ variable "source_ami_al1" {
 variable "docker_version_al1" {
   type        = string
   description = "Docker version to build AL1 AMI with."
-  default     = "20.10.7"
+  default     = "20.10.13"
 }
 
 variable "ecs_version_al1" {
