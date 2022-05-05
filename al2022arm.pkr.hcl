@@ -25,7 +25,7 @@ source "amazon-ebs" "al2022arm" {
   tags = {
     os_version          = "Amazon Linux 2022"
     source_image_name   = "{{ .SourceAMIName }}"
-    ecs_runtime_version = "Docker version ${var.docker_version}"
+    ecs_runtime_version = "Docker version ${var.docker_version_al2022}"
     ecs_agent_version   = "${var.ecs_agent_version}"
     ami_type            = "al2022arm"
     ami_version         = "2022.0.${var.ami_version}"

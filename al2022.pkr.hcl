@@ -25,7 +25,7 @@ source "amazon-ebs" "al2022" {
   tags = {
     os_version          = "Amazon Linux 2022"
     source_image_name   = "{{ .SourceAMIName }}"
-    ecs_runtime_version = "Docker version ${var.docker_version}"
+    ecs_runtime_version = "Docker version ${var.docker_version_al2022}"
     ecs_agent_version   = "${var.ecs_agent_version}"
     ami_type            = "al2022"
     ami_version         = "2022.0.${var.ami_version}"
@@ -88,8 +88,8 @@ build {
   provisioner "shell" {
     script = "scripts/install-docker.sh"
     environment_vars = [
-      "DOCKER_VERSION=${var.docker_version}",
-      "CONTAINERD_VERSION=${var.containerd_version}",
+      "DOCKER_VERSION=${var.docker_version_al2022}",
+      "CONTAINERD_VERSION=${var.containerd_version_al2022}",
       "AIR_GAPPED=${var.air_gapped}"
     ]
   }
