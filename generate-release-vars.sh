@@ -59,7 +59,8 @@ ami_id_al2022_arm=$(aws ec2 describe-images --region "$region" --owners amazon -
 ami_name_al2022_arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2022_arm" --query 'Images[0].Name' --output text)
 
 # Get the latest AL2022 distribution release
-distribution_release_al2022=$(curl "https://al2022-repos-us-west-2-9761ab97.s3.dualstack.us-west-2.amazonaws.com/core/releasemd.xml" | grep -o 'release version="[^"]*"' | cut -f2 -d '"' | sort -r | head -1)
+# xmllint is required to find the latest distribution release from releasemd.xml in us-west-2
+distribution_release_al2022=$(curl -s https://al2022-repos-us-west-2-9761ab97.s3.dualstack.us-west-2.amazonaws.com/core/releasemd.xml | xmllint --xpath "string(//root/releases/release[last()]/@version)" -)
 
 readonly ami_name_al2_arm ami_name_al2_x86 ami_name_al1 ami_name_al2022_arm ami_name_al2022_x86 distribution_release_al2022
 
