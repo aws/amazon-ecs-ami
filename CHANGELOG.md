@@ -1,5 +1,12 @@
 # Changelog
 
+## 20220520
+
+- source al2022 ami: al2022-ami-minimal-2022.0.20220504.1-kernel-5.15-x86_64
+- source al2022arm ami: al2022-ami-minimal-2022.0.20220504.1-kernel-5.15-arm64
+- distribution al2022 release: 2022.0.20220518
+- Enhancement: Updating docker to 20.10.13 and containerd to 1.4.13 for AL2022 [#55](https://github.com/aws/amazon-ecs-ami/pull/55)
+
 ## 20220509
 
 - source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220419.0-x86_64-ebs
