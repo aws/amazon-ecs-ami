@@ -69,6 +69,10 @@ al2022: check-region init validate release.auto.pkrvars.hcl
 al2022arm: check-region init validate release.auto.pkrvars.hcl
 	./packer build -only="amazon-ebs.al2022arm" -var "region=${REGION}" .
 
+.PHONY: al2022neu
+al2022neu: check-region init validate release.auto.pkrvars.hcl
+	./packer build -only="amazon-ebs.al2022neu" -var "region=${REGION}" .
+
 shellcheck:
 	curl -fLSs ${SHELLCHECK_URL} -o /tmp/shellcheck.tar.xz
 	tar -xvf /tmp/shellcheck.tar.xz -C /tmp --strip-components=1
