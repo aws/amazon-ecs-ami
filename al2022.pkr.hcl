@@ -112,12 +112,8 @@ build {
     script = "scripts/append-efs-client-info.sh"
   }
 
-  ### neuron support packages not in AL2022 repos
   provisioner "shell" {
-    script = "scripts/al2022/install-neuron-packages.sh"
-    environment_vars = [
-      "AMI_TYPE=${source.name}"
-    ]
+    script = "scripts/install-additional-packages.sh"
   }
 
   ### exec
