@@ -35,7 +35,8 @@ source "amazon-ebs" "al2022" {
 build {
   sources = [
     "source.amazon-ebs.al2022",
-    "source.amazon-ebs.al2022arm"
+    "source.amazon-ebs.al2022arm",
+    "source.amazon-ebs.al2022neu"
   ]
 
   provisioner "file" {
@@ -111,6 +112,10 @@ build {
     script = "scripts/append-efs-client-info.sh"
   }
 
+  provisioner "shell" {
+    script = "scripts/install-additional-packages.sh"
+  }
+
   ### exec
   provisioner "shell" {
     script = "scripts/install-exec-dependencies.sh"
@@ -119,6 +124,13 @@ build {
       "EXEC_SSM_VERSION=${var.exec_ssm_version}",
       "AIR_GAPPED=${var.air_gapped}"
     ]
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "AMI_TYPE=${source.name}"
+    ]
+    script = "scripts/enable-ecs-agent-inferentia-support.sh"
   }
 
   provisioner "shell" {
