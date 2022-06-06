@@ -1,5 +1,8 @@
 # Changelog
 
+## 20220607
+- ecs version: 1.61.2-1
+
 ## 20220520
 
 - source al2022 ami: al2022-ami-minimal-2022.0.20220504.1-kernel-5.15-x86_64
