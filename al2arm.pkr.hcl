@@ -4,12 +4,12 @@ locals {
 
 source "amazon-ebs" "al2arm" {
   ami_name        = "${local.ami_name_al2arm}"
-  ami_description = "Amazon Linux AMI 2.0.${var.ami_version} arm64 ECS HVM GP2"
+  ami_description = "Amazon Linux AMI 2.0.${var.ami_version} arm64 ECS HVM GP3"
   instance_type   = "m6g.xlarge"
   launch_block_device_mappings {
     volume_size           = var.block_device_size_gb
     delete_on_termination = true
-    volume_type           = "gp2"
+    volume_type           = "gp3"
     device_name           = "/dev/xvda"
   }
   region = var.region
