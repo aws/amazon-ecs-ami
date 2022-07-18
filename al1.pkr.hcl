@@ -4,18 +4,18 @@ locals {
 
 source "amazon-ebs" "al1" {
   ami_name        = "${local.ami_name_al1}"
-  ami_description = "Amazon Linux AMI amzn-ami-2018.03.${var.ami_version} x86_64 ECS HVM GP2"
+  ami_description = "Amazon Linux AMI amzn-ami-2018.03.${var.ami_version} x86_64 ECS HVM GP3"
   instance_type   = "c5.large"
   launch_block_device_mappings {
     volume_size           = 8
     delete_on_termination = true
-    volume_type           = "gp2"
+    volume_type           = "gp3"
     device_name           = "/dev/xvda"
   }
   launch_block_device_mappings {
     volume_size           = 22
     delete_on_termination = true
-    volume_type           = "gp2"
+    volume_type           = "gp3"
     device_name           = "/dev/xvdcz"
   }
   region = var.region
