@@ -2,8 +2,8 @@
 set -ex
 
 # ECS-optimized AMIs are provisioned with two disks:
-# 1) Root volume at /dev/sda (GP2, 8GB, delete on terminate)
-# 2) Extra EBS volume at /dev/xvdcz just for Docker (GP2, 22GB, delete on terminate)
+# 1) Root volume at /dev/sda (GP3, 8GB, delete on terminate)
+# 2) Extra EBS volume at /dev/xvdcz just for Docker (GP3, 22GB, delete on terminate)
 #
 # We use docker-storage-setup to configure this additional device properly.
 # By default docker-storage-setup will configure 40% of the device, and will
