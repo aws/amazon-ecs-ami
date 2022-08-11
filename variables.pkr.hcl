@@ -64,13 +64,13 @@ variable "containerd_version" {
 variable "docker_version_al2022" {
   type        = string
   description = "Docker version to build AL2022 AMI with."
-  default     = "20.10.13"
+  default     = "20.10.17"
 }
 
 variable "containerd_version_al2022" {
   type        = string
   description = "Containerd version to build AL2022 AMI with."
-  default     = "1.4.13"
+  default     = "1.6.6"
 }
 
 variable "exec_ssm_version" {

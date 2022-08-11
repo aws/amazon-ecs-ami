@@ -159,7 +159,9 @@ fi
 
 curl -fLSs -o "$WORK_DIR/ecs-init.rpm" "$ECS_INIT_URL"
 curl -fLSs -o "$WORK_DIR/ecs-init.rpm.asc" "${ECS_INIT_URL}.asc"
-gpg --import "$WORK_DIR/amazon-ecs-agent.gpg"
-gpg --verify "$WORK_DIR/ecs-init.rpm.asc" "$WORK_DIR/ecs-init.rpm"
+# bypass gpg check until gpg util is available in minimal AMI
+# we've added a gpg check to our manual release steps until then
+gpg --import "$WORK_DIR/amazon-ecs-agent.gpg" || true
+gpg --verify "$WORK_DIR/ecs-init.rpm.asc" "$WORK_DIR/ecs-init.rpm" || true
 
 sudo yum install -y "$WORK_DIR/ecs-init.rpm"
