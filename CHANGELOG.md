@@ -1,5 +1,9 @@
 # Changelog
 
+## 20220810
+- distribution al2022 release: 2022.0.20220810
+- al2022 docker/containerd version update
+
 ## 20220805
 - ecs version 1.62.1-1
 
