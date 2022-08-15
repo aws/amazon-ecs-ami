@@ -1,8 +1,12 @@
 # Changelog
 
 ## 20220810
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220705.0-x86_64-ebs
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20220719.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220719.1-arm64-ebs
+- source al2022 ami: al2022-ami-minimal-2022.0.20220728.0-kernel-5.15-x86_64
 - distribution al2022 release: 2022.0.20220810
-- al2022 docker/containerd version update
+- enhancement: Updating docker to 20.10.17 and containerd to 1.6.6 for AL2022 AMI [#66](https://github.com/aws/amazon-ecs-ami/pull/66) 
 
 ## 20220805
 - ecs version 1.62.1-1
