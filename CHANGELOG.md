@@ -1,10 +1,19 @@
 # Changelog
 
+## 20220822
+
+- ecs version: 1.62.2-1
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220802.0-x86_64-ebs
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20220805.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220805.0-arm64-ebs
+
 ## 20220810
+
 - distribution al2022 release: 2022.0.20220810
 - al2022 docker/containerd version update
 
 ## 20220805
+
 - ecs version 1.62.1-1
 
 ## 20220630
@@ -19,6 +28,7 @@
 - distribution al2022 release: 2022.0.20220531
 
 ## 20220607
+
 - ecs version: 1.61.2-1
 
 ## 20220520
@@ -34,7 +44,7 @@
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20220426.0-x86_64-ebs
 - source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220426.0-arm64-ebs
 - source al2022 ami: al2022-ami-minimal-2022.0.20220419.0-kernel-5.15-x86_64
-- distribution al2022 release: 2022.0.20220504 
+- distribution al2022 release: 2022.0.20220504
 - Enhancement: Cleanup /var/log/messages [#49](https://github.com/aws/amazon-ecs-ami/pull/49)
 - Enhancement: Updating docker to 20.10.13 and containerd to 1.4.13 for all AMIs except AL2022 [#51](https://github.com/aws/amazon-ecs-ami/pull/51)
 - Enhancement: Updating docker and containerd versions in generate-release-vars script [#52](https://github.com/aws/amazon-ecs-ami/pull/52)
