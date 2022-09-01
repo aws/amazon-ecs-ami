@@ -30,6 +30,9 @@ sudo yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
 sudo yum install -y aws-neuronx-dkms-2.*
 sudo yum install -y aws-neuronx-oci-hook-2.*
 
+# Install Neuron Tools
+sudo yum install -y aws-neuron-tools
+
 # disable neuron package upgrades by deleting the yum repo
 sudo rm /etc/yum.repos.d/neuron.repo
 
