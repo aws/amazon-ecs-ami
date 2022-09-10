@@ -136,8 +136,10 @@ build {
     environment_vars = [
       "AMI_TYPE=${source.name}"
     ]
-    pause_before = "60s" # pause for the reboot
-    script       = "scripts/enable-ecs-agent-inferentia-support.sh"
+    pause_before        = "1s" # pause for starting the reboot
+    start_retry_timeout = "1s" # wait before start retry
+    max_retries         = 30
+    script              = "scripts/enable-ecs-agent-inferentia-support.sh"
   }
 
   provisioner "shell" {
