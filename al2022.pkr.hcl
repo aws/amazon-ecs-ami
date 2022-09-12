@@ -122,11 +122,24 @@ build {
     ]
   }
 
+  ### reboot worker instance to install kernel update. enable-ecs-agent-inferentia-support needs
+  ### new kernel (if there is) to be installed.
+  provisioner "shell" {
+    inline_shebang    = "/bin/sh -ex"
+    expect_disconnect = "true"
+    inline = [
+      "sudo reboot"
+    ]
+  }
+
   provisioner "shell" {
     environment_vars = [
       "AMI_TYPE=${source.name}"
     ]
-    script = "scripts/enable-ecs-agent-inferentia-support.sh"
+    pause_before        = "10s" # pause for starting the reboot
+    start_retry_timeout = "40s" # wait before start retry
+    max_retries         = 3
+    script              = "scripts/enable-ecs-agent-inferentia-support.sh"
   }
 
   provisioner "shell" {
