@@ -3,3 +3,5 @@ manifest.json
 overrides.auto.pkrvars.hcl
 shfmt
 shellcheck
+*.idea
+*.DS_Store

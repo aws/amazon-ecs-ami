@@ -35,7 +35,8 @@ source "amazon-ebs" "al2022" {
 build {
   sources = [
     "source.amazon-ebs.al2022",
-    "source.amazon-ebs.al2022arm"
+    "source.amazon-ebs.al2022arm",
+    "source.amazon-ebs.al2022neu"
   ]
 
   provisioner "file" {
@@ -107,6 +108,10 @@ build {
     script = "scripts/append-efs-client-info.sh"
   }
 
+  provisioner "shell" {
+    script = "scripts/install-additional-packages.sh"
+  }
+
   ### exec
   provisioner "shell" {
     script = "scripts/install-exec-dependencies.sh"
@@ -115,6 +120,26 @@ build {
       "EXEC_SSM_VERSION=${var.exec_ssm_version}",
       "AIR_GAPPED=${var.air_gapped}"
     ]
+  }
+
+  ### reboot worker instance to install kernel update. enable-ecs-agent-inferentia-support needs
+  ### new kernel (if there is) to be installed.
+  provisioner "shell" {
+    inline_shebang    = "/bin/sh -ex"
+    expect_disconnect = "true"
+    inline = [
+      "sudo reboot"
+    ]
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "AMI_TYPE=${source.name}"
+    ]
+    pause_before        = "10s" # pause for starting the reboot
+    start_retry_timeout = "40s" # wait before start retry
+    max_retries         = 3
+    script              = "scripts/enable-ecs-agent-inferentia-support.sh"
   }
 
   provisioner "shell" {
