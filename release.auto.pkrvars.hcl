@@ -1,5 +1,6 @@
-ami_version                 = "20221010"
-ecs_agent_version           = "1.64.0"
+ecs_init_local_override     = "test_init.x86_64.rpm"
+ami_version                 = "20220916"
+ecs_agent_version           = "1.62.2"
 ecs_init_rev                = "1"
 docker_version              = "20.10.13"
 containerd_version          = "1.4.13"

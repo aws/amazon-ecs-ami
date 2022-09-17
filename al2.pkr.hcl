@@ -146,6 +146,15 @@ build {
     ]
   }
 
+  provisioner "file" {
+    source  = "files/appnet_agent.interface-v1.tar"
+    destination = "/tmp/appnet_agent.interface-v1.tar"
+  }
+
+  provisioner "shell" {
+    script = "scripts/install-appnet.sh"
+  }
+
   provisioner "shell" {
     script = "scripts/append-efs-client-info.sh"
   }

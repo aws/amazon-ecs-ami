@@ -6,7 +6,7 @@ if [ -n "$AIR_GAPPED" ]; then
     exit 0
 fi
 
-if [ -n "$INIT_LOCAL_OVERRIDE" ]; then
+if [ -n "$ECS_INIT_LOCAL_OVERRIDE" ]; then
     echo "ecs-init is provided locally, assuming it's in additional-packages/ directory"
     exit 0
 fi
