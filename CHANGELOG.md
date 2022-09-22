@@ -8,7 +8,7 @@
 - source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220912.1-arm64-ebs
 - source al2022 x86 ami: al2022-ami-minimal-2022.0.20220831.1-kernel-5.15-x86_64
 - source al2022 arm ami: al2022-ami-minimal-2022.0.20220831.1-kernel-5.15-arm64
-- distribution al2022 release: 2022.0.20220921
+- distribution al2022 release: 2022.0.20220831
 - feature: AL2022 Neuron Support [#76](https://github.com/aws/amazon-ecs-ami/pull/76)
 
 ## 20220831
