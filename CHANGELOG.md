@@ -1,5 +1,12 @@
 # Changelog
 
+## 20220921
+
+- ecs version: 1.63.1-1
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20220912.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220912.1-arm64-ebs
+- feature: AL2022 Neuron Support [#76](https://github.com/aws/amazon-ecs-ami/pull/76)
+
 ## 20220831
 
 - Enhancement: Neuron/Inf AMIs, update Neuron build script to use Neuron V2 [#70](https://github.com/aws/amazon-ecs-ami/pull/70)
