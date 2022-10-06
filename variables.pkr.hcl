@@ -75,7 +75,7 @@ variable "containerd_version_al2022" {
 
 variable "exec_ssm_version" {
   type        = string
-  default     = "3.1.1260.0"
+  default     = "3.1.1732.0"
   description = "SSM binary version to build ECS exec support with."
 }
 
