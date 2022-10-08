@@ -104,6 +104,16 @@ variable "distribution_release_al2022" {
   description = "Amazon Linux 2022 distribution release."
 }
 
+variable "kernel_version_al2022" {
+  type        = string
+  description = "Amazon Linux 2022 kernel version."
+}
+
+variable "kernel_version_al2022arm" {
+  type        = string
+  description = "Amazon Linux 2022 ARM kernel version."
+}
+
 variable "ami_name_prefix_al1" {
   type        = string
   description = "Outputted AMI name prefix."
