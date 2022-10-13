@@ -1,5 +1,14 @@
 # Changelog
 
+## 20221010
+
+- ecs version: 1.64.0-1
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220907.3-x86_64-ebs
+- source al2022 ami: al2022-ami-minimal-2022.0.20220928.0-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20220928.0-kernel-5.15-arm64
+- distribution al2022 release: 2022.0.20220928
+- enhancement: Update to Exec SSM Agent version 3.1.1732.0 [#80](https://github.com/aws/amazon-ecs-ami/pull/80)
+
 ## 20220921
 
 - ecs version: 1.63.1-1
