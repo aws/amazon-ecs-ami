@@ -97,6 +97,19 @@ build {
     ]
   }
 
+  provisioner "file" {
+    source = "files/docker-daemon-config.json"
+    destination = "/tmp/docker-daemon-config.json"
+  }
+  
+  provisioner "shell" {
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo mkdir -p /etc/docker && sudo mv /tmp/docker-daemon-config.json /etc/docker/daemon.json"
+    ]
+  }
+
+
   provisioner "shell" {
     script = "scripts/install-docker.sh"
     environment_vars = [
@@ -147,8 +160,8 @@ build {
   }
 
   provisioner "file" {
-    source  = "files/appnet_agent.interface-v1.tar"
-    destination = "/tmp/appnet_agent.interface-v1.tar"
+    source  = "files/ecs-service-connect-agent.interface-v1.tar"
+    destination = "/tmp/ecs-service-connect-agent.interface-v1.tar"
   }
 
   provisioner "shell" {
