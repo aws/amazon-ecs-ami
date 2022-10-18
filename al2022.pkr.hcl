@@ -1,5 +1,5 @@
 locals {
-  ami_name_al2022 = "${var.ami_name_prefix_al2022}-hvm-2022.0.${var.ami_version}-x86_64-ebs"
+  ami_name_al2022 = "${var.ami_name_prefix_al2022}-hvm-2022.0.${var.ami_version}${var.kernel_version_al2022}-x86_64"
 }
 
 source "amazon-ebs" "al2022" {
