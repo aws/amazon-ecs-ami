@@ -1,5 +1,16 @@
 # Changelog
 
+## 20221025
+
+- ecs version: 1.65.0-1
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20221004.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20221004.0-arm64-ebs
+- source al2022 ami: al2022-ami-minimal-2022.0.20221019.4-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20221019.4-kernel-5.15-arm64
+- distribution al2022 release: 2022.0.20221019
+- enhancement: Updating docker verison to 20.10.17 and containerd version to 1.6.6 for AL2
+- enhancement: AL2022 AMI name - drop root volume type, add kernel version [#81](https://github.com/aws/amazon-ecs-ami/pull/81)
+
 ## 20221010
 
 - ecs version: 1.64.0-1
