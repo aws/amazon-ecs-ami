@@ -175,6 +175,10 @@ build {
   }
 
   provisioner "shell" {
+    script = "scripts/install-service-connect-appnet.sh"
+  }
+
+  provisioner "shell" {
     script = "scripts/cleanup.sh"
   }
 
