@@ -1,7 +1,7 @@
 ami_version                 = "20221025"
 ecs_agent_version           = "1.65.0"
 ecs_init_rev                = "1"
-docker_version              = "20.10.17"
+docker_version              = "20.10.20"
 containerd_version          = "1.6.6"
 source_ami_al1              = "amzn-ami-minimal-hvm-2018.03.0.20220907.3-x86_64-ebs"
 source_ami_al2              = "amzn2-ami-minimal-hvm-2.0.20221004.0-x86_64-ebs"
