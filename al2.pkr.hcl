@@ -97,19 +97,6 @@ build {
     ]
   }
 
-  provisioner "file" {
-    source = "files/docker-daemon-config.json"
-    destination = "/tmp/docker-daemon-config.json"
-  }
-  
-  provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mkdir -p /etc/docker && sudo mv /tmp/docker-daemon-config.json /etc/docker/daemon.json"
-    ]
-  }
-
-
   provisioner "shell" {
     script = "scripts/install-docker.sh"
     environment_vars = [
