@@ -1,5 +1,12 @@
 # Changelog
 
+## 20221102
+
+- ecs version: 1.65.1-1
+- source al2022 ami: al2022-ami-minimal-2022.0.20221101.0-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20221101.0-kernel-5.15-arm64
+- distribution al2022 release: 2022.0.20221101 
+
 ## 20221025
 
 - ecs version: 1.65.0-1
