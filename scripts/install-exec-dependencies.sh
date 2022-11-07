@@ -20,12 +20,12 @@ mkdir -p /tmp/ssm-binaries && cd /tmp/ssm-binaries
 case $ARCHITECTURE in
 'x86_64')
     curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.amazonaws.com${host_suffix}/${EXEC_SSM_VERSION}/linux_amd64/amazon-ssm-agent-binaries.tar.gz" -o amazon-ssm-agent.tar.gz
-    echo "068ceae7e0cf7cb096fbaed1b1341a7c6781b06e08659937823e9285c1963b6d ./amazon-ssm-agent.tar.gz" >./amazon-ssm-agent.tar.gz.sha256
+    echo "0100e5f6299274150d9252eb56ace6f3ff797ee2e9c17be1d6b9b8035b75315c ./amazon-ssm-agent.tar.gz" >./amazon-ssm-agent.tar.gz.sha256
     sha256sum -c ./amazon-ssm-agent.tar.gz.sha256
     ;;
 'aarch64')
     curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.amazonaws.com${host_suffix}/${EXEC_SSM_VERSION}/linux_arm64/amazon-ssm-agent-binaries.tar.gz" -o amazon-ssm-agent.tar.gz
-    echo "33cbb5b970ecbe6559835936b76b337c28a9d5104c85fb80eb734128e90242a9 ./amazon-ssm-agent.tar.gz" >./amazon-ssm-agent.tar.gz.sha256
+    echo "2f345a98ed25a9ffeb12355533b242110a502c929dd3abd61c2936000d22f230 ./amazon-ssm-agent.tar.gz" >./amazon-ssm-agent.tar.gz.sha256
     sha256sum -c ./amazon-ssm-agent.tar.gz.sha256
     ;;
 esac

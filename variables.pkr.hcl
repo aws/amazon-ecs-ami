@@ -10,7 +10,7 @@ packer {
 locals {
   packages_al1    = "amazon-efs-utils ec2-net-utils acpid irqbalance numactl rng-tools docker-storage-setup"
   packages_al2    = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent yum-plugin-upgrade-helper"
-  packages_al2022 = "amazon-efs-utils amazon-ec2-net-utils acpid"
+  packages_al2022 = "amazon-efs-utils amazon-ssm-agent amazon-ec2-net-utils acpid"
 }
 
 variable "ami_name_prefix_al2" {
@@ -75,7 +75,7 @@ variable "containerd_version_al2022" {
 
 variable "exec_ssm_version" {
   type        = string
-  default     = "3.1.1260.0"
+  default     = "3.1.1732.0"
   description = "SSM binary version to build ECS exec support with."
 }
 
@@ -102,6 +102,16 @@ variable "source_ami_al2022arm" {
 variable "distribution_release_al2022" {
   type        = string
   description = "Amazon Linux 2022 distribution release."
+}
+
+variable "kernel_version_al2022" {
+  type        = string
+  description = "Amazon Linux 2022 kernel version."
+}
+
+variable "kernel_version_al2022arm" {
+  type        = string
+  description = "Amazon Linux 2022 ARM kernel version."
 }
 
 variable "ami_name_prefix_al1" {

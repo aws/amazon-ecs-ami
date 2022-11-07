@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-if [[ $AMI_TYPE != "al2inf" ]]; then
+if [[ $AMI_TYPE != "al2inf" && $AMI_TYPE != "al2022neu" ]]; then
     exit 0
 fi
 
@@ -27,12 +27,14 @@ sudo mv /tmp/neuron.repo /etc/yum.repos.d/neuron.repo
 sudo yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
 
 # Install Neuron Driver
-sudo yum install -y aws-neuron-dkms
-# Install Neuron Tools
-sudo yum install -y aws-neuron-tools
-sudo yum install -y aws-neuron-runtime-base
+sudo yum install -y aws-neuronx-dkms-2.*
+sudo yum install -y aws-neuronx-oci-hook-2.*
 
-sudo yum install -y pciutils oci-add-hooks
+# Install Neuron Tools
+# TODO: use aws-neuronx-tools on al2inf when it is ready
+if [[ $AMI_TYPE == "al2inf" ]]; then # drop this dependency for AL2022 or later AMIs
+    sudo yum install -y aws-neuron-tools
+fi
 
 # disable neuron package upgrades by deleting the yum repo
 sudo rm /etc/yum.repos.d/neuron.repo
@@ -47,10 +49,4 @@ sudo mv /tmp/ecs/ecs.config /var/lib/ecs/ecs.config
 if [ ! -f $NEURON_RUNTIME ]; then
     sudo cp /opt/aws/neuron/bin/oci_neuron_hook_wrapper.sh $NEURON_RUNTIME
     sudo chmod +x $NEURON_RUNTIME
-fi
-
-# Copy neuron-discovery which is a prereq for neuron to function
-if [ ! -f /lib/systemd/system/neuron-discovery.service ]; then
-    sudo cp /opt/aws/neuron/config/neuron-discovery.service /lib/systemd/system/
-    sudo systemctl enable neuron-discovery
 fi

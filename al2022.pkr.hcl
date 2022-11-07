@@ -1,15 +1,15 @@
 locals {
-  ami_name_al2022 = "${var.ami_name_prefix_al2022}-hvm-2022.0.${var.ami_version}-x86_64-ebs"
+  ami_name_al2022 = "${var.ami_name_prefix_al2022}-hvm-2022.0.${var.ami_version}${var.kernel_version_al2022}-x86_64"
 }
 
 source "amazon-ebs" "al2022" {
   ami_name        = "${local.ami_name_al2022}"
-  ami_description = "Amazon Linux AMI 2022.0.${var.ami_version} x86_64 ECS HVM GP2"
+  ami_description = "Amazon Linux AMI 2022.0.${var.ami_version} x86_64 ECS HVM EBS"
   instance_type   = "c5.large"
   launch_block_device_mappings {
     volume_size           = var.block_device_size_gb
     delete_on_termination = true
-    volume_type           = "gp2"
+    volume_type           = "gp3"
     device_name           = "/dev/xvda"
   }
   region = var.region
@@ -35,7 +35,8 @@ source "amazon-ebs" "al2022" {
 build {
   sources = [
     "source.amazon-ebs.al2022",
-    "source.amazon-ebs.al2022arm"
+    "source.amazon-ebs.al2022arm",
+    "source.amazon-ebs.al2022neu"
   ]
 
   provisioner "file" {
@@ -67,10 +68,6 @@ build {
     inline = [
       "sudo dnf update -y --releasever=${var.distribution_release_al2022}"
     ]
-  }
-
-  provisioner "shell" {
-    script = "scripts/al2022/install-workarounds.sh"
   }
 
   provisioner "file" {
@@ -111,6 +108,10 @@ build {
     script = "scripts/append-efs-client-info.sh"
   }
 
+  provisioner "shell" {
+    script = "scripts/install-additional-packages.sh"
+  }
+
   ### exec
   provisioner "shell" {
     script = "scripts/install-exec-dependencies.sh"
@@ -119,6 +120,26 @@ build {
       "EXEC_SSM_VERSION=${var.exec_ssm_version}",
       "AIR_GAPPED=${var.air_gapped}"
     ]
+  }
+
+  ### reboot worker instance to install kernel update. enable-ecs-agent-inferentia-support needs
+  ### new kernel (if there is) to be installed.
+  provisioner "shell" {
+    inline_shebang    = "/bin/sh -ex"
+    expect_disconnect = "true"
+    inline = [
+      "sudo reboot"
+    ]
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "AMI_TYPE=${source.name}"
+    ]
+    pause_before        = "10s" # pause for starting the reboot
+    start_retry_timeout = "40s" # wait before start retry
+    max_retries         = 3
+    script              = "scripts/enable-ecs-agent-inferentia-support.sh"
   }
 
   provisioner "shell" {

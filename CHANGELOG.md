@@ -1,6 +1,57 @@
 # Changelog
 
+## 20221102
+
+- ecs version: 1.65.1-1
+- source al2022 ami: al2022-ami-minimal-2022.0.20221101.0-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20221101.0-kernel-5.15-arm64
+- distribution al2022 release: 2022.0.20221101 
+
+## 20221025
+
+- ecs version: 1.65.0-1
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20221004.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20221004.0-arm64-ebs
+- source al2022 ami: al2022-ami-minimal-2022.0.20221019.4-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20221019.4-kernel-5.15-arm64
+- distribution al2022 release: 2022.0.20221019
+- enhancement: Updating docker verison to 20.10.17 and containerd version to 1.6.6 for AL2
+- enhancement: AL2022 AMI name - drop root volume type, add kernel version [#81](https://github.com/aws/amazon-ecs-ami/pull/81)
+
+## 20221010
+
+- ecs version: 1.64.0-1
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220907.3-x86_64-ebs
+- source al2022 ami: al2022-ami-minimal-2022.0.20220928.0-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20220928.0-kernel-5.15-arm64
+- distribution al2022 release: 2022.0.20220928
+- enhancement: Update to Exec SSM Agent version 3.1.1732.0 [#80](https://github.com/aws/amazon-ecs-ami/pull/80)
+
+## 20220921
+
+- ecs version: 1.63.1-1
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20220912.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220912.1-arm64-ebs
+- feature: AL2022 Neuron Support [#76](https://github.com/aws/amazon-ecs-ami/pull/76)
+
+## 20220831
+
+- Enhancement: Neuron/Inf AMIs, update Neuron build script to use Neuron V2 [#70](https://github.com/aws/amazon-ecs-ami/pull/70)
+- Enhancement: AL2022 defaults to gp3 volumes [#72](https://github.com/aws/amazon-ecs-ami/pull/72)
+- Enhancement: AL2022 install ssm agent from official AL repo [#72](https://github.com/aws/amazon-ecs-ami/pull/72)
+- source al2022 x86 ami: al2022-ami-minimal-2022.0.20220824.0-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20220824.0-kernel-5.15-arm64
+- al2022 distribution release: 2022.0.20220831
+
+## 20220822
+
+- ecs version: 1.62.2-1
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220802.0-x86_64-ebs
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20220805.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220805.0-arm64-ebs
+
 ## 20220810
+
 - source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20220705.0-x86_64-ebs
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20220719.1-x86_64-ebs
 - source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220719.1-arm64-ebs
@@ -9,6 +60,7 @@
 - enhancement: Updating docker to 20.10.17 and containerd to 1.6.6 for AL2022 AMI [#66](https://github.com/aws/amazon-ecs-ami/pull/66) 
 
 ## 20220805
+
 - ecs version 1.62.1-1
 
 ## 20220630
@@ -23,6 +75,7 @@
 - distribution al2022 release: 2022.0.20220531
 
 ## 20220607
+
 - ecs version: 1.61.2-1
 
 ## 20220520
@@ -38,7 +91,7 @@
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20220426.0-x86_64-ebs
 - source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20220426.0-arm64-ebs
 - source al2022 ami: al2022-ami-minimal-2022.0.20220419.0-kernel-5.15-x86_64
-- distribution al2022 release: 2022.0.20220504 
+- distribution al2022 release: 2022.0.20220504
 - Enhancement: Cleanup /var/log/messages [#49](https://github.com/aws/amazon-ecs-ami/pull/49)
 - Enhancement: Updating docker to 20.10.13 and containerd to 1.4.13 for all AMIs except AL2022 [#51](https://github.com/aws/amazon-ecs-ami/pull/51)
 - Enhancement: Updating docker and containerd versions in generate-release-vars script [#52](https://github.com/aws/amazon-ecs-ami/pull/52)
