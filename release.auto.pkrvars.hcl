@@ -1,3 +1,4 @@
+ecs_init_local_override     = "test_init.x86_64.rpm"
 ami_version                 = "20221102"
 ecs_agent_version           = "1.65.1"
 ecs_init_rev                = "1"
