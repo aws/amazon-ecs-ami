@@ -6,7 +6,8 @@ It will create a private AMI in whatever account you are running it in.
 ## Instructions
 
 1. Setup AWS cli credentials.
-2. Make the recipe that you want, REGION must be specified. Options are: al1, al2, al2arm, al2gpu, al2inf.
+2. Make the recipe that you want, REGION must be specified. Options are: al1, al2, al2arm, al2gpu, al2inf, 
+al2kernel5dot10, al2kernel5dot10arm.
 ```
 REGION=us-west-2 make al2
 ```
