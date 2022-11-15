@@ -1,5 +1,15 @@
 # Changelog
 
+## 20221115
+
+- ecs version: 1.66.2-1
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20221018.0-x86_64-ebs
+- source al2022 ami: al2022-ami-minimal-2022.0.20221103.1-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20221103.1-kernel-5.15-arm64
+- distribution al2022 release: 2022.0.20221103
+- enhancement: Add back oci-add-hooks to neuron recipe (AL2INF only) [#90](https://github.com/aws/amazon-ecs-ami/pull/90)
+- bug fix: Reverting the change to disable userland proxy [#91](https://github.com/aws/amazon-ecs-ami/pull/91)
+
 ## 20221102
 
 - ecs version: 1.65.1-1
