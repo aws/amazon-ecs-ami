@@ -3,6 +3,9 @@
 ## 20221207
 
 - ecs version: 1.67.1-1
+- source al2022 ami: al2022-ami-minimal-2022.0.20221103.1-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20221103.1-kernel-5.15-arm64
+- distribution al2022 release: 2022.0.20221103
 - feature: Add AL2 kernel 5.10 recipes for x86_64 and arm64 [#97](https://github.com/aws/amazon-ecs-ami/pull/97)
 
 ## 20221118
