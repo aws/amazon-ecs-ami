@@ -1,5 +1,8 @@
 # Changelog
 
+## 20221213
+- ecs version: 1.67.2-1
+
 ## 20221207
 
 - ecs version: 1.67.1-1
