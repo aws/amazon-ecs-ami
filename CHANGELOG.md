@@ -1,5 +1,9 @@
 # Changelog
 
+## 20230109
+
+- ecs version: 1.68.0-1
+
 ## 20221230
 
 - ecs version: 1.67.2-1
