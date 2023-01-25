@@ -1,5 +1,10 @@
 # Changelog
 
+## 20230127
+
+- ecs version: 1.68.1-1
+- distribution al2022 release: 2022.0.20230118
+
 ## 20230109
 
 - ecs version: 1.68.0-1

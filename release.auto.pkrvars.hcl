@@ -1,5 +1,5 @@
-ami_version                   = "20230109"
-ecs_agent_version             = "1.68.0"
+ami_version                   = "20230127"
+ecs_agent_version             = "1.68.1"
 ecs_init_rev                  = "1"
 docker_version                = "20.10.17"
 containerd_version            = "1.6.6"
@@ -12,4 +12,4 @@ source_ami_al2022             = "al2022-ami-minimal-2022.0.20221207.4-kernel-5.1
 source_ami_al2022arm          = "al2022-ami-minimal-2022.0.20221207.4-kernel-5.15-arm64"
 kernel_version_al2022         = "-kernel-5.15"
 kernel_version_al2022arm      = "-kernel-5.15"
-distribution_release_al2022   = "2022.0.20221207"
+distribution_release_al2022   = "2022.0.20230118"
