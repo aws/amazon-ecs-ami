@@ -3,9 +3,10 @@ locals {
 }
 
 source "amazon-ebs" "al2022arm" {
-  ami_name        = "${local.ami_name_al2022arm}"
-  ami_description = "Amazon Linux AMI 2022.0.${var.ami_version} arm64 ECS HVM EBS"
-  instance_type   = "m6g.xlarge"
+  ami_name            = "${local.ami_name_al2022arm}"
+  ami_description     = "Amazon Linux AMI 2022.0.${var.ami_version} arm64 ECS HVM EBS"
+  spot_instance_types = var.arm_instance_types
+  spot_price          = "auto"
   launch_block_device_mappings {
     volume_size           = var.block_device_size_gb
     delete_on_termination = true
@@ -20,7 +21,8 @@ source "amazon-ebs" "al2022arm" {
     owners      = ["amazon"]
     most_recent = true
   }
-  ssh_username = "ec2-user"
+  ssh_interface = "public_ip"
+  ssh_username  = "ec2-user"
   tags = {
     os_version          = "Amazon Linux 2022"
     source_image_name   = "{{ .SourceAMIName }}"

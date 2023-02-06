@@ -170,3 +170,33 @@ variable "ecs_init_local_override" {
   description = "Specify a local init rpm under /additional-packages to be used for building AL2 and AL2022 AMIs. If empty it will use ecs_init_url if specified, otherwise the standard path"
   default     = ""
 }
+
+variable "general_purpose_instance_types" {
+  type        = list(string)
+  description = "List of available in-region instance types for general-purpose platform"
+  default     = ["c5.large"]
+}
+
+variable "gpu_instance_types" {
+  type        = list(string)
+  description = "List of available in-region instance types for GPU platform"
+  default     = ["c5.4xlarge"]
+}
+
+variable "arm_instance_types" {
+  type        = list(string)
+  description = "List of available in-region instance types for ARM platform"
+  default     = ["m6g.xlarge"]
+}
+
+variable "inf_instance_types" {
+  type        = list(string)
+  description = "List of available in-region instance types for INF platform"
+  default     = ["inf1.xlarge"]
+}
+
+variable "neu_instance_types" {
+  type        = list(string)
+  description = "List of available in-region instance types for NEU platform"
+  default     = ["trn1.2xlarge"]
+}
