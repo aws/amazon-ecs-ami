@@ -3,9 +3,10 @@ locals {
 }
 
 source "amazon-ebs" "al2gpu" {
-  ami_name        = "${local.ami_name_al2gpu}"
-  ami_description = "Amazon Linux AMI 2.0.${var.ami_version} x86_64 ECS HVM GP2"
-  instance_type   = "c5.4xlarge"
+  ami_name            = "${local.ami_name_al2gpu}"
+  ami_description     = "Amazon Linux AMI 2.0.${var.ami_version} x86_64 ECS HVM GP2"
+  spot_instance_types = var.gpu_instance_types
+  spot_price          = "auto"
   launch_block_device_mappings {
     volume_size           = var.block_device_size_gb
     delete_on_termination = true
@@ -20,7 +21,8 @@ source "amazon-ebs" "al2gpu" {
     owners      = ["amazon"]
     most_recent = true
   }
-  ssh_username = "ec2-user"
+  ssh_interface = "public_ip"
+  ssh_username  = "ec2-user"
   tags = {
     os_version          = "Amazon Linux 2"
     source_image_name   = "{{ .SourceAMIName }}"
