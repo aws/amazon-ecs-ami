@@ -1,5 +1,15 @@
 # Changelog
 
+## 20230214
+
+- ecs version: 1.68.2-1
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20230207.0-x86_64-ebs
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20230119.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20230119.1-arm64-ebs
+- source al2022 ami: al2022-ami-minimal-2022.0.20230118.3-kernel-5.15-x86_64
+- source al2022 arm ami: al2022-ami-minimal-2022.0.20230118.3-kernel-5.15-arm64
+- Enhancement: Use `spot_instance_types` for building AMIs [#104](https://github.com/aws/amazon-ecs-ami/pull/104)
+
 ## 20230127
 
 - ecs version: 1.68.1-1
