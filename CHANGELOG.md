@@ -1,5 +1,14 @@
 # Changelog
 
+## 20230301
+
+- ecs version: 1.69.0-1
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20230221.0-x86_64-ebs
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20230221.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20230221.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20230221.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20230221.0-arm64-ebs
+- bug fix: Don't use spot instances to build AMIs [#106](https://github.com/aws/amazon-ecs-ami/pull/106)
 ## 20230214
 
 - ecs version: 1.68.2-1
