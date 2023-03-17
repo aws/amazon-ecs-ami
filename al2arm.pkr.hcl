@@ -1,5 +1,5 @@
 locals {
-  ami_name_al2arm = "${var.ami_name_prefix_al2}-hvm-2.0.${var.ami_version}-arm64-ebs"
+  ami_name_al2arm = "${var.ami_name_prefix_al2}-hvm-2.0.${var.ami_version}-arm64-ebs-2"
 }
 
 source "amazon-ebs" "al2arm" {

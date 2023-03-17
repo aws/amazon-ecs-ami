@@ -1,3 +1,8 @@
+# Forked repo - Build ARM64 image with Nvidia GPU support (on Docker)
+```bash
+REGION=eu-central-1 make al2arm
+```
+
 # ECS-optimized AMI Build Recipes
 
 This is a [packer](https://packer.io) recipe for creating an ECS-optimized AMI.

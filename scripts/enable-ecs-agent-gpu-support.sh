@@ -1,51 +1,19 @@
 #!/usr/bin/env bash
 set -ex
 
-if [[ $AMI_TYPE != "al2gpu" ]]; then
-    exit 0
-fi
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+   && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.repo | sudo tee /etc/yum.repos.d/nvidia-container-toolkit.repo
 
-GPG_CHECK=1
-# don't do the gpg check in air-gapped regions
-if [ -n "$AIR_GAPPED" ]; then
-    GPG_CHECK=0
-fi
-tmpfile=$(mktemp)
-cat >$tmpfile <<EOF
-[amzn2-nvidia]
-name=Amazon Linux 2 Nvidia repository
-mirrorlist=\$awsproto://\$amazonlinux.\$awsregion.\$awsdomain/\$releasever/amzn2-nvidia/latest/\$basearch/mirror.list
-priority=20
-gpgcheck=$GPG_CHECK
-gpgkey=https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/7fa2af80.pub
-enabled=1
-exclude=libglvnd-*
-EOF
+sudo yum install -y nvidia-container-toolkit gcc kernel-devel-$(uname -r)
 
-# this repo is temporary and only used for installing the system-release-nvidia package
-sudo mv $tmpfile /etc/yum.repos.d/amzn2-nvidia-tmp.repo
-# system-release-nvidia creates an nvidia repo file at /etc/yum.repos.d/amzn2-nvidia.repo
-sudo yum install -y system-release-nvidia
-sudo rm /etc/yum.repos.d/amzn2-nvidia-tmp.repo
+curl -O https://us.download.nvidia.com/tesla/525.85.12/NVIDIA-Linux-aarch64-525.85.12.run
+chmod +x ./NVIDIA-Linux-aarch64-525.85.12.run
+sudo ./NVIDIA-Linux-aarch64-525.85.12.run --silent
 
-sudo yum install -y kernel-devel-$(uname -r) \
-    system-release-nvidia \
-    nvidia-driver-latest-dkms \
-    nvidia-fabric-manager \
-    pciutils \
-    xorg-x11-server-Xorg \
-    docker-runtime-nvidia \
-    oci-add-hooks \
-    libnvidia-container \
-    libnvidia-container-tools \
-    nvidia-container-runtime-hook
+sudo nvidia-ctk runtime configure --runtime=docker
 
-sudo yum install -y cuda-drivers \
-    cuda
+sudo systemctl restart docker
 
-# The Fabric Manager service needs be started and enabled on EC2 P4d instances
-# in order to configure NVLinks and NVSwitches
-sudo systemctl enable nvidia-fabricmanager
 mkdir -p /tmp/ecs
 echo 'ECS_ENABLE_GPU_SUPPORT=true' >>/tmp/ecs/ecs.config
 sudo mv /tmp/ecs/ecs.config /var/lib/ecs/ecs.config
