@@ -7,7 +7,7 @@ It will create a private AMI in whatever account you are running it in.
 
 1. Setup AWS cli credentials.
 2. Make the recipe that you want, REGION must be specified. Options are: al1, al2, al2arm, al2gpu, al2inf, 
-al2kernel5dot10, al2kernel5dot10arm.
+al2kernel5dot10, al2kernel5dot10arm, al2023, al2023arm, al2023neu.
 ```
 REGION=us-west-2 make al2
 ```
@@ -21,7 +21,7 @@ Variables can be set in `./release.auto.pkrvars.hcl` or `./overrides.auto.pkrvar
 
 #### Overrides
 
-If you would like to override any of the defaults provided here without commiting any changes to git, you
+If you would like to override any of the defaults provided here without committing any changes to git, you
 can use the `overrides.auto.pkrvars.hcl` file, which is ignored by source control.
 
 For example, if you want your AMI to have a smaller root block device, you can override the default value

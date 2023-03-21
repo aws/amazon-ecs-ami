@@ -69,17 +69,17 @@ al2kernel5dot10: check-region init validate release.auto.pkrvars.hcl
 al2kernel5dot10arm: check-region init validate release.auto.pkrvars.hcl
 	./packer build -only="amazon-ebs.al2kernel5dot10arm" -var "region=${REGION}" .
 
-.PHONY: al2022
-al2022: check-region init validate release.auto.pkrvars.hcl
-	./packer build -only="amazon-ebs.al2022" -var "region=${REGION}" .
+.PHONY: al2023
+al2023: check-region init validate release.auto.pkrvars.hcl
+	./packer build -only="amazon-ebs.al2023" -var "region=${REGION}" .
 
-.PHONY: al2022arm
-al2022arm: check-region init validate release.auto.pkrvars.hcl
-	./packer build -only="amazon-ebs.al2022arm" -var "region=${REGION}" .
+.PHONY: al2023arm
+al2023arm: check-region init validate release.auto.pkrvars.hcl
+	./packer build -only="amazon-ebs.al2023arm" -var "region=${REGION}" .
 
-.PHONY: al2022neu
-al2022neu: check-region init validate release.auto.pkrvars.hcl
-	./packer build -only="amazon-ebs.al2022neu" -var "region=${REGION}" .
+.PHONY: al2023neu
+al2023neu: check-region init validate release.auto.pkrvars.hcl
+	./packer build -only="amazon-ebs.al2023neu" -var "region=${REGION}" .
 
 shellcheck:
 	curl -fLSs ${SHELLCHECK_URL} -o /tmp/shellcheck.tar.xz

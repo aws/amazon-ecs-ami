@@ -54,21 +54,22 @@ ami_name_al2_kernel5dot10=$(aws ec2 describe-images --region "$region" --owner a
 ami_id_al2_kernel5dot10arm=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn2-ami-minimal-hvm-arm64-ebs --query 'Parameters[0].[Value]' --output text)
 ami_name_al2_kernel5dot10arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2_arm" --query 'Images[0].Name' --output text)
 
-# AL2022
-ami_id_al2022_x86=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/al2022-ami-minimal-kernel-default-x86_64 --query 'Parameters[0].[Value]' --output text)
-ami_name_al2022_x86=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2022_x86" --query 'Images[0].Name' --output text)
-kernel_version_al2022_x86=$(grep -o -e "-kernel-[1-9.]*" <<<"$ami_name_al2022_x86")
+# AL2023
+ami_id_al2023_x86=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/al2023-ami-minimal-kernel-default-x86_64 --query 'Parameters[0].[Value]' --output text)
+ami_name_al2023_x86=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2023_x86" --query 'Images[0].Name' --output text)
+kernel_version_al2023_x86=$(grep -o -e "-kernel-[1-9.]*" <<<"$ami_name_al2023_x86")
 
-# AL2022 ARM (use describe-images for now until al2022 ARM SSM parameters are ready)
-ami_id_al2022_arm=$(aws ec2 describe-images --region "$region" --owners amazon --filters "Name=name,Values=al2022-ami-minimal-2022.0.*" "Name=architecture,Values=arm64" --query "reverse(sort_by(Images, &CreationDate))[0].ImageId" --output text)
-ami_name_al2022_arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2022_arm" --query 'Images[0].Name' --output text)
-kernel_version_al2022_arm=$(grep -o -e "-kernel-[1-9.]*" <<<"$ami_name_al2022_arm")
+# AL2023 ARM
+ami_id_al2023_arm=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/al2023-ami-minimal-kernel-default-arm64 --query 'Parameters[0].[Value]' --output text)
+ami_name_al2023_arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2023_arm" --query 'Images[0].Name' --output text)
+kernel_version_al2023_arm=$(grep -o -e "-kernel-[1-9.]*" <<<"$ami_name_al2023_arm")
 
-# Get the latest AL2022 distribution release
+# Get the latest AL2023 distribution release
+# Ref: https://docs.aws.amazon.com/linux/al2023/ug/managing-repos-os-updates.html
 # xmllint is required to find the latest distribution release from releasemd.xml in us-west-2
-distribution_release_al2022=$(curl -s https://al2022-repos-us-west-2-9761ab97.s3.dualstack.us-west-2.amazonaws.com/core/releasemd.xml | xmllint --xpath "string(//root/releases/release[last()]/@version)" -)
+distribution_release_al2023=$(curl -s https://al2023-repos-us-west-2-de612dc2.s3.dualstack.us-west-2.amazonaws.com/core/releasemd.xml | xmllint --xpath "string(//root/releases/release[last()]/@version)" -)
 
-readonly ami_name_al2_kernel5dot10arm ami_name_al2_kernel5dot10 ami_name_al2_arm ami_name_al2_x86 ami_name_al1 ami_name_al2022_arm ami_name_al2022_x86 distribution_release_al2022
+readonly ami_name_al2_kernel5dot10arm ami_name_al2_kernel5dot10 ami_name_al2_arm ami_name_al2_x86 ami_name_al1 ami_name_al2023_arm ami_name_al2023_x86 distribution_release_al2023
 
 cat >|release.auto.pkrvars.hcl <<EOF
 ami_version          = "$ami_version"
@@ -81,9 +82,9 @@ source_ami_al2       = "$ami_name_al2_x86"
 source_ami_al2arm    = "$ami_name_al2_arm"
 source_ami_al2kernel5dot10    = "$ami_name_al2_kernel5dot10"
 source_ami_al2kernel5dot10arm = "$ami_name_al2_kernel5dot10arm"
-source_ami_al2022    = "$ami_name_al2022_x86"
-source_ami_al2022arm = "$ami_name_al2022_arm"
-kernel_version_al2022    = "$kernel_version_al2022_x86"
-kernel_version_al2022arm = "$kernel_version_al2022_arm"
-distribution_release_al2022  = "$distribution_release_al2022"
+source_ami_al2023    = "$ami_name_al2023_x86"
+source_ami_al2023arm = "$ami_name_al2023_arm"
+kernel_version_al2023    = "$kernel_version_al2023_x86"
+kernel_version_al2023arm = "$kernel_version_al2023_arm"
+distribution_release_al2023  = "$distribution_release_al2023"
 EOF
