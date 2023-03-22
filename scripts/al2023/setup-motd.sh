@@ -8,7 +8,7 @@ set -ex
 sudo ln -s /dev/null /etc/motd.d/30-banner
 
 # add the ECS motd banner
-echo -e "
+cat <<'EOF' >>/tmp/31-banner
    ,     #_
    ~\_  ####_
   ~~  \_#####\
@@ -20,5 +20,6 @@ echo -e "
          _/ _/
        _/m/'
 
-For documentation, visit http://aws.amazon.com/documentation/ecs" >/tmp/31-banner
+For documentation, visit http://aws.amazon.com/documentation/ecs
+EOF
 sudo mv /tmp/31-banner /etc/motd.d/31-banner
