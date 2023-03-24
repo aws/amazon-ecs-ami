@@ -1,5 +1,15 @@
 # Changelog
 
+## 20230321
+
+- ecs version: 1.70.0-1
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20230322.0-x86_64-ebs
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20230320.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20230320.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20230320.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20230320.0-arm64-ebs
+- Feature: Add AL2023 AMI
+
 ## 20230314
 
 - source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20230306.1-x86_64-ebs
