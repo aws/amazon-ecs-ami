@@ -198,5 +198,5 @@ variable "inf_instance_types" {
 variable "neu_instance_types" {
   type        = list(string)
   description = "List of available in-region instance types for NEU platform"
-  default     = ["trn1.2xlarge"]
+  default     = ["inf1.xlarge"]
 }
