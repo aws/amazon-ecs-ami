@@ -57,6 +57,10 @@ al2arm: check-region init validate release.auto.pkrvars.hcl
 al2gpu: check-region init validate release.auto.pkrvars.hcl
 	./packer build -only="amazon-ebs.al2gpu" -var "region=${REGION}" .
 
+.PHONY: al2armgpu
+al2armgpu: check-region init validate release.auto.pkrvars.hcl
+	./packer build -only="amazon-ebs.al2armgpu" -var "region=${REGION}" .
+
 .PHONY: al2inf
 al2inf: check-region init validate release.auto.pkrvars.hcl
 	./packer build -only="amazon-ebs.al2inf" -var "region=${REGION}" .

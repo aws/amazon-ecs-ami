@@ -180,13 +180,19 @@ variable "general_purpose_instance_types" {
 variable "gpu_instance_types" {
   type        = list(string)
   description = "List of available in-region instance types for GPU platform"
-  default     = ["c5.4xlarge"]
+  default     = ["g5.xlarge"]
 }
 
 variable "arm_instance_types" {
   type        = list(string)
   description = "List of available in-region instance types for ARM platform"
   default     = ["m6g.xlarge"]
+}
+
+variable "arm_gpu_instance_types" {
+  type        = list(string)
+  description = "List of available in-region instance types for GPU platform"
+  default     = ["g5g.xlarge"]
 }
 
 variable "inf_instance_types" {

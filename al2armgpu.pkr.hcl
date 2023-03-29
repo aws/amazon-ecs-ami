@@ -1,11 +1,11 @@
 locals {
-  ami_name_al2gpu = "${var.ami_name_prefix_al2}-gpu-hvm-2.0.${var.ami_version}-x86_64-ebs-gp3"
+  ami_name_al2armgpu = "${var.ami_name_prefix_al2}-gpu-hvm-2.0.${var.ami_version}-arm64-ebs-gp3"
 }
 
-source "amazon-ebs" "al2gpu" {
-  ami_name        = "${local.ami_name_al2gpu}"
-  ami_description = "Amazon Linux AMI 2.0.${var.ami_version} x86_64 ECS HVM GP3"
-  instance_type   = var.gpu_instance_types[0]
+source "amazon-ebs" "al2armgpu" {
+  ami_name        = "${local.ami_name_al2armgpu}"
+  ami_description = "Amazon Linux AMI 2.0.${var.ami_version} arm64 ECS HVM GP3"
+  instance_type   = var.arm_gpu_instance_types[0]
   launch_block_device_mappings {
     volume_size           = var.block_device_size_gb
     delete_on_termination = true
@@ -15,7 +15,7 @@ source "amazon-ebs" "al2gpu" {
   region = var.region
   source_ami_filter {
     filters = {
-      name = "${var.source_ami_al2}"
+      name = "${var.source_ami_al2arm}"
     }
     owners      = ["amazon"]
     most_recent = true
@@ -27,7 +27,7 @@ source "amazon-ebs" "al2gpu" {
     source_image_name   = "{{ .SourceAMIName }}"
     ecs_runtime_version = "Docker version ${var.docker_version}"
     ecs_agent_version   = "${var.ecs_agent_version}"
-    ami_type            = "al2gpu"
+    ami_type            = "al2armgpu"
     ami_version         = "2.0.${var.ami_version}"
   }
 }
