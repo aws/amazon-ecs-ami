@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-if [[ $AMI_TYPE != "al2inf" && $AMI_TYPE != "al2022neu" ]]; then
+if [[ $AMI_TYPE != "al2inf" && $AMI_TYPE != "al2023neu" ]]; then
     exit 0
 fi
 
@@ -31,14 +31,14 @@ sudo yum install -y aws-neuronx-dkms-2.*
 sudo yum install -y aws-neuronx-oci-hook-2.*
 
 # Install oci-add-hooks
-# TODO: oci-add-hooks package has compatibility issue with AL2022 IMDSv2. Remove condition after root caused and resolved
+# TODO: oci-add-hooks package has compatibility issue with AL2023 IMDSv2. Remove condition after root caused and resolved
 if [[ $AMI_TYPE == "al2inf" ]]; then
     sudo yum install -y oci-add-hooks
 fi
 
 # Install Neuron Tools
 # TODO: use aws-neuronx-tools on al2inf when it is ready
-if [[ $AMI_TYPE == "al2inf" ]]; then # drop this dependency for AL2022 or later AMIs
+if [[ $AMI_TYPE == "al2inf" ]]; then # drop this dependency for AL2023 or later AMIs
     sudo yum install -y aws-neuron-tools
 fi
 

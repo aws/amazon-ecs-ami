@@ -10,7 +10,7 @@ packer {
 locals {
   packages_al1    = "amazon-efs-utils ec2-net-utils acpid irqbalance numactl rng-tools docker-storage-setup"
   packages_al2    = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent yum-plugin-upgrade-helper"
-  packages_al2022 = "amazon-efs-utils amazon-ssm-agent amazon-ec2-net-utils acpid"
+  packages_al2023 = "amazon-efs-utils amazon-ssm-agent amazon-ec2-net-utils acpid"
 }
 
 variable "ami_name_prefix_al2" {
@@ -19,10 +19,10 @@ variable "ami_name_prefix_al2" {
   default     = "unofficial-amzn2-ami-ecs"
 }
 
-variable "ami_name_prefix_al2022" {
+variable "ami_name_prefix_al2023" {
   type        = string
   description = "Outputted AMI name prefix."
-  default     = "unofficial-amzn2022-ami-ecs"
+  default     = "unofficial-amzn2023-ami-ecs"
 }
 
 variable "ami_version" {
@@ -61,16 +61,16 @@ variable "containerd_version" {
   description = "Containerd version to build AMI with."
 }
 
-variable "docker_version_al2022" {
+variable "docker_version_al2023" {
   type        = string
-  description = "Docker version to build AL2022 AMI with."
+  description = "Docker version to build AL2023 AMI with."
   default     = "20.10.17"
 }
 
-variable "containerd_version_al2022" {
+variable "containerd_version_al2023" {
   type        = string
-  description = "Containerd version to build AL2022 AMI with."
-  default     = "1.6.6"
+  description = "Containerd version to build AL2023 AMI with."
+  default     = "1.6.8"
 }
 
 variable "exec_ssm_version" {
@@ -99,29 +99,29 @@ variable "source_ami_al2kernel5dot10arm" {
   description = "Amazon Linux 2 Kernel 5.10 ARM source AMI to build from."
 }
 
-variable "source_ami_al2022" {
+variable "source_ami_al2023" {
   type        = string
-  description = "Amazon Linux 2022 source AMI to build from."
+  description = "Amazon Linux 2023 source AMI to build from."
 }
 
-variable "source_ami_al2022arm" {
+variable "source_ami_al2023arm" {
   type        = string
-  description = "Amazon Linux 2022 ARM source AMI to build from."
+  description = "Amazon Linux 2023 ARM source AMI to build from."
 }
 
-variable "distribution_release_al2022" {
+variable "distribution_release_al2023" {
   type        = string
-  description = "Amazon Linux 2022 distribution release."
+  description = "Amazon Linux 2023 distribution release."
 }
 
-variable "kernel_version_al2022" {
+variable "kernel_version_al2023" {
   type        = string
-  description = "Amazon Linux 2022 kernel version."
+  description = "Amazon Linux 2023 kernel version."
 }
 
-variable "kernel_version_al2022arm" {
+variable "kernel_version_al2023arm" {
   type        = string
-  description = "Amazon Linux 2022 ARM kernel version."
+  description = "Amazon Linux 2023 ARM kernel version."
 }
 
 variable "ami_name_prefix_al1" {
@@ -159,15 +159,15 @@ variable "ecs_init_url_al2" {
   default     = ""
 }
 
-variable "ecs_init_url_al2022" {
+variable "ecs_init_url_al2023" {
   type        = string
-  description = "Specify a particular ECS init URL for AL2022 to install. If empty it will use the standard path."
+  description = "Specify a particular ECS init URL for AL2023 to install. If empty it will use the standard path."
   default     = ""
 }
 
 variable "ecs_init_local_override" {
   type        = string
-  description = "Specify a local init rpm under /additional-packages to be used for building AL2 and AL2022 AMIs. If empty it will use ecs_init_url if specified, otherwise the standard path"
+  description = "Specify a local init rpm under /additional-packages to be used for building AL2 and AL2023 AMIs. If empty it will use ecs_init_url if specified, otherwise the standard path"
   default     = ""
 }
 
@@ -204,5 +204,5 @@ variable "inf_instance_types" {
 variable "neu_instance_types" {
   type        = list(string)
   description = "List of available in-region instance types for NEU platform"
-  default     = ["trn1.2xlarge"]
+  default     = ["inf1.xlarge"]
 }
