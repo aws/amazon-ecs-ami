@@ -1,5 +1,14 @@
 # Changelog
 
+## 20230406
+
+# Updated ecs version to 1.70.1-1
+- ecs version: 1.70.1-1
+- source al2023 ami: al2023-ami-minimal-2023.0.20230322.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.0.20230322.0-kernel-6.1-arm64
+- distribution al2023 release: 2023.0.20230329
+- Fix: default AL2023 neuron builds to inf1 instance types [#116](https://github.com/aws/amazon-ecs-ami/pull/116)
+
 ## 20230321
 
 - ecs version: 1.70.0-1
