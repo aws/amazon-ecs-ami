@@ -2,7 +2,6 @@
 
 ## 20230406
 
-# Updated ecs version to 1.70.1-1
 - ecs version: 1.70.1-1
 - source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20230404.0-x86_64-ebs
 - source al2023 ami: al2023-ami-minimal-2023.0.20230329.0-kernel-6.1-x86_64
