@@ -1,5 +1,16 @@
 # Changelog
 
+## 20230420
+
+- ecs version: 1.70.2-1
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20230404.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20230404.1-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20230404.1-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20230404.1-arm64-ebs
+- source al2023 ami: al2023-ami-minimal-2023.0.20230419.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.0.20230419.0-kernel-6.1-arm64
+- distribution al2023 release: 2023.0.20230419
+
 ## 20230406
 
 - ecs version: 1.70.1-1
