@@ -121,6 +121,10 @@ build {
       "AIR_GAPPED=${var.air_gapped}"
     ]
   }
+ 
+  provisioner "shell" {
+    script = "scripts/install-service-connect-appnet-al2023.sh"
+  }
 
   ### reboot worker instance to install kernel update. enable-ecs-agent-inferentia-support needs
   ### new kernel (if there is) to be installed.
