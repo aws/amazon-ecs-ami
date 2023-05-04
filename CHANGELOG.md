@@ -1,5 +1,25 @@
 # Changelog
 
+## Source AMI release notes
+- [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
+- [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
+- [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/) 
+
+## 20230428
+- ecs version: [1.71.0-1](https://github.com/aws/amazon-ecs-agent/releases/tag/v1.71.0)
+- al2 docker version: 20.10.22
+- al2 containerd version: 1.6.19
+- source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20230419.0-x86_64-ebs
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20230418.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20230418.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20230418.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20230418.0-arm64-ebs
+- source al2023 ami: al2023-ami-minimal-2023.0.20230503.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.0.20230503.0-kernel-6.1-arm64
+- distribution al2023 release: 2023.0.20230503
+- Enhancement: Update docker version to 20.10.22 and containerd version to 1.6.19 for AL2
+- Enhancement: Support Service Connect on ECS-optimized Amazon Linux 2023 AMI
+
 ## 20230420
 
 - ecs version: 1.70.2-1
