@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
+# Below command actually runs `sudo dnf clean all` for AL2023.
+# See https://docs.aws.amazon.com/linux/al2023/ug/package-management.html for more details.
 sudo yum clean all
 
 function cleanup() {
@@ -167,9 +169,11 @@ fi
 # delete a few items missed in https://docs.aws.amazon.com/imagebuilder/latest/userguide/security-best-practices.html
 sudo rm -rf \
     /etc/machine-id \
+    /var/cache/dnf \
     /var/cache/yum \
     /tmp/* \
     /var/lib/dhcp/dhclient.* \
+    /var/lib/dnf/history* \
     /var/lib/yum/history \
     /var/log/secure \
     /var/log/wtmp \
