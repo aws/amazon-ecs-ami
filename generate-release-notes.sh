@@ -79,10 +79,10 @@ fi
 get_ami_details() {
     parameter_name=$1
     ami_details=$(aws ssm --region "us-west-2" get-parameters --names $parameter_name --query 'Parameters[0].Value' --output text | jq .)
-    ami_name=$(echo $ami_details | jq -r '.image_name')
-    agent_version=$(echo $ami_details | jq -r '.ecs_agent_version')
-    docker_version=$(echo $ami_details | jq -r '.ecs_runtime_version' | awk '{print $3}')
-    source_ami_name=$(echo $ami_details | jq -r '.source_image_name')
+    ami_name=$(echo "$ami_details" | jq -r '.image_name')
+    agent_version=$(echo "$ami_details" | jq -r '.ecs_agent_version')
+    docker_version=$(echo "$ami_details" | jq -r '.ecs_runtime_version' | awk '{print $3}')
+    source_ami_name=$(echo "$ami_details" | jq -r '.source_image_name')
     echo "$ami_name $agent_version $docker_version $source_ami_name"
 }
 
