@@ -14,7 +14,7 @@ usage() {
 # Parameters
 al2_gpu_nvidia_version=$1
 al2_gpu_cuda_version=$2
-al1_containerd_version=$3
+al1_containerd_version=$3 # Optional, will include AL1 in the release notes if provided
 
 if [ "$al2_gpu_nvidia_version" == "" ]; then
     echo "Error: AL2 GPU NVIDIA version is empty"
