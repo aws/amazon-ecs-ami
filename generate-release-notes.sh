@@ -28,44 +28,25 @@ if [ "$al2_gpu_cuda_version" == "" ]; then
 fi
 
 # Read some information from pkrvars file
-ami_version=""
-containerd_version_al2023=""
-distribution_release_al2023=""
-containerd_version=""
 readonly pkrvars="release.auto.pkrvars.hcl"
-while IFS='=' read -r key value; do
-    # Remove leading and trailing whitespace, and quotes from the key and value
-    key=$(echo "$key" | awk '{$1=$1};1')
-    value=$(echo "$value" | awk '{$1=$1};1')
-    value=${value//\"/} # strip quotes
+readonly ami_version=$(cat $pkrvars | grep -w 'ami_version' | cut -d "\"" -f2)
+readonly containerd_version_al2023=$(cat $pkrvars | grep -w 'containerd_version_al2023' | cut -d "\"" -f2)
+readonly distribution_release_al2023=$(cat $pkrvars | grep -w 'distribution_release_al2023' | cut -d "\"" -f2)
+readonly containerd_version=$(cat $pkrvars | grep -w 'containerd_version' | cut -d "\"" -f2)
 
-    if [ "$key" == "ami_version" ]; then
-        ami_version=$value
-    fi
-    if [ "$key" == "containerd_version_al2023" ]; then
-        containerd_version_al2023=$value
-    fi
-    if [ "$key" == "distribution_release_al2023" ]; then
-        distribution_release_al2023=$value
-    fi
-    if [ "$key" == "containerd_version" ]; then
-        containerd_version=$value
-    fi
-done <$pkrvars
-
-if [ "$ami_version" == "" ]; then
+if [ -z "$ami_version" ]; then
     echo "Error: AMI version was not found in $pkrvars"
     exit 1
 fi
-if [ "$containerd_version_al2023" == "" ]; then
+if [ -z "$containerd_version_al2023" ]; then
     echo "Error: Containerd version was not found for AL2023 in $pkrvars"
     exit 1
 fi
-if [ "$distribution_release_al2023" == "" ]; then
+if [ -z "$distribution_release_al2023" ]; then
     echo "Error: Distribution release version was not found for AL2023 in $pkrvars"
     exit 1
 fi
-if [ "$containerd_version" == "" ]; then
+if [ -z "$containerd_version" ]; then
     echo "Error: Containerd version was not found in $pkrvars"
     exit 1
 fi
