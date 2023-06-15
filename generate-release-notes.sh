@@ -4,9 +4,11 @@ set -eo pipefail
 
 usage() {
     echo "Usage:"
-    echo "  $0 AL2_GPU_NVIDIA_VERSION AL2_GPU_CUDA_VERSION AL1_CONTAINERD_VERSION"
+    echo "  $0 AL2_GPU_NVIDIA_VERSION AL2_GPU_CUDA_VERSION [AL1_CONTAINERD_VERSION]"
+    echo "  AL1_CONTAINERD_VERSION should not be provided if there is no AL1 AMI release"
     echo "Example:"
-    echo "  $0 470.182.03 11.4 1.4.13"
+    echo "  $0 470.182.03 11.4 1.4.13 # AL1 release included"
+    echo "  $0 470.182.03 11.4        # No AL1 release"
 }
 
 # Parameters
@@ -21,11 +23,6 @@ if [ "$al2_gpu_nvidia_version" == "" ]; then
 fi
 if [ "$al2_gpu_cuda_version" == "" ]; then
     echo "Error: AL2 GPU CUDA version is empty"
-    usage
-    exit 1
-fi
-if [ "$al1_containerd_version" == "" ]; then
-    echo "Error: AL1 containerd version is empty"
     usage
     exit 1
 fi
@@ -183,7 +180,11 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2_kernel_5_10_arm](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2_kernel_5_10_arm)
 - Docker version: $docker_version_al2_kernel_5_10_arm
 - Containerd version: $containerd_version
-- Source AMI name: $source_ami_name_al2_kernel_5_10_arm
+- Source AMI name: $source_ami_name_al2_kernel_5_10_arm"
+
+# Include AL1 release notes if there was an AL1 release
+if [ -n "$al1_containerd_version" ]; then
+    al1_release_notes="
 
 ### Amazon ECS-optimized Amazon Linux AMI
 ---
@@ -194,5 +195,8 @@ The Amazon ECS-optimized Amazon Linux AMI is deprecated as of April 15, 2021. Af
 - Docker version: $docker_version_al1
 - Containerd version: $al1_containerd_version
 - Source AMI name: $source_ami_name_al1"
+
+    release_notes="${release_notes}${al1_release_notes}"
+fi
 
 echo "$release_notes"
