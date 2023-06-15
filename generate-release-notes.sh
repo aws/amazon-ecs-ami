@@ -29,10 +29,10 @@ fi
 
 # Read some information from pkrvars file
 readonly pkrvars="release.auto.pkrvars.hcl"
-readonly ami_version=$(cat $pkrvars | grep -w 'ami_version' | cut -d "\"" -f2)
-readonly containerd_version_al2023=$(cat $pkrvars | grep -w 'containerd_version_al2023' | cut -d "\"" -f2)
-readonly distribution_release_al2023=$(cat $pkrvars | grep -w 'distribution_release_al2023' | cut -d "\"" -f2)
-readonly containerd_version=$(cat $pkrvars | grep -w 'containerd_version' | cut -d "\"" -f2)
+readonly ami_version=$(cat $pkrvars | grep -w 'ami_version' | cut -d '"' -f2)
+readonly containerd_version_al2023=$(cat $pkrvars | grep -w 'containerd_version_al2023' | cut -d '"' -f2)
+readonly distribution_release_al2023=$(cat $pkrvars | grep -w 'distribution_release_al2023' | cut -d '"' -f2)
+readonly containerd_version=$(cat $pkrvars | grep -w 'containerd_version' | cut -d '"' -f2)
 
 if [ -z "$ami_version" ]; then
     echo "Error: AMI version was not found in $pkrvars"
