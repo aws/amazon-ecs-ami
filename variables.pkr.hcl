@@ -73,7 +73,7 @@ variable "containerd_version_al2023" {
 
 variable "exec_ssm_version" {
   type        = string
-  default     = "3.1.1732.0"
+  default     = "3.2.1478.0"
   description = "SSM binary version to build ECS exec support with."
 }
 
