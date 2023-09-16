@@ -78,7 +78,8 @@ build {
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
-      "sudo dnf install -y ${local.packages_al2023}"
+      "sudo dnf install -y ${local.packages_al2023}",
+      "sudo dnf swap -y gnupg2-minimal gnupg2-full"
     ]
   }
 
@@ -113,6 +114,12 @@ build {
   }
 
   ### exec
+
+  provisioner "file" {
+    source      = "files/amazon-ssm-agent.gpg"
+    destination = "/tmp/amazon-ssm-agent.gpg"
+  }
+
   provisioner "shell" {
     script = "scripts/install-exec-dependencies.sh"
     environment_vars = [
