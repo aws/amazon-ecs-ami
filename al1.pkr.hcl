@@ -99,6 +99,11 @@ build {
     script = "scripts/install-additional-packages.sh"
   }
 
+  provisioner "file" {
+    source      = "files/amazon-ssm-agent.gpg"
+    destination = "/tmp/amazon-ssm-agent.gpg"
+  }
+
   provisioner "shell" {
     script = "scripts/install-exec-dependencies.sh"
     environment_vars = [

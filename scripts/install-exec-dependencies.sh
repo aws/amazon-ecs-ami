@@ -17,18 +17,21 @@ fi
 
 # Download ssm agent static binaries in BINARY_PATH
 mkdir -p /tmp/ssm-binaries && cd /tmp/ssm-binaries
+
+# Import ssm agent public key
+gpg --import /tmp/amazon-ssm-agent.gpg
+
 case $ARCHITECTURE in
 'x86_64')
     curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.amazonaws.com${host_suffix}/${EXEC_SSM_VERSION}/linux_amd64/amazon-ssm-agent-binaries.tar.gz" -o amazon-ssm-agent.tar.gz
-    echo "94be5ddec82d67d2f799d2fd1c8ab3f597e5d166b9750891a135d3093e15aa24 ./amazon-ssm-agent.tar.gz" >./amazon-ssm-agent.tar.gz.sha256
-    sha256sum -c ./amazon-ssm-agent.tar.gz.sha256
+    curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.amazonaws.com${host_suffix}/${EXEC_SSM_VERSION}/linux_amd64/amazon-ssm-agent-binaries.tar.gz.sig" -o amazon-ssm-agent.tar.gz.sig
     ;;
 'aarch64')
     curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.amazonaws.com${host_suffix}/${EXEC_SSM_VERSION}/linux_arm64/amazon-ssm-agent-binaries.tar.gz" -o amazon-ssm-agent.tar.gz
-    echo "f306be07eb4d82ef367af71de87a0aeb05097282731f361dbe782e29d3dcf660 ./amazon-ssm-agent.tar.gz" >./amazon-ssm-agent.tar.gz.sha256
-    sha256sum -c ./amazon-ssm-agent.tar.gz.sha256
+    curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.amazonaws.com${host_suffix}/${EXEC_SSM_VERSION}/linux_arm64/amazon-ssm-agent-binaries.tar.gz.sig" -o amazon-ssm-agent.tar.gz.sig
     ;;
 esac
+gpg --verify amazon-ssm-agent.tar.gz.sig amazon-ssm-agent.tar.gz
 
 sudo tar -xvf amazon-ssm-agent.tar.gz
 sudo mkdir -p "${BINARY_PATH}"
