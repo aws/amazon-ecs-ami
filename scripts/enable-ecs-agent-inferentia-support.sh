@@ -37,10 +37,7 @@ if [[ $AMI_TYPE == "al2inf" ]]; then
 fi
 
 # Install Neuron Tools
-# TODO: use aws-neuronx-tools on al2inf when it is ready
-if [[ $AMI_TYPE == "al2inf" ]]; then # drop this dependency for AL2023 or later AMIs
-    sudo yum install -y aws-neuron-tools
-fi
+sudo yum install -y use aws-neuronx-tools
 
 # disable neuron package upgrades by deleting the yum repo
 sudo rm /etc/yum.repos.d/neuron.repo
