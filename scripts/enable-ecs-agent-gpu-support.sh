@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-if [[ $AMI_TYPE != "al2gpu" ]]; then
+if [[ $AMI_TYPE != "al2gpu" && $AMI_TYPE != "al2keplergpu" ]]; then
     exit 0
 fi
 
@@ -28,21 +28,41 @@ sudo mv $tmpfile /etc/yum.repos.d/amzn2-nvidia-tmp.repo
 sudo yum install -y system-release-nvidia
 sudo rm /etc/yum.repos.d/amzn2-nvidia-tmp.repo
 
-sudo yum install -y kernel-devel-$(uname -r) \
-    system-release-nvidia \
-    nvidia-driver-latest-dkms \
-    nvidia-fabric-manager \
-    pciutils \
-    xorg-x11-server-Xorg \
-    docker-runtime-nvidia \
-    oci-add-hooks \
-    libnvidia-container \
-    libnvidia-container-tools \
-    nvidia-container-runtime-hook
+# for building AMIs for GPUs with Kepler architecture, fix package versions
+# also exclude nvidia and cuda packages to update. Newer Nvidia drivers do not support Kepler architecture
+# TODO: The package versions are fixed for Kepler. They have to be manually updated when there is a minor version update in AL repo.
+if [[ $AMI_TYPE == "al2keplergpu" ]]; then
+    sudo yum install -y kernel-devel-$(uname -r) \
+        system-release-nvidia \
+        nvidia-driver-latest-dkms-470.182.03 \
+        nvidia-fabric-manager-470.182.03-1 \
+        pciutils-3.5.1-2.amzn2 \
+        xorg-x11-server-Xorg \
+        docker-runtime-nvidia-1 \
+        oci-add-hooks \
+        libnvidia-container-1.4.0 \
+        libnvidia-container-tools-1.4.0 \
+        nvidia-container-runtime-hook-1.4.0
 
-sudo yum install -y cuda-drivers \
-    cuda
+    sudo yum install -y cuda-toolkit-11-4
+    echo "exclude=*nvidia* *cuda*" | sudo tee -a /etc/yum.conf
+else
+    # Default GPU AMI
+    sudo yum install -y kernel-devel-$(uname -r) \
+        system-release-nvidia \
+        nvidia-driver-latest-dkms \
+        nvidia-fabric-manager \
+        pciutils \
+        xorg-x11-server-Xorg \
+        docker-runtime-nvidia \
+        oci-add-hooks \
+        libnvidia-container \
+        libnvidia-container-tools \
+        nvidia-container-runtime-hook
 
+    sudo yum install -y cuda-drivers \
+        cuda
+fi
 # The Fabric Manager service needs to be started and enabled on EC2 P4d instances
 # in order to configure NVLinks and NVSwitches
 sudo systemctl enable nvidia-fabricmanager
