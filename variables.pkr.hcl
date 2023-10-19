@@ -198,3 +198,9 @@ variable "neu_instance_types" {
   description = "List of available in-region instance types for NEU platform"
   default     = ["inf1.xlarge"]
 }
+
+variable "managed_daemon_base_url" {
+  type        = string
+  description = "Base URL (minus file name) to download managed daemons from."
+  default     = ""
+}
