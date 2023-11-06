@@ -15,7 +15,7 @@ source "amazon-ebs" "al2gpu" {
   region = var.region
   source_ami_filter {
     filters = {
-      name = "${var.source_ami_al2}"
+      name = "${var.source_ami_al2_gpu}"
     }
     owners      = ["amazon"]
     most_recent = true

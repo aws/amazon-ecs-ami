@@ -71,6 +71,7 @@ distribution_release_al2023=$(curl -s https://al2023-repos-us-west-2-de612dc2.s3
 
 readonly ami_name_al2_kernel5dot10arm ami_name_al2_kernel5dot10 ami_name_al2_arm ami_name_al2_x86 ami_name_al1 ami_name_al2023_arm ami_name_al2023_x86 distribution_release_al2023
 
+# Temporarily override base AMI for AL2 GPU due to a known al2 kernel and EFA/Nvidia incompatibility
 cat >|release.auto.pkrvars.hcl <<EOF
 ami_version          = "$ami_version"
 ecs_agent_version    = "$agent_version"
@@ -84,6 +85,7 @@ source_ami_al2       = "$ami_name_al2_x86"
 source_ami_al2arm    = "$ami_name_al2_arm"
 source_ami_al2kernel5dot10    = "$ami_name_al2_kernel5dot10"
 source_ami_al2kernel5dot10arm = "$ami_name_al2_kernel5dot10arm"
+source_ami_al2_gpu   = "amzn2-ami-minimal-hvm-2.0.20230926.0-x86_64-ebs"
 source_ami_al2023    = "$ami_name_al2023_x86"
 source_ami_al2023arm = "$ami_name_al2023_arm"
 kernel_version_al2023    = "$kernel_version_al2023_x86"
