@@ -1,0 +1,36 @@
+name: PushToCodeCommit
+
+on: workflow_dispatch
+
+jobs:
+  PushToCodeCommit:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with: 
+        role-to-assume: ${{secrets.AMI_MIRROR_ROLE}}
+        aws-region: us-west-2
+    - name: Delete shinkansen branch on codecommit repository
+      run: |
+        aws codecommit delete-branch --repository-name amazon-ecs-ami-mirror --branch-name shinkansen
+    - name: Configure prereqs
+      run: |
+        git config --global user.name "Github Action"
+        git config --global user.email "action@github.com"
+        pip install git-remote-codecommit
+    - name: Mirror to shinkansen branch on codecommit repository
+      run: | 
+        git clone --single-branch --branch feature/shinkansen https://github.com/aws/amazon-ecs-ami ecsAmiGithub
+        git clone codecommit::us-west-2://amazon-ecs-ami-mirror ecsAmiCodeCommit
+        cp ecsAmiCodeCommit/Config ecsAmiGithub/
+        cd ecsAmiGithub
+        git add Config
+        git commit -m "Add config"
+        git remote add codecommit codecommit::us-west-2://amazon-ecs-ami-mirror
+        git push codecommit feature/shinkansen:shinkansen
