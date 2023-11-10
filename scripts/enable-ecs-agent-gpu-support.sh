@@ -5,6 +5,7 @@ if [[ $AMI_TYPE != "al2gpu" && $AMI_TYPE != "al2keplergpu" ]]; then
     exit 0
 fi
 
+# set up amzn2-nvidia repo
 GPG_CHECK=1
 # don't do the gpg check in air-gapped regions
 if [ -n "$AIR_GAPPED" ]; then
@@ -22,8 +23,75 @@ enabled=1
 exclude=libglvnd-*
 EOF
 
-# this repo is temporary and only used for installing the system-release-nvidia package
+# the amzn2-nvidia repo is temporary and only used for installing the system-release-nvidia package
 sudo mv $tmpfile /etc/yum.repos.d/amzn2-nvidia-tmp.repo
+
+# only install open driver for post-kepler gpus
+if [[ $AMI_TYPE != "al2keplergpu" ]]; then
+    sudo yum install -y yum-plugin-versionlock \
+        yum-utils
+    sudo amazon-linux-extras install epel -y
+    sudo yum install -y "kernel-devel-uname-r == $(uname -r)"
+
+    # pull nvidia version from what's available in amzn2-nvidia
+    # trim after `:` until `-` to get the major.minor.patch version
+    NVIDIA_VERSION=$(yum list available | grep nvidia-kmod-common | awk '{print $2}' | sed -e 's/.*://' -e 's/-.*//')
+
+    # disable amzn2 in favor of rh repo
+    sudo yum-config-manager --disable amzn2-nvidia
+    sudo yum-config-manager --add-repo=https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo
+    sudo yum-config-manager --enable cuda-rhel7.repo
+
+    # install open dkms from rh repo
+    sudo yum install -y nvidia-kmod-common-${NVIDIA_VERSION}
+
+    # build nvidia-open kmod tar
+    DKMS=/usr/sbin/dkms
+    DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
+    MODULE_NAME="nvidia-open"
+    MODULE_VERSION=$(${DKMS} status -m ${MODULE_NAME} | awk '{print $2}' | tr -d ',:')
+
+    sudo ${DKMS} build -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
+    sudo ${DKMS} mktarball -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
+    sudo mkdir -p "${DKMS_ARCHIVE_DIR}/${MODULE_NAME}/"
+    sudo cp /var/lib/dkms/${MODULE_NAME}/${MODULE_VERSION}/tarball/*.tar.gz "${DKMS_ARCHIVE_DIR}/${MODULE_NAME}/"
+
+    # re-enable amzn2 and clean up
+    sudo yum remove -y kmod-nvidia-open-dkms
+    sudo yum-config-manager --disable cuda-rhel7.repo
+    sudo rm /etc/yum.repos.d/cuda-rhel7.repo
+    sudo rm -rf /var/cache/yum
+    sudo yum-config-manager --enable amzn2-nvidia
+
+    # copy install-nvidia-open-kmod.sh to host
+    sudo mkdir -p /var/lib/ecs/scripts
+
+    tmpfile=$(mktemp)
+    cat >$tmpfile <<"EOF"
+#!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o xtrace
+DKMS=/usr/sbin/dkms
+DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
+KERNEL_VERSION="$(uname -r)"
+MODULE_VERSION=$(${DKMS} status -m nvidia | awk '{print $2}' | tr -d ',:')
+${DKMS} uninstall -m nvidia -v ${MODULE_VERSION}
+NVIDIA_TO_REMOVE="nvidia/${MODULE_VERSION}"
+${DKMS} remove ${NVIDIA_TO_REMOVE} --all
+echo "found nvidia kernel module: ${MODULE_VERSION}"
+MODULE_ARCHIVE="${DKMS_ARCHIVE_DIR}/nvidia-open/nvidia-open-${MODULE_VERSION}-kernel${KERNEL_VERSION}-x86_64.dkms.tar.gz"
+echo "loading from ${MODULE_ARCHIVE}"
+${DKMS} ldtarball ${MODULE_ARCHIVE}
+${DKMS} install -m nvidia -v ${MODULE_VERSION}
+sudo systemctl daemon-reload
+${DKMS} status -m nvidia
+EOF
+
+    sudo mv $tmpfile /var/lib/ecs/scripts/install-nvidia-open-kmod.sh
+    sudo chmod +x /var/lib/ecs/scripts/install-nvidia-open-kmod.sh
+fi
+
 # system-release-nvidia creates an nvidia repo file at /etc/yum.repos.d/amzn2-nvidia.repo
 sudo yum install -y system-release-nvidia
 sudo rm /etc/yum.repos.d/amzn2-nvidia-tmp.repo
@@ -63,6 +131,7 @@ else
     sudo yum install -y cuda-drivers \
         cuda
 fi
+
 # The Fabric Manager service needs to be started and enabled on EC2 P4d instances
 # in order to configure NVLinks and NVSwitches
 sudo systemctl enable nvidia-fabricmanager
