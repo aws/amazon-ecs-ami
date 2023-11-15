@@ -104,14 +104,6 @@ if [[ $(sudo find {{workingDirectory}}/TOE_* -type d | sudo wc -l) -gt 0 ]]; the
 fi
 
 echo "Cleaning up ssm log files"
-if [[ $(sudo find /var/log/amazon/ssm -type f | sudo wc -l) -gt 0 ]]; then
-    echo "Deleting files within /var/log/amazon/ssm/*"
-    sudo find /var/log/amazon/ssm -type f -exec shred -zuf {} \;
-fi
-if [[ $(sudo find /var/log/amazon/ssm -type f | sudo wc -l) -gt 0 ]]; then
-    echo "Failed to delete /var/log/amazon/ssm"
-    exit 1
-fi
 if sudo test -d "/var/log/amazon/ssm"; then
     echo "Deleting /var/log/amazon/ssm/*"
     sudo rm -rf /var/log/amazon/ssm
