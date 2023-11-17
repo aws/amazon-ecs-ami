@@ -46,6 +46,11 @@ variable "ecs_agent_version" {
   description = "ECS agent version to build AMI with."
 }
 
+variable "csi_driver_version" {
+  type        = string
+  description = "EBS CSI driver version to build AMI with."
+}
+
 variable "ecs_init_rev" {
   type        = string
   description = "ecs-init package version rev"

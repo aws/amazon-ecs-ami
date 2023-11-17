@@ -75,6 +75,7 @@ readonly ami_name_al2_kernel5dot10arm ami_name_al2_kernel5dot10 ami_name_al2_arm
 cat >|release.auto.pkrvars.hcl <<EOF
 ami_version          = "$ami_version"
 ecs_agent_version    = "$agent_version"
+csi_driver_version   = "$agent_version"
 ecs_init_rev         = "$ecs_init_rev"
 docker_version       = "20.10.25"
 docker_version_al2023 = "20.10.25"
