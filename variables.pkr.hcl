@@ -9,7 +9,7 @@ packer {
 
 locals {
   packages_al1    = "amazon-efs-utils ec2-net-utils acpid irqbalance numactl rng-tools docker-storage-setup"
-  packages_al2    = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent yum-plugin-upgrade-helper"
+  packages_al2    = "acpid amazon-efs-utils amazon-ssm-agent ec2-instance-connect ec2-net-utils yum-plugin-upgrade-helper"
   packages_al2023 = "amazon-efs-utils amazon-ssm-agent amazon-ec2-net-utils acpid ec2-instance-connect"
 }
 
