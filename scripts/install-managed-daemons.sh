@@ -151,6 +151,10 @@ if [ -z "$MANAGED_DAEMON_BASE_URL" ]; then
     MANAGED_DAEMON_BASE_URL="https://s3.$REGION.amazonaws.com${host_suffix}/amazon-ecs-agent-$REGION/"
 fi
 
+if [ -z "$EBS_CSI_DRIVER_VERSION" ]; then
+    EBS_CSI_DRIVER_VERSION="v${AGENT_VERSION}"
+fi
+
 ARCH=$(uname -m)
 case "$ARCH" in
 "aarch64")
@@ -165,7 +169,7 @@ case "$ARCH" in
 esac
 
 # Install CSI driver managed daemon
-CSI_DRIVER_FILENAME="ebs-csi-driver${ARCH_MOD}-v$AGENT_VERSION.tar"
+CSI_DRIVER_FILENAME="ebs-csi-driver${ARCH_MOD}-${EBS_CSI_DRIVER_VERSION}.tar"
 CSI_DRIVER_FULL_URL="${MANAGED_DAEMON_BASE_URL}${CSI_DRIVER_FILENAME}"
 
 curl -fLSs -o "$WORK_DIR/${CSI_DRIVER_FILENAME}" "$CSI_DRIVER_FULL_URL"

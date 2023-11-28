@@ -210,3 +210,9 @@ variable "managed_daemon_base_url" {
   description = "Base URL (minus file name) to download managed daemons from."
   default     = ""
 }
+
+variable "ebs_csi_driver_version" {
+  type        = string
+  description = "EBS CSI driver version to build AMI with."
+  default     = ""
+}
