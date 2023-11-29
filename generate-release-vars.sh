@@ -35,9 +35,16 @@ case "$ami_type" in
 
     readonly ami_name_al1
 
+    readonly ecs_version_al1=$(sed -n '/variable "ecs_version_al1" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly docker_version_al1=$(sed -n '/variable "docker_version_al1" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+
     cat >|release-al1.auto.pkrvars.hcl <<EOF
-ami_version     = "$ami_version"
-source_ami_al1  = "$ami_name_al1"
+ami_version        = "$ami_version"
+ecs_version_al1    = "$ecs_version_al1"
+docker_version_al1 = "$docker_version_al1"
+exec_ssm_version   = "$exec_ssm_version"
+source_ami_al1     = "$ami_name_al1"
 EOF
     ;;
 "al2")
@@ -53,12 +60,23 @@ EOF
 
     readonly ami_name_al2_kernel5dot10arm ami_name_al2_kernel5dot10 ami_name_al2_arm ami_name_al2_x86
 
+    readonly ecs_agent_version=$(sed -n '/variable "ecs_agent_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly ecs_init_rev=$(sed -n '/variable "ecs_init_rev" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly docker_version=$(sed -n '/variable "docker_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly containerd_version=$(sed -n '/variable "containerd_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+
     cat >|release-al2.auto.pkrvars.hcl <<EOF
-ami_version                     = "$ami_version"
-source_ami_al2                  = "$ami_name_al2_x86"
-source_ami_al2arm               = "$ami_name_al2_arm"
-source_ami_al2kernel5dot10      = "$ami_name_al2_kernel5dot10"
-source_ami_al2kernel5dot10arm   = "$ami_name_al2_kernel5dot10arm"
+ami_version                   = "$ami_version"
+ecs_agent_version             = "$ecs_agent_version"
+ecs_init_rev                  = "$ecs_init_rev"
+docker_version                = "$docker_version"
+containerd_version            = "$containerd_version"
+exec_ssm_version              = "$exec_ssm_version"
+source_ami_al2                = "$ami_name_al2_x86"
+source_ami_al2arm             = "$ami_name_al2_arm"
+source_ami_al2kernel5dot10    = "$ami_name_al2_kernel5dot10"
+source_ami_al2kernel5dot10arm = "$ami_name_al2_kernel5dot10arm"
 EOF
     ;;
 "al2023")
@@ -79,8 +97,19 @@ EOF
 
     readonly ami_name_al2023_x86 ami_name_al2023_arm distribution_release_al2023
 
+    readonly ecs_agent_version=$(sed -n '/variable "ecs_agent_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly ecs_init_rev=$(sed -n '/variable "ecs_init_rev" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly docker_version_2023=$(sed -n '/variable "docker_version_al2023" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly containerd_version_al2023=$(sed -n '/variable "containerd_version_al2023" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+
     cat >|release-al2023.auto.pkrvars.hcl <<EOF
 ami_version                 = "$ami_version"
+ecs_agent_version           = "$ecs_agent_version"
+ecs_init_rev                = "$ecs_init_rev"
+docker_version_al2023       = "$docker_version_al2023"
+containerd_version_al2023   = "$containerd_version_al2023"
+exec_ssm_version            = "$exec_ssm_version"
 source_ami_al2023           = "$ami_name_al2023_x86"
 source_ami_al2023arm        = "$ami_name_al2023_arm"
 kernel_version_al2023       = "$kernel_version_al2023_x86"
