@@ -89,7 +89,7 @@ esac
 # Query ssm to get latest ecs optimized ami
 ami_id=$(aws ssm get-parameters --names $ami_path --region us-west-2 | jq -r '.Parameters[0].Value' | jq -r '.image_id')
 
-user_data=$(mktemp user_data.txt)
+user_data=$(touch user_data.txt)
 if [ "$install_and_start_ssm_agent" -eq 1 ]; then
 
     cat <<EOT >>user_data.txt
@@ -153,7 +153,7 @@ check_wait_response $(echo $?)
 # Instance has been launched, terminate in case of an error
 trap 'failure_cleanup' ERR
 
-rm "$user_data"
+rm user_data.txt
 
 # Assert that ssm agent is running before moving forward
 ssm_agent_status() {
@@ -195,12 +195,12 @@ command_status() {
 max_retries=20
 success=0
 for ((r = 0; r < max_retries; r++)); do
+    sleep 5
     cmd_status=$(command_status)
     if [ "$cmd_status" = "Failed" ] || [ "$cmd_status" = "Success" ]; then
         success=1
         break
     fi
-    sleep 5
 done
 if [ $success -ne 1 ]; then
     echo "Command execution timed out"
