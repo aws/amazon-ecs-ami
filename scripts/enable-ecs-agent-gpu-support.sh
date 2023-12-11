@@ -26,8 +26,8 @@ EOF
 # the amzn2-nvidia repo is temporary and only used for installing the system-release-nvidia package
 sudo mv $tmpfile /etc/yum.repos.d/amzn2-nvidia-tmp.repo
 
-# only install open driver for post-kepler gpus
-if [[ $AMI_TYPE != "al2keplergpu" ]]; then
+# only install open driver for post-kepler gpus, exclude airgapped regions
+if [[ $AMI_TYPE != "al2keplergpu" && -z ${AIR_GAPPED} ]]; then
     sudo yum install -y yum-plugin-versionlock \
         yum-utils
     sudo amazon-linux-extras install epel -y
