@@ -5,12 +5,22 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/) 
 
+## 20231211
+- ecs version: 1.79.2-1
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20231206.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20231206.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20231206.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20231206.0-arm64-ebs
+- Enhancement: Add open source nvidia kernel module .tar file and install script. [#163](https://github.com/aws/amazon-ecs-ami/pull/163)
+
 ## 20231204
 - ecs version: 1.79.1-1
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20231116.0-x86_64-ebs
 - source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20231116.0-arm64-ebs
 - source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20231116.0-x86_64-ebs
 - source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20231116.0-arm64-ebs
+- Enhancement: skip shredding files since we're deleting the entire directory [#168](https://github.com/aws/amazon-ecs-ami/pull/168)
+- Enhancement: Make EBS CSI driver version overridable [#172](https://github.com/aws/amazon-ecs-ami/pull/172)
 
 ## 20231114
 - ecs version: 1.79.1-1
