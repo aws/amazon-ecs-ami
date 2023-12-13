@@ -28,11 +28,11 @@ If you would like to override any of the defaults provided here without committi
 can use the `overrides.auto.pkrvars.hcl` file, which is ignored by source control.
 
 For example, if you want your AMI to have a smaller root block device, you can override the default value
-of 30 GB like this:
+of 4 GB like this:
 
 ```
 export REGION=us-west-2
-echo "block_device_size_gb = 8" > ./overrides.auto.pkrvars.hcl
+echo "block_device_size_gb = 3" > ./overrides.auto.pkrvars.hcl
 make al2
 ```
 

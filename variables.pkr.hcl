@@ -37,7 +37,7 @@ variable "region" {
 
 variable "block_device_size_gb" {
   type        = number
-  default     = 30
+  default     = 4
   description = "Size of the root block device."
 }
 
