@@ -24,10 +24,14 @@ fi
 cp release-$ami_type.auto.pkrvars.hcl release-$ami_type.old.hcl
 ./generate-release-vars.sh $ami_type
 diff_val=$(diff <(grep -v ami_version release-$ami_type.old.hcl) <(grep -v ami_version release-$ami_type.auto.pkrvars.hcl))
+# If no difference in dependencies, check for security update
 if [ -z "$diff_val" ]; then
-    Update=$(./scripts/check-update-security.sh $ami_type)
-    if [ "$Update" != "true" ] && [ "$ami_type" != "al1" ]; then
-        Update=$(./scripts/check-update-security.sh "$ami_type"_arm)
+    # al2023 version already generates a diff in dependency file if it has security updates, so no check necessary if al2023
+    if [ "$ami_type" != "al2023" ]; then
+        Update=$(./scripts/check-update-security.sh $ami_type)
+        if [ "$Update" != "true" ] && [ "$ami_type" != "al1" ]; then
+            Update=$(./scripts/check-update-security.sh "$ami_type"_arm)
+        fi
     fi
 else
     Update="true"

@@ -7,7 +7,7 @@ usage() {
     echo "  $0 AMI_PLATFORM"
     echo "Example:"
     echo "  $0 al2_arm"
-    echo "AMI_PLATFORM Must be one of: al1, al2, al2_arm, al2023, al2023_arm"
+    echo "AMI_PLATFORM Must be one of: al1, al2, al2_arm"
 }
 
 error_msg() {
@@ -19,8 +19,6 @@ error_msg() {
 AL1_PATH="/aws/service/ecs/optimized-ami/amazon-linux/recommended"
 AL2_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 AL2_ARM_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/arm64/recommended"
-AL2023_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
-AL2023_ARM_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
 
 # Indicates that an update exists
 UPDATE_EXISTS_CODE="100"
@@ -55,7 +53,6 @@ fi
 
 # Get ecs-optimized ami's PATH in ssm parameters
 platform=$1
-skip_user_data=0
 instance_type="c5.large"
 install_and_start_ssm_agent=0
 case "$platform" in
@@ -68,15 +65,6 @@ case "$platform" in
     ;;
 "al2_arm")
     ami_path=$AL2_ARM_PATH
-    instance_type="c6g.medium"
-    ;;
-"al2023")
-    ami_path=$AL2023_PATH
-    skip_user_data=1
-    ;;
-"al2023_arm")
-    ami_path=$AL2023_ARM_PATH
-    skip_user_data=1
     instance_type="c6g.medium"
     ;;
 *)
@@ -125,26 +113,14 @@ fi
 
 # Launch ec2 instance with given ami and SSM access for command execution
 # Also get instance id
-if [ $skip_user_data -eq 0 ]; then
-    # Modify user data to ignore automatic updates by al and al2
-    instance_id=$(aws ec2 run-instances \
-        --image-id $ami_id \
-        --instance-type $instance_type \
-        --iam-instance-profile Arn=$IAM_INSTANCE_PROFILE_ARN \
-        --user-data file://user_data.txt |
-        jq -r '.Instances[0].InstanceId')
-    command_params='commands=["yum check-update --security --sec-severity=critical --exclude=nvidia*,docker*,cuda*,containerd* -q"]'
-else
-    # In the case that we have al2023, we need to send a separate style of command
-    instance_id=$(aws ec2 run-instances \
-        --image-id $ami_id \
-        --instance-type $instance_type \
-        --iam-instance-profile Arn=$IAM_INSTANCE_PROFILE_ARN |
-        jq -r '.Instances[0].InstanceId')
-    distribution_release_al2023=$(curl -s https://al2023-repos-us-west-2-de612dc2.s3.dualstack.us-west-2.amazonaws.com/core/releasemd.xml |
-        xmllint --xpath "string(//root/releases/release[last()]/@version)" -)
-    command_params='commands=["sudo dnf check-update --releasever='$distribution_release_al2023' --security --sec-severity=Critical --exclude=nvidia*,docker*,cuda*,containerd* -q"]'
-fi
+# Modify user data to ignore automatic updates by al and al2
+instance_id=$(aws ec2 run-instances \
+    --image-id $ami_id \
+    --instance-type $instance_type \
+    --iam-instance-profile Arn=$IAM_INSTANCE_PROFILE_ARN \
+    --user-data file://user_data.txt |
+    jq -r '.Instances[0].InstanceId')
+command_params='commands=["yum check-update --security --sec-severity=critical --exclude=nvidia*,docker*,cuda*,containerd* -q"]'
 
 # Wait for instance status to reach ok, fail at timeout code
 aws ec2 wait instance-running --instance-ids $instance_id
