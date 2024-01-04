@@ -1,0 +1,76 @@
+name: InitiateRelease
+
+on: workflow_dispatch
+
+jobs:
+  GenerateConfig:
+    runs-on: ubuntu-latest
+    outputs:
+      commit_exit_code: ${{ steps.final.outputs.commit_exit_code }}
+    permissions:
+      id-token: write
+      contents: write
+    env: 
+      IAM_INSTANCE_PROFILE_ARN: ${{secrets.IAM_INSTANCE_PROFILE_ARN}} 
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Install xmllint
+      run: sudo apt-get update && sudo apt-get install libxml2-utils
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with: 
+        role-to-assume: ${{secrets.AMI_GENERATE_CONFIG_ROLE}}
+        aws-region: us-west-2
+    - name: Configure prereqs
+      run: |
+        git config --global user.name "GenerateConfig Action"
+        git config --global user.email "gcaction@github.com"
+    - name: Check AL1 Update
+      run: ./scripts/check-update.sh al1
+    - name: Check AL2 Update
+      run: ./scripts/check-update.sh al2
+    - name: Check AL2023 Update
+      run: ./scripts/check-update.sh al2023
+    - name: Commit and Push Changes
+      id: final
+      run: |
+        set +e
+        git commit -m "Release Kickoff"
+        echo "commit_exit_code=$?" >> "$GITHUB_OUTPUT"
+        git status
+        git push
+        set -e
+  PushToCodeCommit:
+    needs: GenerateConfig
+    if: ${{ needs.GenerateConfig.outputs.commit_exit_code==0 }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with: 
+        role-to-assume: ${{secrets.AMI_MIRROR_ROLE}}
+        aws-region: us-west-2
+    - name: Delete shinkansen branch on codecommit repository
+      run: |
+        aws codecommit delete-branch --repository-name amazon-ecs-ami-mirror --branch-name shinkansen
+    - name: Configure prereqs
+      run: |
+        git config --global user.name "Github Action"
+        git config --global user.email "action@github.com"
+        pip install git-remote-codecommit
+    - name: Mirror to shinkansen branch on codecommit repository
+      run: | 
+        git clone --single-branch --branch feature/shinkansen https://github.com/aws/amazon-ecs-ami ecsAmiGithub
+        git clone codecommit::us-west-2://amazon-ecs-ami-mirror ecsAmiCodeCommit
+        cp ecsAmiCodeCommit/Config ecsAmiGithub/
+        cd ecsAmiGithub
+        git add Config
+        git commit -m "Add config"
+        git remote add codecommit codecommit::us-west-2://amazon-ecs-ami-mirror
+        git push codecommit feature/shinkansen:shinkansen

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -io pipefail
+set -o pipefail
 
 usage() {
     echo "Usage:"
