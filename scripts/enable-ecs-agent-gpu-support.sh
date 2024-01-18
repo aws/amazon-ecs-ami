@@ -28,8 +28,7 @@ sudo mv $tmpfile /etc/yum.repos.d/amzn2-nvidia-tmp.repo
 
 # only install open driver for post-kepler gpus, exclude airgapped regions
 if [[ $AMI_TYPE != "al2keplergpu" && -z ${AIR_GAPPED} ]]; then
-    sudo yum install -y yum-plugin-versionlock \
-        yum-utils
+    sudo yum install -y yum-plugin-versionlock yum-utils
     sudo amazon-linux-extras install epel -y
     sudo yum install -y "kernel-devel-uname-r == $(uname -r)"
 
@@ -60,6 +59,12 @@ if [[ $AMI_TYPE != "al2keplergpu" && -z ${AIR_GAPPED} ]]; then
     sudo yum remove -y kmod-nvidia-open-dkms
     sudo yum-config-manager --disable cuda-rhel7.repo
     sudo rm /etc/yum.repos.d/cuda-rhel7.repo
+    # epel was used to install dkms, now delete as it points to public http endpoints which
+    # can cause problems for customers using isolated subnets.
+    sudo yum-config-manager --disable epel
+    sudo rm /etc/yum.repos.d/epel.repo
+    sudo rm /etc/yum.repos.d/epel-testing.repo
+    sudo amazon-linux-extras disable epel
     sudo rm -rf /var/cache/yum
     sudo yum-config-manager --enable amzn2-nvidia
 
