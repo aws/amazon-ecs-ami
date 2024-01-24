@@ -15,6 +15,7 @@ usage() {
 al2_gpu_nvidia_version=$1
 al2_gpu_cuda_version=$2
 al1_containerd_version=$3 # Optional, will include AL1 in the release notes if provided
+al1_runc_version=$4       # Optional, will include AL1 in the release notes if provided
 
 if [ "$al2_gpu_nvidia_version" == "" ]; then
     echo "Error: AL2 GPU NVIDIA version is empty"
@@ -31,8 +32,10 @@ fi
 readonly pkrvars="release.auto.pkrvars.hcl"
 readonly ami_version=$(cat $pkrvars | grep -w 'ami_version' | cut -d '"' -f2)
 readonly containerd_version_al2023=$(cat $pkrvars | grep -w 'containerd_version_al2023' | cut -d '"' -f2)
+readonly runc_version_al2023=$(cat $pkrvars | grep -w 'runc_version_al2023' | cut -d '"' -f2)
 readonly distribution_release_al2023=$(cat $pkrvars | grep -w 'distribution_release_al2023' | cut -d '"' -f2)
 readonly containerd_version=$(cat $pkrvars | grep -w 'containerd_version' | cut -d '"' -f2)
+readonly runc_version=$(cat $pkrvars | grep -w 'runc_version' | cut -d '"' -f2)
 
 if [ -z "$ami_version" ]; then
     echo "Error: AMI version was not found in $pkrvars"
@@ -42,12 +45,20 @@ if [ -z "$containerd_version_al2023" ]; then
     echo "Error: Containerd version was not found for AL2023 in $pkrvars"
     exit 1
 fi
+if [ -z "$runc_version_al2023" ]; then
+    echo "Error: Runc version was not found for AL2023 in $pkrvars"
+    exit 1
+fi
 if [ -z "$distribution_release_al2023" ]; then
     echo "Error: Distribution release version was not found for AL2023 in $pkrvars"
     exit 1
 fi
 if [ -z "$containerd_version" ]; then
     echo "Error: Containerd version was not found in $pkrvars"
+    exit 1
+fi
+if [ -z "$runc_version" ]; then
+    echo "Error: Runc version was not found in $pkrvars"
     exit 1
 fi
 
@@ -98,6 +109,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2023_x86](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2023_x86)
 - Docker version: $docker_version_al2023_x86
 - Containerd version: $containerd_version_al2023
+- Runc version: $runc_version_al2023
 - Source AMI name: $source_ami_name_al2023_x86
 - Distribution al2023 release: $distribution_release_al2023
 
@@ -106,6 +118,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2023_arm](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2023_arm)
 - Docker version: $docker_version_al2023_arm
 - Containerd version: $containerd_version_al2023
+- Runc version: $runc_version_al2023
 - Source AMI name: $source_ami_name_al2023_arm
 - Distribution al2023 release: $distribution_release_al2023
 
@@ -114,6 +127,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2023_neuron](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2023_neuron)
 - Docker version: $docker_version_al2023_neuron
 - Containerd version: $containerd_version_al2023
+- Runc version: $runc_version_al2023
 - Source AMI name: $source_ami_name_al2023_neuron
 - Distribution al2023 release: $distribution_release_al2023
 
@@ -124,6 +138,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2_x86](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2_x86)
 - Docker version: $docker_version_al2_x86
 - Containerd version: $containerd_version
+- Runc version: $runc_version
 - Source AMI name: $source_ami_name_al2_x86
 
 #### ARM64 (Kernel 4.14)
@@ -131,6 +146,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2_arm](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2_arm)
 - Docker version: $docker_version_al2_arm
 - Containerd version: $containerd_version
+- Runc version: $runc_version
 - Source AMI name: $source_ami_name_al2_arm
 
 #### Neuron (Kernel 4.14)
@@ -138,6 +154,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2_inf](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2_inf)
 - Docker version: $docker_version_al2_inf
 - Containerd version: $containerd_version
+- Runc version: $runc_version
 - Source AMI name: $source_ami_name_al2_inf
 
 #### GPU (Kernel 4.14)
@@ -145,6 +162,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2_gpu](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2_gpu)
 - Docker version: $docker_version_al2_gpu
 - Containerd version: $containerd_version
+- Runc version: $runc_version
 - NVIDIA driver version: $al2_gpu_nvidia_version
 - CUDA version: $al2_gpu_cuda_version
 - Source AMI name: $source_ami_name_al2_gpu
@@ -154,6 +172,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2_kernel_5_10](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2_kernel_5_10)
 - Docker version: $docker_version_al2_kernel_5_10
 - Containerd version: $containerd_version
+- Runc version: $runc_version
 - Source AMI name: $source_ami_name_al2_kernel_5_10
 
 #### ARM64 (Kernel 5.10)
@@ -161,10 +180,11 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 - ECS Agent version: [$agent_version_al2_kernel_5_10_arm](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al2_kernel_5_10_arm)
 - Docker version: $docker_version_al2_kernel_5_10_arm
 - Containerd version: $containerd_version
+- Runc version: $runc_version
 - Source AMI name: $source_ami_name_al2_kernel_5_10_arm"
 
 # Include AL1 release notes if there was an AL1 release
-if [ -n "$al1_containerd_version" ]; then
+if [ -n "$al1_containerd_version" ] || [ -n "$al1_runc_version" ]; then
     al1_release_notes="
 
 ### Amazon ECS-optimized Amazon Linux AMI
@@ -175,6 +195,7 @@ The Amazon ECS-optimized Amazon Linux AMI is deprecated as of April 15, 2021. Af
 - ECS Agent version: [$agent_version_al1](https://github.com/aws/amazon-ecs-agent/releases/tag/v$agent_version_al1)
 - Docker version: $docker_version_al1
 - Containerd version: $al1_containerd_version
+- Runc version: $al1_runc_version
 - Source AMI name: $source_ami_name_al1"
 
     release_notes="${release_notes}${al1_release_notes}"
