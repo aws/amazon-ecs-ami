@@ -61,6 +61,11 @@ variable "containerd_version" {
   description = "Containerd version to build AMI with."
 }
 
+variable "runc_version" {
+  type        = string
+  description = "Runc version to build AMI with."
+}
+
 variable "docker_version_al2023" {
   type        = string
   description = "Docker version to build AL2023 AMI with."
@@ -69,6 +74,11 @@ variable "docker_version_al2023" {
 variable "containerd_version_al2023" {
   type        = string
   description = "Containerd version to build AL2023 AMI with."
+}
+
+variable "runc_version_al2023" {
+  type        = string
+  description = "Runc version to build AL2023 AMI with."
 }
 
 variable "exec_ssm_version" {

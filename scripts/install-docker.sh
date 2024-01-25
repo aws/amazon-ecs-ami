@@ -11,4 +11,4 @@ if command -v amazon-linux-extras; then
     sudo amazon-linux-extras enable docker
 fi
 
-sudo yum install -y "docker-$DOCKER_VERSION" "containerd-$CONTAINERD_VERSION"
+sudo yum install -y "docker-$DOCKER_VERSION" "containerd-$CONTAINERD_VERSION" "runc-$RUNC_VERSION"

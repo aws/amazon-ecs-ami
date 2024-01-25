@@ -106,6 +106,7 @@ build {
     environment_vars = [
       "DOCKER_VERSION=${var.docker_version}",
       "CONTAINERD_VERSION=${var.containerd_version}",
+      "RUNC_VERSION=${var.runc_version}",
       "AIR_GAPPED=${var.air_gapped}"
     ]
   }
