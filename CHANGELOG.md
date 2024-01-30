@@ -5,6 +5,19 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/) 
 
+## 20240131
+- ecs version: 1.80.0-1
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20240124.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20240124.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20240124.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20240124.0-arm64-ebs
+- source al2023 ami: al2023-ami-minimal-2023.3.20240122.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.3.20240122.0-kernel-6.1-arm64
+- distribution al2023 release: 2023.3.20240122
+- enhancement: Bump packer amazon plugin to source deprecated amis for al1 build.[#192](https://github.com/aws/amazon-ecs-ami/pull/192)
+- enhancement: Add runc to versioned parameters for installation.[#193](https://github.com/aws/amazon-ecs-ami/pull/193)
+- bug fix: Fix al2gpu AMI package installs and updates when running in isolated subnets. [#191](https://github.com/aws/amazon-ecs-ami/pull/191)
+
 ## 20240109
 - ecs version: 1.80.0-1
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20240109.0-x86_64-ebs
