@@ -1,0 +1,6 @@
+ami_version                 = "20240201"
+source_ami_al2023           = "al2023-ami-minimal-2023.3.20240131.0-kernel-6.1-x86_64"
+source_ami_al2023arm        = "al2023-ami-minimal-2023.3.20240131.0-kernel-6.1-arm64"
+kernel_version_al2023       = "-kernel-6.1"
+kernel_version_al2023arm    = "-kernel-6.1"
+distribution_release_al2023 = "2023.3.20240131"
