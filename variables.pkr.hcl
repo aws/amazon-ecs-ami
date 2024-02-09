@@ -13,6 +13,12 @@ locals {
   packages_al2023 = "amazon-efs-utils amazon-ssm-agent amazon-ec2-net-utils acpid"
 }
 
+variable "ami_name_prefix_al1" {
+  type        = string
+  description = "Outputted AMI name prefix."
+  default     = "unofficial-amzn-ami-2018.03."
+}
+
 variable "ami_name_prefix_al2" {
   type        = string
   description = "Outputted AMI name prefix."
@@ -25,7 +31,17 @@ variable "ami_name_prefix_al2023" {
   default     = "unofficial-amzn2023-ami-ecs"
 }
 
-variable "ami_version" {
+variable "ami_version_al1" {
+  type        = string
+  description = "Outputted AMI version."
+}
+
+variable "ami_version_al2" {
+  type        = string
+  description = "Outputted AMI version."
+}
+
+variable "ami_version_al2023" {
   type        = string
   description = "Outputted AMI version."
 }
@@ -138,12 +154,6 @@ variable "kernel_version_al2023" {
 variable "kernel_version_al2023arm" {
   type        = string
   description = "Amazon Linux 2023 ARM kernel version."
-}
-
-variable "ami_name_prefix_al1" {
-  type        = string
-  description = "Outputted AMI name prefix."
-  default     = "unofficial-amzn-ami-2018.03."
 }
 
 variable "source_ami_al1" {

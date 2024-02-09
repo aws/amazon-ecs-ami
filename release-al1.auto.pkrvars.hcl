@@ -1,4 +1,4 @@
-ami_version        = "20240201"
+ami_version_al1    = "20240201"
 ecs_version_al1    = "1.51.0"
 docker_version_al1 = "20.10.13"
 exec_ssm_version   = "3.2.1630.0"

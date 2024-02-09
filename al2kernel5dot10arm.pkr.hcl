@@ -1,10 +1,10 @@
 locals {
-  ami_name_al2kernel5dot10arm = "${var.ami_name_prefix_al2}-kernel-5.10-hvm-2.0.${var.ami_version}-arm64-ebs"
+  ami_name_al2kernel5dot10arm = "${var.ami_name_prefix_al2}-kernel-5.10-hvm-2.0.${var.ami_version_al2}-arm64-ebs"
 }
 
 source "amazon-ebs" "al2kernel5dot10arm" {
   ami_name        = "${local.ami_name_al2kernel5dot10arm}"
-  ami_description = "Amazon Linux AMI 2.0.${var.ami_version} Kernel 5.10 arm64 ECS HVM GP2"
+  ami_description = "Amazon Linux AMI 2.0.${var.ami_version_al2} Kernel 5.10 arm64 ECS HVM GP2"
   instance_type   = var.arm_instance_types[0]
   launch_block_device_mappings {
     volume_size           = var.block_device_size_gb
@@ -28,6 +28,6 @@ source "amazon-ebs" "al2kernel5dot10arm" {
     ecs_runtime_version = "Docker version ${var.docker_version}"
     ecs_agent_version   = "${var.ecs_agent_version}"
     ami_type            = "al2kernel5dot10arm"
-    ami_version         = "2.0.${var.ami_version}"
+    ami_version         = "2.0.${var.ami_version_al2}"
   }
 }

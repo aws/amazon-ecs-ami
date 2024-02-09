@@ -1,10 +1,10 @@
 locals {
-  ami_name_al1 = "${var.ami_name_prefix_al1}${var.ami_version}-amazon-ecs-optimized"
+  ami_name_al1 = "${var.ami_name_prefix_al1}${var.ami_version_al1}-amazon-ecs-optimized"
 }
 
 source "amazon-ebs" "al1" {
   ami_name        = "${local.ami_name_al1}"
-  ami_description = "Amazon Linux AMI amzn-ami-2018.03.${var.ami_version} x86_64 ECS HVM GP2"
+  ami_description = "Amazon Linux AMI amzn-ami-2018.03.${var.ami_version_al1} x86_64 ECS HVM GP2"
   instance_type   = var.general_purpose_instance_types[0]
   launch_block_device_mappings {
     volume_size           = 8
@@ -36,7 +36,7 @@ source "amazon-ebs" "al1" {
     ecs_runtime_version = "Docker version ${var.docker_version_al1}"
     ecs_agent_version   = "${var.ecs_version_al1}"
     ami_type            = "al1"
-    ami_version         = "2018.03.${var.ami_version}"
+    ami_version         = "2018.03.${var.ami_version_al1}"
   }
 }
 
