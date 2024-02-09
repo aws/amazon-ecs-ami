@@ -40,7 +40,7 @@ case "$ami_type" in
     readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
 
     cat >|release-al1.auto.pkrvars.hcl <<EOF
-ami_version        = "$ami_version"
+ami_version_al1    = "$ami_version"
 ecs_version_al1    = "$ecs_version_al1"
 docker_version_al1 = "$docker_version_al1"
 exec_ssm_version   = "$exec_ssm_version"
@@ -67,7 +67,7 @@ EOF
     readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
 
     cat >|release-al2.auto.pkrvars.hcl <<EOF
-ami_version                   = "$ami_version"
+ami_version_al2               = "$ami_version"
 ecs_agent_version             = "$ecs_agent_version"
 ecs_init_rev                  = "$ecs_init_rev"
 docker_version                = "$docker_version"
@@ -104,7 +104,7 @@ EOF
     readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
 
     cat >|release-al2023.auto.pkrvars.hcl <<EOF
-ami_version                 = "$ami_version"
+ami_version_al2023          = "$ami_version"
 ecs_agent_version           = "$ecs_agent_version"
 ecs_init_rev                = "$ecs_init_rev"
 docker_version_al2023       = "$docker_version_al2023"
