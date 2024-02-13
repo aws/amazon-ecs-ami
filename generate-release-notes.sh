@@ -106,7 +106,7 @@ generate_release_notes() {
     readonly al1pkrvars="release-al1.auto.pkrvars.hcl"
     pkvars_files="$al2023pkrvars $al2pkrvars $al1pkrvars"
     for file in $pkvars_files; do
-        file_ami_version=$(cat $file | grep -w 'ami_version' | cut -d '"' -f2)
+        file_ami_version=$(cat $file | grep 'ami_version' | cut -d '"' -f2)
         if [[ $file_ami_version -gt $ami_version ]]; then
             ami_version="$file_ami_version"
         fi
