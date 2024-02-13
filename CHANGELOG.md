@@ -5,6 +5,16 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/) 
 
+## 20240212
+- al1 ami version: 20240201
+- al2 ami version: 20240207
+- al2023 ami version: 20240207
+- source al2023 ami: al2023-ami-minimal-2023.3.20240205.2-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.3.20240205.2-kernel-6.1-arm64
+- distribution al2023 release: 2023.3.20240205
+- enhancement: ECS-Optimized AMIs release enhancements [#197](https://github.com/aws/amazon-ecs-ami/pull/197), [#199](https://github.com/aws/amazon-ecs-ami/pull/199), [#200](https://github.com/aws/amazon-ecs-ami/pull/200), [#201](https://github.com/aws/amazon-ecs-ami/pull/201), [#202](https://github.com/aws/amazon-ecs-ami/pull/202)
+- enhancement: change amzn2-extras.repo file owner to root [#198](https://github.com/aws/amazon-ecs-ami/pull/198)
+
 ## 20240201
 - ecs version: 1.81.0-1
 - containerd version: 1.7.2
