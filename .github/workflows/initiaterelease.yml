@@ -74,3 +74,25 @@ jobs:
         git commit -m "Add config"
         git remote add codecommit codecommit::us-west-2://amazon-ecs-ami-mirror
         git push codecommit main:shinkansen
+  MetricPublish:
+    needs: [GenerateConfig, PushToCodeCommit]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with: 
+        role-to-assume: ${{secrets.AMI_MIRROR_ROLE}}
+        aws-region: us-west-2
+    - name: Failure Scenario
+      if: ${{ needs.GenerateConfig.result == 'failure' || needs.PushToCodeCommit.result == 'failure' }}
+      run: aws cloudwatch put-metric-data --metric-name EcsAmiGithubActionStatus --namespace ECSAMIRelease --value "-1"
+    - name: Release Kickoff Scenario
+      if: ${{ needs.PushToCodeCommit.result == 'success'}}
+      run: aws cloudwatch put-metric-data --metric-name EcsAmiGithubActionStatus --namespace ECSAMIRelease --value 1
+    - name: No Release Scenario
+      if: ${{ needs.GenerateConfig.result == 'success' && needs.PushToCodeCommit.result == 'skipped' }}
+      run: aws cloudwatch put-metric-data --metric-name EcsAmiGithubActionStatus --namespace ECSAMIRelease --value 0
