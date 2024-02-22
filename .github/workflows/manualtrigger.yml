@@ -10,7 +10,7 @@ jobs:
       contents: read
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with: 
@@ -26,12 +26,13 @@ jobs:
         pip install git-remote-codecommit
     - name: Mirror to shinkansen branch on codecommit repository
       run: | 
+        date=$(date '+%Y%m%d')
         git clone --single-branch --branch main https://github.com/aws/amazon-ecs-ami ecsAmiGithub
         git clone codecommit::us-west-2://amazon-ecs-ami-mirror ecsAmiCodeCommit
         cp ecsAmiCodeCommit/Config ecsAmiGithub/
         cd ecsAmiGithub
         git add Config
-        git commit -m "Add config"
+        git commit -m "Release ${date}"
         git remote add codecommit codecommit::us-west-2://amazon-ecs-ami-mirror
         git push codecommit main:shinkansen
   MetricPublish:
