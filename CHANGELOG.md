@@ -9,6 +9,8 @@
 - ecs version: 1.81.1-1
 - contaienrd version: 1.7.11
 - containerd version al2023: 1.7.11
+- al2 ami version: 20240221
+- al2023 ami version: 20240221
 - enhancement: Update generate release notes script to factor in decoupled ami_version across ami families [#205](https://github.com/aws/amazon-ecs-ami/pull/205)
 
 ## 20240212
