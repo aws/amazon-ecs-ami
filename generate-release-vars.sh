@@ -64,6 +64,7 @@ EOF
     readonly ecs_init_rev=$(sed -n '/variable "ecs_init_rev" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly docker_version=$(sed -n '/variable "docker_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly containerd_version=$(sed -n '/variable "containerd_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly runc_version=$(sed -n '/variable "runc_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
 
     cat >|release-al2.auto.pkrvars.hcl <<EOF
@@ -72,6 +73,7 @@ ecs_agent_version             = "$ecs_agent_version"
 ecs_init_rev                  = "$ecs_init_rev"
 docker_version                = "$docker_version"
 containerd_version            = "$containerd_version"
+runc_version                  = "$runc_version"
 exec_ssm_version              = "$exec_ssm_version"
 source_ami_al2                = "$ami_name_al2_x86"
 source_ami_al2arm             = "$ami_name_al2_arm"
@@ -101,6 +103,7 @@ EOF
     readonly ecs_init_rev=$(sed -n '/variable "ecs_init_rev" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly docker_version_al2023=$(sed -n '/variable "docker_version_al2023" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly containerd_version_al2023=$(sed -n '/variable "containerd_version_al2023" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly runc_version_al2023=$(sed -n '/variable "runc_version_al2023" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
 
     cat >|release-al2023.auto.pkrvars.hcl <<EOF
@@ -109,6 +112,7 @@ ecs_agent_version           = "$ecs_agent_version"
 ecs_init_rev                = "$ecs_init_rev"
 docker_version_al2023       = "$docker_version_al2023"
 containerd_version_al2023   = "$containerd_version_al2023"
+runc_version_al2023         = "$runc_version_al2023"
 exec_ssm_version            = "$exec_ssm_version"
 source_ami_al2023           = "$ami_name_al2023_x86"
 source_ami_al2023arm        = "$ami_name_al2023_arm"

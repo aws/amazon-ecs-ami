@@ -120,7 +120,7 @@ instance_id=$(aws ec2 run-instances \
     --iam-instance-profile Arn=$IAM_INSTANCE_PROFILE_ARN \
     --user-data file://user_data.txt |
     jq -r '.Instances[0].InstanceId')
-command_params='commands=["yum check-update --security --sec-severity=critical --exclude=nvidia*,docker*,cuda*,containerd* -q"]'
+command_params='commands=["yum check-update --security --sec-severity=critical --exclude=nvidia*,docker*,cuda*,containerd*,runc* -q"]'
 
 # Wait for instance status to reach ok, fail at timeout code
 aws ec2 wait instance-running --instance-ids $instance_id
