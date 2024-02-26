@@ -81,6 +81,14 @@ al2kernel5dot10: check-region init validate release-al2.auto.pkrvars.hcl
 al2kernel5dot10arm: check-region init validate release-al2.auto.pkrvars.hcl
 	./packer build -only="amazon-ebs.al2kernel5dot10arm" -var "region=${REGION}" .
 
+.PHONY: al2kernel5dot10gpu
+al2kernel5dot10gpu: check-region init validate release-al2.auto.pkrvars.hcl
+	./packer build -only="amazon-ebs.al2kernel5dot10gpu" -var "region=${REGION}" .
+
+.PHONY: al2kernel5dot10inf
+al2kernel5dot10inf: check-region init validate release-al2.auto.pkrvars.hcl
+	./packer build -only="amazon-ebs.al2kernel5dot10inf" -var "region=${REGION}" .
+
 .PHONY: al2023
 al2023: check-region init validate release-al2023.auto.pkrvars.hcl
 	./packer build -only="amazon-ebs.al2023" -var "region=${REGION}" .
