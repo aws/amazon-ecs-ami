@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 set -ex
 
-if [[ $AMI_TYPE != "al2gpu" && $AMI_TYPE != "al2keplergpu" ]]; then
+# Makes sure that a compatible version of gcc is used for compiling NVIDIA driver.
+set_compatible_gcc_version_for_nvidia_compile() {
+    # Currently a compatible version of gcc is assumed to be used by default, unless the AMI recipe uses kernel 5.10.
+    if [[ $AMI_TYPE == *"kernel5dot10gpu" ]]; then
+        # Explicitly use gcc10 since gcc version for compiling the NVIDIA driver must match gcc version with which the
+        # Linux kernel was compiled.
+        sudo sed -i "s/'make' -j2 module/& CC=\/usr\/bin\/gcc10-cc/" /usr/src/${MODULE_NAME}-${MODULE_VERSION}/dkms.conf
+    fi
+}
+
+if [[ $AMI_TYPE != "al2"*"gpu" ]]; then
     exit 0
 fi
 
@@ -22,6 +32,9 @@ gpgkey=https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/7fa
 enabled=1
 exclude=libglvnd-*
 EOF
+
+DKMS=/usr/sbin/dkms
+DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
 
 # the amzn2-nvidia repo is temporary and only used for installing the system-release-nvidia package
 sudo mv $tmpfile /etc/yum.repos.d/amzn2-nvidia-tmp.repo
@@ -45,11 +58,9 @@ if [[ $AMI_TYPE != "al2keplergpu" && -z ${AIR_GAPPED} ]]; then
     sudo yum install -y nvidia-kmod-common-${NVIDIA_VERSION}
 
     # build nvidia-open kmod tar
-    DKMS=/usr/sbin/dkms
-    DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
     MODULE_NAME="nvidia-open"
     MODULE_VERSION=$(${DKMS} status -m ${MODULE_NAME} | awk '{print $2}' | tr -d ',:')
-
+    set_compatible_gcc_version_for_nvidia_compile
     sudo ${DKMS} build -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
     sudo ${DKMS} mktarball -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
     sudo mkdir -p "${DKMS_ARCHIVE_DIR}/${MODULE_NAME}/"
@@ -135,6 +146,14 @@ else
 
     sudo yum install -y cuda-drivers \
         cuda
+fi
+
+if [[ $AMI_TYPE == *"kernel5dot10gpu" ]]; then
+    # rebuild module/update drivers using compatible gcc version (gcc10)
+    MODULE_NAME="nvidia"
+    MODULE_VERSION=$(${DKMS} status -m ${MODULE_NAME} | awk '{print $2}' | tr -d ',:')
+    set_compatible_gcc_version_for_nvidia_compile
+    sudo ${DKMS} install -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
 fi
 
 # The Fabric Manager service needs to be started and enabled on EC2 P4d instances

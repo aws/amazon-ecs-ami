@@ -40,7 +40,9 @@ build {
     "source.amazon-ebs.al2keplergpu",
     "source.amazon-ebs.al2inf",
     "source.amazon-ebs.al2kernel5dot10",
-    "source.amazon-ebs.al2kernel5dot10arm"
+    "source.amazon-ebs.al2kernel5dot10arm",
+    "source.amazon-ebs.al2kernel5dot10gpu",
+    "source.amazon-ebs.al2kernel5dot10inf"
   ]
 
   provisioner "file" {
@@ -174,12 +176,21 @@ build {
 
   provisioner "shell" {
     environment_vars = ["AMI_TYPE=${source.name}"]
-    script           = "scripts/enable-ecs-agent-inferentia-support.sh"
+    script           = "scripts/al2/install-kernel5dot10.sh"
+  }
+
+  ### If necessary, reboot worker instance to install kernel update for enable-ecs-agent-inferentia-support or
+  ### enable-ecs-agent-gpu-support scripts that factor in kernel version.
+  provisioner "shell" {
+    environment_vars  = ["AMI_TYPE=${source.name}"]
+    expect_disconnect = "true"
+    script            = "scripts/al2/reboot-for-kernel-upgrade.sh"
   }
 
   provisioner "shell" {
     environment_vars = ["AMI_TYPE=${source.name}"]
-    script           = "scripts/al2/install-kernel5dot10.sh"
+    pause_before     = "10s" # pause for starting the reboot
+    script           = "scripts/enable-ecs-agent-inferentia-support.sh"
   }
 
   provisioner "shell" {
