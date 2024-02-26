@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-if [[ $AMI_TYPE != "al2gpu" && $AMI_TYPE != "al2keplergpu" ]]; then
+if [[ $AMI_TYPE != "al2"*"gpu" ]]; then
     exit 0
 fi
 
@@ -49,6 +49,12 @@ if [[ $AMI_TYPE != "al2keplergpu" && -z ${AIR_GAPPED} ]]; then
     DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
     MODULE_NAME="nvidia-open"
     MODULE_VERSION=$(${DKMS} status -m ${MODULE_NAME} | awk '{print $2}' | tr -d ',:')
+
+    if [[ $AMI_TYPE == *"kernel5dot10gpu" ]]; then
+        # explicitly use gcc10 since gcc version for compiling the NVIDIA driver must match gcc version with which the
+        # Linux kernel was compiled
+        sudo sed -i "s/'make' -j2 module/& CC=\/usr\/bin\/gcc10-cc/" /usr/src/${MODULE_NAME}-${MODULE_VERSION}/dkms.conf
+    fi
 
     sudo ${DKMS} build -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
     sudo ${DKMS} mktarball -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
@@ -135,6 +141,12 @@ else
 
     sudo yum install -y cuda-drivers \
         cuda
+fi
+
+if [[ $AMI_TYPE == *"kernel5dot10gpu" ]]; then
+    # explicitly use gcc10 since gcc version for compiling the NVIDIA driver must match gcc version with which the
+    # Linux kernel was compiled
+    sudo sed -i "s/'make' -j2 module/& CC=\/usr\/bin\/gcc10-cc/" /usr/src/nvidia-${MODULE_VERSION}/dkms.conf
 fi
 
 # The Fabric Manager service needs to be started and enabled on EC2 P4d instances
