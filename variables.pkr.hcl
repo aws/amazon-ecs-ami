@@ -108,7 +108,7 @@ variable "runc_version_al2023" {
 variable "exec_ssm_version" {
   type        = string
   description = "SSM binary version to build ECS exec support with."
-  default     = "3.2.1630.0"
+  default     = "3.2.2222.0"
 }
 
 variable "source_ami_al2" {
