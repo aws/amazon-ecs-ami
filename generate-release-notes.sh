@@ -16,7 +16,7 @@ Usage:
 
 Options:
 	--al2-gpu-nvidia-ver  (Optional) AL2 GPU NVIDIA version. If specified, then --al2-gpu-cuda-ver option is also required to be specified.
-	--al2-gpu-cuda-ver    (Optional) AL2 GPU CUDA version. If specified, then  --al2-gpu-nvidia optin is also required to be specified.
+	--al2-gpu-cuda-ver    (Optional) AL2 GPU CUDA version. If specified, then  --al2-gpu-nvidia-ver option is also required to be specified.
 	--al1-containerd-ver  (Optional) AL1 containerd version.
 	--al1-runc-ver        (Optional) AL1 runc version.
 	--exclude-ami         (Optional) comma separated list of AMI variants that are excluded in the release.
@@ -74,7 +74,7 @@ parse_args() {
 # Validates the options specified for the script.
 validate_args() {
     if [ -z "$AL2_GPU_CUDA_VERSION" ] || [ -z "$AL2_GPU_NVIDIA_VERSION" ]; then
-        if ! is_ami_excluded "al2gpu"; then
+        if ! { is_ami_excluded "al2gpu" && is_ami_excluded "al2kernel5dot10gpu"; }; then
             printf "Error: AL2 GPU CUDA version or AL2 GPU NVIDIA version is empty when releasing AL2 GPU\n\n"
             usage
             exit 1
@@ -178,7 +178,8 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 
     # AL2
     if ! { is_ami_excluded "al2" && is_ami_excluded "al2arm" && is_ami_excluded "al2inf" && is_ami_excluded "al2gpu" &&
-        is_ami_excluded "al2kernel5dot10" && is_ami_excluded "al2kernel5dot10arm"; }; then
+        is_ami_excluded "al2kernel5dot10" && is_ami_excluded "al2kernel5dot10arm" &&
+        is_ami_excluded "al2kernel5dot10inf" && is_ami_excluded "al2kernel5dot10gpu"; }; then
         # Get AL2 AMI family details
         readonly containerd_version=$(cat $variablespkr | sed -n '/containerd_version"/,/}/p' | grep -w 'default' | cut -d '"' -f2)
         readonly runc_version=$(cat $variablespkr | sed -n '/runc_version"/,/}/p' | grep -w 'default' | cut -d '"' -f2)
@@ -211,14 +212,14 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
             add_ami_to_release_notes "#### ARM64 (Kernel 4.14)" "$ami_name_al2_arm" "$agent_version_al2_arm" "$docker_version_al2_arm" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_arm" ""
         fi
 
-        # Include AL2 Neuron release notes if there was an al2inf release
+        # Include AL2 Neuron (Kernel 4.14) release notes if there was an al2inf release
         if ! is_ami_excluded "al2inf"; then
             # AL2 Neuron AMI details
             read ami_name_al2_inf agent_version_al2_inf docker_version_al2_inf source_ami_name_al2_inf <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/inf/recommended")
             add_ami_to_release_notes "#### Neuron (Kernel 4.14)" "$ami_name_al2_inf" "$agent_version_al2_inf" "$docker_version_al2_inf" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_inf" ""
         fi
 
-        # Include AL2 GPU release notes if there was an al2gpu release
+        # Include AL2 GPU (Kernel 4.14) release notes if there was an al2gpu release
         if ! is_ami_excluded "al2gpu"; then
             # AL2 GPU AMI details
             read ami_name_al2_gpu agent_version_al2_gpu docker_version_al2_gpu source_ami_name_al2_gpu <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended")
@@ -237,6 +238,20 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
             # AL2 ARM64 (Kernel 5.10) AMI details
             read ami_name_al2_kernel_5_10_arm agent_version_al2_kernel_5_10_arm docker_version_al2_kernel_5_10_arm source_ami_name_al2_kernel_5_10_arm <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/kernel-5.10/arm64/recommended")
             add_ami_to_release_notes "#### ARM64 (Kernel 5.10)" "$ami_name_al2_kernel_5_10_arm" "$agent_version_al2_kernel_5_10_arm" "$docker_version_al2_kernel_5_10_arm" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_kernel_5_10_arm" ""
+        fi
+
+        # Include AL2 Neuron (Kernel 5.10) release notes if there was an al2kernel5dot10inf release
+        if ! is_ami_excluded "al2kernel5dot10inf"; then
+            # AL2 Neuron (Kernel 5.10) AMI details
+            read ami_name_al2_kernel_5_10_inf agent_version_al2_kernel_5_10_inf docker_version_al2_kernel_5_10_inf source_ami_name_al2_kernel_5_10_inf <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/kernel-5.10/inf/recommended")
+            add_ami_to_release_notes "#### Neuron (Kernel 5.10)" "$ami_name_al2_kernel_5_10_inf" "$agent_version_al2_kernel_5_10_inf" "$docker_version_al2_kernel_5_10_inf" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_kernel_5_10_inf" ""
+        fi
+
+        # Include AL2 GPU (Kernel 5.10) release notes if there was an al2kernel5dot10gpu release
+        if ! is_ami_excluded "al2kernel5dot10gpu"; then
+            # AL2 GPU (Kernel 5.10) AMI details
+            read ami_name_al2_kernel_5_10_gpu agent_version_al2_kernel_5_10_gpu docker_version_al2_kernel_5_10_gpu source_ami_name_al2_kernel_5_10_gpu <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/kernel-5.10/gpu/recommended")
+            add_ami_to_release_notes "#### GPU (Kernel 5.10)" "$ami_name_al2_kernel_5_10_gpu" "$agent_version_al2_kernel_5_10_gpu" "$docker_version_al2_kernel_5_10_gpu" "$containerd_version" "$runc_version" "$AL2_GPU_NVIDIA_VERSION" "$AL2_GPU_CUDA_VERSION" "$source_ami_name_al2_kernel_5_10_gpu" ""
         fi
     fi
 
