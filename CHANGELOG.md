@@ -5,11 +5,24 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20240312
+- al2 ami version: 20240312
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20240306.2-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20240306.2-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20240306.2-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20240306.2-arm64-ebs
+- al2023 ami version: 20240312
+- source al2023 ami: al2023-ami-minimal-2023.3.20240304.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.3.20240304.0-kernel-6.1-arm64
+- distribution al2023 release: 2023.3.20240304
+- enhancement: Add AL2 GPU/INF kernel 5.10 AMIs to release notes [#221](https://github.com/aws/amazon-ecs-ami/pull/221)
+
 ## 20240305
 - al1 ami version: 20240305
 - al2 ami version: 20240305
 - al2023 ami version: 20240305
 - ecs version: 1.82.0-1
+- feature: Support AL2 kernel 5.10 GPU and INF [#214](https://github.com/aws/amazon-ecs-ami/pull/214)
 - enhancement: Update exec ssm version to 3.2.2222.0 [#217](https://github.com/aws/amazon-ecs-ami/pull/217)
 
 ## 20240227
