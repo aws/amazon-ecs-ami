@@ -90,7 +90,7 @@ variable "runc_version" {
 variable "docker_version_al2023" {
   type        = string
   description = "Docker version to build AL2023 AMI with."
-  default     = "20.10.25"
+  default     = "25.0.3"
 }
 
 variable "containerd_version_al2023" {
