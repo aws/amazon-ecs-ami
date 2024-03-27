@@ -104,6 +104,10 @@ build {
   }
 
   provisioner "shell" {
+    script = "scripts/setup-ecs-config-dir.sh"
+  }
+
+  provisioner "shell" {
     script = "scripts/install-docker.sh"
     environment_vars = [
       "DOCKER_VERSION=${var.docker_version}",
