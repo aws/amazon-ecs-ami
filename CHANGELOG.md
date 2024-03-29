@@ -5,6 +5,22 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20240328
+- ecs version: 1.82.1
+- al2 ami version: 20240328
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20240318.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20240318.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20240318.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20240318.0-arm64-ebs
+- al2023 ami version: 20240328
+- docker version al2023: 25.0.3
+- source al2023 ami: al2023-ami-minimal-2023.4.20240319.1-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.4.20240319.1-kernel-6.1-arm64
+- distribution al2023 release: 2023.4.20240319
+- enhancement: Update AL2023 Docker version to 25.0.3 [#228](https://github.com/aws/amazon-ecs-ami/pull/228)
+- bug fix: Setup ECS config directory if not present [#230](https://github.com/aws/amazon-ecs-ami/pull/230)
+
+
 ## 20240319
 - al1 ami version: 20240319
 - al2 ami version: 20240319
