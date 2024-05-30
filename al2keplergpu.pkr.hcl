@@ -17,8 +17,9 @@ source "amazon-ebs" "al2keplergpu" {
     filters = {
       name = "${var.source_ami_al2}"
     }
-    owners      = ["amazon"]
-    most_recent = true
+    owners             = ["amazon"]
+    most_recent        = true
+    include_deprecated = true
   }
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
