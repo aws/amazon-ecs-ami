@@ -85,6 +85,33 @@ build {
     ]
   }
 
+  provisioner "file" {
+    source      = "files/69-available-updates-begin.sh.amzn2"
+    destination = "/tmp/69-available-updates-begin"
+  }
+
+  provisioner "shell" {
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo mv /tmp/69-available-updates-begin /etc/update-motd.d/69-available-updates-begin",
+      "sudo chmod 755 /etc/update-motd.d/69-available-updates-begin"
+    ]
+  }
+
+
+  provisioner "file" {
+    source      = "files/71-available-updates-finish.sh.amzn2"
+    destination = "/tmp/71-available-updates-finish"
+  }
+
+  provisioner "shell" {
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo mv /tmp/71-available-updates-finish /etc/update-motd.d/71-available-updates-finish",
+      "sudo chmod 755 /etc/update-motd.d/71-available-updates-finish"
+    ]
+  }
+
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
