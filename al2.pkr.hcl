@@ -1,5 +1,11 @@
 locals {
   ami_name_al2 = "${var.ami_name_prefix_al2}-hvm-2.0.${var.ami_version_al2}-x86_64-ebs"
+  motd_files = [
+    "29-ecs-banner-begin",
+    "31-ecs-banner-finish",
+    "69-available-updates-begin",
+    "71-available-updates-finish"
+  ]
 }
 
 source "amazon-ebs" "al2" {
@@ -59,57 +65,25 @@ build {
     ]
   }
 
-  provisioner "file" {
-    source      = "files/29-ecs-banner-begin.sh.amzn2"
-    destination = "/tmp/29-ecs-banner-begin"
+  dynamic "provisioner" {
+    for_each = local.motd_files
+    labels   = ["file"]
+    content {
+      source      = "files/${provisioner.value}.sh.amzn2"
+      destination = "/tmp/${provisioner.value}"
+    }
   }
 
-  provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mv /tmp/29-ecs-banner-begin /etc/update-motd.d/29-ecs-banner-begin",
-      "sudo chmod 755 /etc/update-motd.d/29-ecs-banner-begin"
-    ]
-  }
-
-  provisioner "file" {
-    source      = "files/31-ecs-banner-finish.sh.amzn2"
-    destination = "/tmp/31-ecs-banner-finish"
-  }
-
-  provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mv /tmp/31-ecs-banner-finish /etc/update-motd.d/31-ecs-banner-finish",
-      "sudo chmod 755 /etc/update-motd.d/31-ecs-banner-finish"
-    ]
-  }
-
-  provisioner "file" {
-    source      = "files/69-available-updates-begin.sh.amzn2"
-    destination = "/tmp/69-available-updates-begin"
-  }
-
-  provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mv /tmp/69-available-updates-begin /etc/update-motd.d/69-available-updates-begin",
-      "sudo chmod 755 /etc/update-motd.d/69-available-updates-begin"
-    ]
-  }
-
-
-  provisioner "file" {
-    source      = "files/71-available-updates-finish.sh.amzn2"
-    destination = "/tmp/71-available-updates-finish"
-  }
-
-  provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mv /tmp/71-available-updates-finish /etc/update-motd.d/71-available-updates-finish",
-      "sudo chmod 755 /etc/update-motd.d/71-available-updates-finish"
-    ]
+  dynamic "provisioner" {
+    for_each = local.motd_files
+    labels   = ["shell"]
+    content {
+      inline_shebang = "/bin/sh -ex"
+      inline = [
+        "sudo mv /tmp/${provisioner.value} /etc/update-motd.d/${provisioner.value}",
+        "sudo chmod 755 /etc/update-motd.d/${provisioner.value}"
+      ]
+    }
   }
 
   provisioner "shell" {
