@@ -33,6 +33,12 @@ Update to the latest ECS-Optimized AMI for all updates, including security"
   echo 'Run "sudo yum update" to apply all updates in place'
 fi
 
-# Disable 70-available-updates during update-motd, reverted with
-# 71-available-updates-finish.
+# The order in which update-motd runs the scripts is
+# 1. 69-available-updates-begin
+# 2. 70-available-updates
+# 3. 71-available-updates-finish
+#
+# 70-available-updates is inherited from AL2. It is disabled here but re-enabled in
+# 71-available-updates-finish so that the custom ECS message shows but the AL2
+# message does not.
 chmod -x /etc/update-motd.d/70-available-updates
