@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations under the
 # License.
 
+# package_updates is a summary of the number of updates available.
+# It is copied from 70-available-updates, which is inherited from AL2.
 package_updates=$(LANG=C timeout 30s /usr/bin/yum \
   --debuglevel 2 \
   --security check-update 2>/dev/null \
