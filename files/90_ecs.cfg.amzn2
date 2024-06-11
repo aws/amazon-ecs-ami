@@ -1,4 +1,6 @@
 #cloud-config
+repo_upgrade: none
+
 system_info:
   default_user:
     groups: [ "wheel", "docker" ]

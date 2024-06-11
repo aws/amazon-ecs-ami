@@ -1,0 +1,46 @@
+#!/usr/bin/bash
+
+# Copyright (C) 2024 Amazon.com, Inc. or its affiliates.
+# All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+#    http://aws.amazon.com/apache2.0/
+#
+# or in the "license" file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
+# OF ANY KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations under the
+# License.
+
+# package_updates is a summary of the number of updates available.
+# It is copied from 70-available-updates, which is inherited from AL2.
+package_updates=$(LANG=C timeout 30s /usr/bin/yum \
+  --debuglevel 2 \
+  --security check-update 2>/dev/null \
+  | grep -P '(?<! 0 packages) available$')
+
+if [ -n "$package_updates" ]; then
+  echo "$package_updates
+Update to the latest ECS-Optimized AMI for all updates, including security"
+
+  security_updates=$(grep -oP '(\d+)(?=.* security)' <<< "$package_updates")
+
+  if [ ${security_updates:=0} -ne 0 ]; then
+    echo 'Run "sudo yum update --security" to apply security updates in place'
+  fi
+
+  echo 'Run "sudo yum update" to apply all updates in place'
+fi
+
+# The order in which update-motd runs the scripts is
+# 1. 69-available-updates-begin
+# 2. 70-available-updates
+# 3. 71-available-updates-finish
+#
+# 70-available-updates is inherited from AL2. It is disabled here but re-enabled in
+# 71-available-updates-finish so that the custom ECS message shows but the AL2
+# message does not.
+chmod -x /etc/update-motd.d/70-available-updates
