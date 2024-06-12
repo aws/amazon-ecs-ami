@@ -5,6 +5,10 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20240611
+- al2 ami version: 20240611
+- enhancement: Disable security updates at launch for ECS-optimized AL2 AMIs [#254](https://github.com/aws/amazon-ecs-ami/pull/254)
+
 ## 20240610
 - al2 ami version: 20240610
 - al2023 ami version: 20240610
