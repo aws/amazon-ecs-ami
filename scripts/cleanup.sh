@@ -85,24 +85,6 @@ INSTANCE_LOG_FILES=(
 echo "Cleaning up instance log files"
 cleanup "${INSTANCE_LOG_FILES[@]}"
 
-echo "Cleaning TOE files"
-if [[ $(sudo find {{workingDirectory}}/TOE_* -type f | sudo wc -l) -gt 0 ]]; then
-    echo "Deleting files within {{workingDirectory}}/TOE_*"
-    sudo find {{workingDirectory}}/TOE_* -type f -exec shred -zuf {} \;
-fi
-if [[ $(sudo find {{workingDirectory}}/TOE_* -type f | sudo wc -l) -gt 0 ]]; then
-    echo "Failed to delete {{workingDirectory}}/TOE_*"
-    exit 1
-fi
-if [[ $(sudo find {{workingDirectory}}/TOE_* -type d | sudo wc -l) -gt 0 ]]; then
-    echo "Deleting {{workingDirectory}}/TOE_*"
-    sudo rm -rf {{workingDirectory}}/TOE_*
-fi
-if [[ $(sudo find {{workingDirectory}}/TOE_* -type d | sudo wc -l) -gt 0 ]]; then
-    echo "Failed to delete {{workingDirectory}}/TOE_*"
-    exit 1
-fi
-
 echo "Cleaning up ssm log files"
 if sudo test -d "/var/log/amazon/ssm"; then
     echo "Deleting /var/log/amazon/ssm/*"
