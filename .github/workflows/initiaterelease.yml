@@ -3,7 +3,7 @@ name: InitiateRelease
 on: 
   workflow_dispatch:
   schedule: 
-    - cron: 0 18 * * 2
+    - cron: 0 18 * * 1-5
 
 jobs:
   GenerateConfig:
