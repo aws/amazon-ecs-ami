@@ -72,7 +72,7 @@ variable "ecs_init_rev" {
 variable "docker_version" {
   type        = string
   description = "Docker version to build AMI with."
-  default     = "20.10.25"
+  default     = "25.0.3"
 }
 
 variable "containerd_version" {
