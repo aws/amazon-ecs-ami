@@ -5,6 +5,12 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20240709
+- al2 ami version: 20240709
+- al2023 ami version: 20240709
+- enhancement: Update ECS Agent version to 1.85.0 [#268](https://github.com/aws/amazon-ecs-ami/pull/268)
+- enhancement: Update AL2 Docker version to 25.0.3 [#267](https://github.com/aws/amazon-ecs-ami/pull/267) 
+
 ## 20240702
 - al2023 ami version: 20240702
 - source al2023 ami: al2023-ami-minimal-2023.5.20240701.0-kernel-6.1-x86_64
