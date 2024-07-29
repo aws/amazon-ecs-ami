@@ -19,6 +19,9 @@ jobs:
     - name: Delete shinkansen branch on codecommit repository
       run: |
         aws codecommit delete-branch --repository-name amazon-ecs-ami-mirror --branch-name shinkansen
+    - name: Sleeping for 30 seconds after CodeCommit branch deletion and before recreating it
+      run: |
+        sleep 30
     - name: Configure prereqs
       run: |
         git config --global user.name "Github Action"
