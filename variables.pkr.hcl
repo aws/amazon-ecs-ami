@@ -72,7 +72,7 @@ variable "ecs_init_rev" {
 variable "docker_version" {
   type        = string
   description = "Docker version to build AMI with."
-  default     = "25.0.3"
+  default     = "25.0.6"
 }
 
 variable "containerd_version" {
@@ -90,7 +90,7 @@ variable "runc_version" {
 variable "docker_version_al2023" {
   type        = string
   description = "Docker version to build AL2023 AMI with."
-  default     = "25.0.3"
+  default     = "25.0.6"
 }
 
 variable "containerd_version_al2023" {
