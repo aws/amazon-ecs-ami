@@ -1,5 +1,11 @@
 locals {
   ami_name_al2 = "${var.ami_name_prefix_al2}-hvm-2.0.${var.ami_version_al2}-x86_64-ebs"
+  motd_files = [
+    "29-ecs-banner-begin",
+    "31-ecs-banner-finish",
+    "69-available-updates-begin",
+    "71-available-updates-finish"
+  ]
 }
 
 source "amazon-ebs" "al2" {
@@ -17,8 +23,9 @@ source "amazon-ebs" "al2" {
     filters = {
       name = "${var.source_ami_al2}"
     }
-    owners      = ["amazon"]
-    most_recent = true
+    owners             = ["amazon"]
+    most_recent        = true
+    include_deprecated = true
   }
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
@@ -58,30 +65,25 @@ build {
     ]
   }
 
-  provisioner "file" {
-    source      = "files/29-ecs-banner-begin.sh.amzn2"
-    destination = "/tmp/29-ecs-banner-begin"
+  dynamic "provisioner" {
+    for_each = local.motd_files
+    labels   = ["file"]
+    content {
+      source      = "files/${provisioner.value}.sh.amzn2"
+      destination = "/tmp/${provisioner.value}"
+    }
   }
 
-  provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mv /tmp/29-ecs-banner-begin /etc/update-motd.d/29-ecs-banner-begin",
-      "sudo chmod 755 /etc/update-motd.d/29-ecs-banner-begin"
-    ]
-  }
-
-  provisioner "file" {
-    source      = "files/31-ecs-banner-finish.sh.amzn2"
-    destination = "/tmp/31-ecs-banner-finish"
-  }
-
-  provisioner "shell" {
-    inline_shebang = "/bin/sh -ex"
-    inline = [
-      "sudo mv /tmp/31-ecs-banner-finish /etc/update-motd.d/31-ecs-banner-finish",
-      "sudo chmod 755 /etc/update-motd.d/31-ecs-banner-finish"
-    ]
+  dynamic "provisioner" {
+    for_each = local.motd_files
+    labels   = ["shell"]
+    content {
+      inline_shebang = "/bin/sh -ex"
+      inline = [
+        "sudo mv /tmp/${provisioner.value} /etc/update-motd.d/${provisioner.value}",
+        "sudo chmod 755 /etc/update-motd.d/${provisioner.value}"
+      ]
+    }
   }
 
   provisioner "shell" {

@@ -31,10 +31,7 @@ sudo yum install -y aws-neuronx-dkms-2.*
 sudo yum install -y aws-neuronx-oci-hook-2.*
 
 # Install oci-add-hooks
-# TODO: oci-add-hooks package has compatibility issue with AL2023 IMDSv2. Remove condition after root caused and resolved
-if [[ $AMI_TYPE == "al2"*"inf" ]]; then
-    sudo yum install -y oci-add-hooks
-fi
+sudo yum install -y oci-add-hooks
 
 # Install Neuron Tools
 sudo yum install -y aws-neuronx-tools
