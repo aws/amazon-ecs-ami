@@ -78,7 +78,7 @@ variable "docker_version" {
 variable "containerd_version" {
   type        = string
   description = "Containerd version to build AMI with."
-  default     = "1.7.11"
+  default     = "1.7.20"
 }
 
 variable "runc_version" {
