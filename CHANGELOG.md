@@ -5,6 +5,10 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20240814
+- al2 ami version: 20240814
+- enhancement: Bump AL2 containerd to 1.7.20 [#293](https://github.com/aws/amazon-ecs-ami/pull/293)
+
 ## 20240809
 - ecs version: 1.86.0
 
