@@ -27,7 +27,7 @@ sudo mv /tmp/neuron.repo /etc/yum.repos.d/neuron.repo
 sudo yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
 
 # Install Neuron Driver
-sudo yum install -y aws-neuronx-dkms-2.*
+sudo yum install -y aws-neuronx-dkms-2.17.17.0
 sudo yum install -y aws-neuronx-oci-hook-2.*
 
 # Install oci-add-hooks
