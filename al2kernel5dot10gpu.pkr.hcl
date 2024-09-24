@@ -21,6 +21,9 @@ source "amazon-ebs" "al2kernel5dot10gpu" {
     most_recent        = true
     include_deprecated = true
   }
+  ami_ou_arns   = "${var.ami_ou_arns}"
+  ami_org_arns  = "${var.ami_org_arns}"
+  ami_users     = "${var.ami_users}"
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
   tags = {
