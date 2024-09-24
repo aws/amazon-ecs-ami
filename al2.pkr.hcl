@@ -6,6 +6,15 @@ locals {
     "69-available-updates-begin",
     "71-available-updates-finish"
   ]
+  default_tags = {
+    os_version          = "Amazon Linux 2"
+    source_image_name   = "{{ .SourceAMIName }}"
+    ecs_runtime_version = "Docker version ${var.docker_version}"
+    ecs_agent_version   = "${var.ecs_agent_version}"
+    ami_type            = "al2"
+    ami_version         = "2.0.${var.ami_version_al2}"
+  }
+  merged_tags = merge("${local.default_tags}", "${var.tags}")
 }
 
 source "amazon-ebs" "al2" {
@@ -29,14 +38,8 @@ source "amazon-ebs" "al2" {
   }
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
-  tags = {
-    os_version          = "Amazon Linux 2"
-    source_image_name   = "{{ .SourceAMIName }}"
-    ecs_runtime_version = "Docker version ${var.docker_version}"
-    ecs_agent_version   = "${var.ecs_agent_version}"
-    ami_type            = "al2"
-    ami_version         = "2.0.${var.ami_version_al2}"
-  }
+  tags = "${local.merged_tags}"
+  run_tags = "${var.run_tags}"
 }
 
 build {

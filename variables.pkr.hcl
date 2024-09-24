@@ -238,3 +238,15 @@ variable "ebs_csi_driver_version" {
   description = "EBS CSI driver version to build AMI with."
   default     = ""
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Tags to apply to the built AMI."
+  default     = {}
+}
+
+variable "run_tags" {
+  type        = map(string)
+  description = "Tags to apply to resources (key-pair, SG, IAM, snapshot, interfaces and instance) used when building the AMI."
+  default     = {}
+}

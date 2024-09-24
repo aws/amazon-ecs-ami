@@ -1,5 +1,14 @@
 locals {
   ami_name_al2kernel5dot10gpu = "${var.ami_name_prefix_al2}-kernel-5.10-gpu-hvm-2.0.${var.ami_version_al2}-x86_64-ebs"
+  tags = {
+    os_version          = "Amazon Linux 2"
+    source_image_name   = "{{ .SourceAMIName }}"
+    ecs_runtime_version = "Docker version ${var.docker_version}"
+    ecs_agent_version   = "${var.ecs_agent_version}"
+    ami_type            = "al2kernel5dot10gpu"
+    ami_version         = "2.0.${var.ami_version_al2}"
+  }
+  merged_tags = merge("${local.default_tags}", "${var.tags}")
 }
 
 source "amazon-ebs" "al2kernel5dot10gpu" {
@@ -23,12 +32,6 @@ source "amazon-ebs" "al2kernel5dot10gpu" {
   }
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
-  tags = {
-    os_version          = "Amazon Linux 2"
-    source_image_name   = "{{ .SourceAMIName }}"
-    ecs_runtime_version = "Docker version ${var.docker_version}"
-    ecs_agent_version   = "${var.ecs_agent_version}"
-    ami_type            = "al2kernel5dot10gpu"
-    ami_version         = "2.0.${var.ami_version_al2}"
-  }
+  tags = "${local.merged_tags}"
+  run_tags = "${var.run_tags}"
 }
