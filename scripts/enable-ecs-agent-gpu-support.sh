@@ -140,9 +140,10 @@ else
         xorg-x11-server-Xorg \
         docker-runtime-nvidia \
         oci-add-hooks \
-        libnvidia-container \
+        libnvidia-container1 \
         libnvidia-container-tools \
-        nvidia-container-runtime-hook
+        nvidia-container-toolkit-base \
+        nvidia-container-toolkit
 
     sudo yum install -y cuda-drivers \
         cuda
