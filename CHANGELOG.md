@@ -5,6 +5,10 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20241031
+- al2023 ami version: 20241031
+- distribution al2023 release: 2023.6.20241028
+
 ## 20241023
 - al2 ami version: 20241023
 - enhancement: gpu AMI package update [#328](https://github.com/aws/amazon-ecs-ami/pull/328)
