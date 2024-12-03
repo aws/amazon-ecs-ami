@@ -36,6 +36,9 @@ source "amazon-ebs" "al1" {
     most_recent        = true
     include_deprecated = true
   }
+  ami_ou_arns    = "${var.ami_ou_arns}"
+  ami_org_arns   = "${var.ami_org_arns}"
+  ami_users      = "${var.ami_users}"
   user_data_file = "scripts/al1/user_data.sh"
   ssh_interface  = "public_ip"
   ssh_username   = "ec2-user"

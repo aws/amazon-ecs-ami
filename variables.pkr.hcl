@@ -60,7 +60,7 @@ variable "block_device_size_gb" {
 variable "ecs_agent_version" {
   type        = string
   description = "ECS agent version to build AMI with."
-  default     = "1.88.0"
+  default     = "1.89.1"
 }
 
 variable "ecs_init_rev" {
@@ -237,6 +237,24 @@ variable "ebs_csi_driver_version" {
   type        = string
   description = "EBS CSI driver version to build AMI with."
   default     = ""
+}
+
+variable "ami_ou_arns" {
+  type        = list(string)
+  description = "A list of Amazon Resource Names (ARN) of AWS Organizations organizational units (OU) that have access to launch the resulting AMI(s)."
+  default     = []
+}
+
+variable "ami_org_arns" {
+  type        = list(string)
+  description = "A list of Amazon Resource Names (ARN) of AWS Organizations that have access to launch the resulting AMI(s)."
+  default     = []
+}
+
+variable "ami_users" {
+  type        = list(string)
+  description = "A list of account IDs that have access to launch the resulting AMI(s)."
+  default     = []
 }
 
 variable "tags" {
