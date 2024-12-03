@@ -39,8 +39,8 @@ source "amazon-ebs" "al1" {
   user_data_file = "scripts/al1/user_data.sh"
   ssh_interface  = "public_ip"
   ssh_username   = "ec2-user"
-  tags = "${local.merged_tags}"
-  run_tags = "${var.run_tags}"
+  tags           = "${local.merged_tags}"
+  run_tags       = "${var.run_tags}"
 }
 
 build {

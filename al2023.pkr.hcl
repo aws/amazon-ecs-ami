@@ -32,8 +32,8 @@ source "amazon-ebs" "al2023" {
   }
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
-  tags = "${local.merged_tags}"
-  run_tags = "${var.run_tags}"
+  tags          = "${local.merged_tags}"
+  run_tags      = "${var.run_tags}"
 }
 
 build {
