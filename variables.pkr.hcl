@@ -256,3 +256,15 @@ variable "ami_users" {
   description = "A list of account IDs that have access to launch the resulting AMI(s)."
   default     = []
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Tags to apply to the built AMI."
+  default     = {}
+}
+
+variable "run_tags" {
+  type        = map(string)
+  description = "Tags to apply to resources (key-pair, SG, IAM, snapshot, interfaces and instance) used when building the AMI."
+  default     = {}
+}

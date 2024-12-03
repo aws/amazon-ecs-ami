@@ -1,5 +1,14 @@
 locals {
   ami_name_al1 = "${var.ami_name_prefix_al1}${var.ami_version_al1}-amazon-ecs-optimized"
+  default_tags = {
+    os_version          = "Amazon Linux"
+    source_image_name   = "{{ .SourceAMIName }}"
+    ecs_runtime_version = "Docker version ${var.docker_version_al1}"
+    ecs_agent_version   = "${var.ecs_version_al1}"
+    ami_type            = "al1"
+    ami_version         = "2018.03.${var.ami_version_al1}"
+  }
+  merged_tags = merge("${local.default_tags}", "${var.tags}")
 }
 
 source "amazon-ebs" "al1" {
@@ -33,14 +42,8 @@ source "amazon-ebs" "al1" {
   user_data_file = "scripts/al1/user_data.sh"
   ssh_interface  = "public_ip"
   ssh_username   = "ec2-user"
-  tags = {
-    os_version          = "Amazon Linux"
-    source_image_name   = "{{ .SourceAMIName }}"
-    ecs_runtime_version = "Docker version ${var.docker_version_al1}"
-    ecs_agent_version   = "${var.ecs_version_al1}"
-    ami_type            = "al1"
-    ami_version         = "2018.03.${var.ami_version_al1}"
-  }
+  tags           = "${local.merged_tags}"
+  run_tags       = "${var.run_tags}"
 }
 
 build {
