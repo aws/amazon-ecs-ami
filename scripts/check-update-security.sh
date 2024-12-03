@@ -118,7 +118,8 @@ instance_id=$(aws ec2 run-instances \
     --image-id $ami_id \
     --instance-type $instance_type \
     --iam-instance-profile Arn=$IAM_INSTANCE_PROFILE_ARN \
-    --user-data file://user_data.txt |
+    --user-data file://user_data.txt \
+    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value='$platform-check-update-security'}]' |
     jq -r '.Instances[0].InstanceId')
 command_params='commands=["yum check-update --security --sec-severity=critical --exclude=nvidia*,docker*,cuda*,containerd*,runc* -q"]'
 
