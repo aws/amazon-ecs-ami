@@ -1,6 +1,6 @@
 locals {
   ami_name_al2023neu = "${var.ami_name_prefix_al2023}-neuron-hvm-2023.0.${var.ami_version_al2023}${var.kernel_version_al2023}-x86_64"
-  tags = {
+  default_tags = {
     os_version          = "Amazon Linux 2023"
     source_image_name   = "{{ .SourceAMIName }}"
     ecs_runtime_version = "Docker version ${var.docker_version_al2023}"

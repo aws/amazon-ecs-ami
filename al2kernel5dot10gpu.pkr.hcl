@@ -1,6 +1,6 @@
 locals {
   ami_name_al2kernel5dot10gpu = "${var.ami_name_prefix_al2}-kernel-5.10-gpu-hvm-2.0.${var.ami_version_al2}-x86_64-ebs"
-  tags = {
+  default_tags = {
     os_version          = "Amazon Linux 2"
     source_image_name   = "{{ .SourceAMIName }}"
     ecs_runtime_version = "Docker version ${var.docker_version}"

@@ -8,6 +8,7 @@ locals {
     ami_type            = "al2keplergpu"
     ami_version         = "2.0.${var.ami_version_al2}"
   }
+  merged_tags = merge("${local.default_tags}", "${var.tags}")
 }
 
 source "amazon-ebs" "al2keplergpu" {
