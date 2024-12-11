@@ -148,7 +148,8 @@ build {
     environment_vars = [
       "REGION=${var.region}",
       "EXEC_SSM_VERSION=${var.exec_ssm_version}",
-      "AIR_GAPPED=${var.air_gapped}"
+      "AIR_GAPPED=${var.air_gapped}",
+      "REGION_DNS_SUFFIX=${var.region_dns_suffix}"
     ]
   }
 
