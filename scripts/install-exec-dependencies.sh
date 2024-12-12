@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -ex
 
-if [ -n "$AIR_GAPPED" ]; then
-    echo "Air-gapped region, exec feature is not supported"
-    exit 0
-fi
+# Attempts to download a file using curl and exits the script gracefully if the download fails.
+# Usage: download_or_exit_gracefully <url> <output_file>
+download_or_exit_gracefully() {
+    curl -fLSs "$1" -o "$2" || { echo "Error: Failed to download $2"; exit 0; }
+}
 
 get_dns_suffix() {
     # If $REGION_DNS_SUFFIX is assigned and non-empty, use that
@@ -39,12 +40,12 @@ gpg --import /tmp/amazon-ssm-agent.gpg
 
 case $ARCHITECTURE in
 'x86_64')
-    curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.${DNS_SUFFIX}/${EXEC_SSM_VERSION}/linux_amd64/amazon-ssm-agent-binaries.tar.gz" -o amazon-ssm-agent.tar.gz || echo "Error: Failed to download amazon-ssm-agent.tar.gz"
-    curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.${DNS_SUFFIX}/${EXEC_SSM_VERSION}/linux_amd64/amazon-ssm-agent-binaries.tar.gz.sig" -o amazon-ssm-agent.tar.gz.sig || echo "Error: Failed to download amazon-ssm-agent.tar.gz.sig"
+    download_or_exit_gracefully "https://amazon-ssm-${REGION}.s3.${REGION}.${DNS_SUFFIX}/${EXEC_SSM_VERSION}/linux_amd64/amazon-ssm-agent-binaries.tar.gz" "amazon-ssm-agent.tar.gz"
+    download_or_exit_gracefully "https://amazon-ssm-${REGION}.s3.${REGION}.${DNS_SUFFIX}/${EXEC_SSM_VERSION}/linux_amd64/amazon-ssm-agent-binaries.tar.gz.sig" "amazon-ssm-agent.tar.gz.sig"
     ;;
 'aarch64')
-    curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.${DNS_SUFFIX}/${EXEC_SSM_VERSION}/linux_arm64/amazon-ssm-agent-binaries.tar.gz" -o amazon-ssm-agent.tar.gz || echo "Error: Failed to download amazon-ssm-agent.tar.gz"
-    curl -fLSs "https://amazon-ssm-${REGION}.s3.${REGION}.${DNS_SUFFIX}/${EXEC_SSM_VERSION}/linux_arm64/amazon-ssm-agent-binaries.tar.gz.sig" -o amazon-ssm-agent.tar.gz.sig || echo "Error: Failed to download amazon-ssm-agent.tar.gz.sig"
+    download_or_exit_gracefully "https://amazon-ssm-${REGION}.s3.${REGION}.${DNS_SUFFIX}/${EXEC_SSM_VERSION}/linux_arm64/amazon-ssm-agent-binaries.tar.gz" "amazon-ssm-agent.tar.gz"
+    download_or_exit_gracefully "https://amazon-ssm-${REGION}.s3.${REGION}.${DNS_SUFFIX}/${EXEC_SSM_VERSION}/linux_arm64/amazon-ssm-agent-binaries.tar.gz.sig" "amazon-ssm-agent.tar.gz.sig"
     ;;
 esac
 gpg --verify amazon-ssm-agent.tar.gz.sig amazon-ssm-agent.tar.gz
