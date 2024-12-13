@@ -26,6 +26,14 @@ get_dns_suffix() {
     echo "amazonaws.com${host_suffix}"
 }
 
+cleanup() {
+    if [ -d "/tmp/ssm-binaries" ]; then
+        rm -rf /tmp/ssm-binaries
+    fi
+}
+
+trap cleanup EXIT
+
 DNS_SUFFIX=$(get_dns_suffix)
 
 BINARY_PATH="/var/lib/ecs/deps/execute-command/bin/${EXEC_SSM_VERSION}"
