@@ -42,6 +42,7 @@ source "amazon-ebs" "al2023" {
 build {
   sources = [
     "source.amazon-ebs.al2023",
+    "source.amazon-ebs.al2023gpu",
     "source.amazon-ebs.al2023arm",
     "source.amazon-ebs.al2023neu"
   ]
@@ -170,6 +171,13 @@ build {
     start_retry_timeout = "40s" # wait before start retry
     max_retries         = 3
     script              = "scripts/enable-ecs-agent-inferentia-support.sh"
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "AMI_TYPE=${source.name}"
+    ]
+    script = "scripts/enable-ecs-agent-gpu-support.sh"
   }
 
   provisioner "shell" {

@@ -15,14 +15,34 @@ if [[ $AMI_TYPE != "al2"*"gpu" ]]; then
     exit 0
 fi
 
-# set up amzn2-nvidia repo
-GPG_CHECK=1
-# don't do the gpg check in air-gapped regions
-if [ -n "$AIR_GAPPED" ]; then
-    GPG_CHECK=0
-fi
-tmpfile=$(mktemp)
-cat >$tmpfile <<EOF
+if [[ $AMI_TYPE == "al2023"*"gpu" ]]; then 
+    # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-yum-or-dnf
+    tmpfile=$(mktemp)
+    cat >$tmpfile <<"EOF"
+[nvidia-container-toolkit]
+name=nvidia-container-toolkit
+baseurl=https://nvidia.github.io/libnvidia-container/stable/rpm/$basearch
+repo_gpgcheck=1
+gpgcheck=0
+enabled=1
+gpgkey=https://nvidia.github.io/libnvidia-container/gpgkey
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+EOF
+    sudo mv $tmpfile "/etc/yum.repos.d/nvidia-container-toolkit.repo"
+
+    # https://github.com/aws/amazon-ecs-ami/issues/319#issuecomment-2471834667
+    sudo dnf install -y nvidia-release
+    sudo dnf clean all
+else
+    # set up amzn2-nvidia repo
+    GPG_CHECK=1
+    # don't do the gpg check in air-gapped regions
+    if [ -n "$AIR_GAPPED" ]; then
+        GPG_CHECK=0
+    fi
+    tmpfile=$(mktemp)
+    cat >$tmpfile <<EOF
 [amzn2-nvidia]
 name=Amazon Linux 2 Nvidia repository
 mirrorlist=\$awsproto://\$amazonlinux.\$awsregion.\$awsdomain/\$releasever/amzn2-nvidia/latest/\$basearch/mirror.list
@@ -33,14 +53,15 @@ enabled=1
 exclude=libglvnd-*
 EOF
 
-DKMS=/usr/sbin/dkms
-DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
+    DKMS=/usr/sbin/dkms
+    DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
 
-# the amzn2-nvidia repo is temporary and only used for installing the system-release-nvidia package
-sudo mv $tmpfile /etc/yum.repos.d/amzn2-nvidia-tmp.repo
+    # the amzn2-nvidia repo is temporary and only used for installing the system-release-nvidia package
+    sudo mv $tmpfile /etc/yum.repos.d/amzn2-nvidia-tmp.repo
+fi
 
 # only install open driver for post-kepler gpus, exclude airgapped regions
-if [[ $AMI_TYPE != "al2keplergpu" && -z ${AIR_GAPPED} ]]; then
+if [[ $AMI_TYPE != "al2keplergpu" && $AMI_TYPE != "al2023"*"gpu" && -z ${AIR_GAPPED} ]]; then
     sudo yum install -y yum-plugin-versionlock yum-utils
     sudo amazon-linux-extras install epel -y
     sudo yum install -y "kernel-devel-uname-r == $(uname -r)"
@@ -108,9 +129,11 @@ EOF
     sudo chmod +x /var/lib/ecs/scripts/install-nvidia-open-kmod.sh
 fi
 
-# system-release-nvidia creates an nvidia repo file at /etc/yum.repos.d/amzn2-nvidia.repo
-sudo yum install -y system-release-nvidia
-sudo rm /etc/yum.repos.d/amzn2-nvidia-tmp.repo
+if [[ $AMI_TYPE == "al2"*"gpu" && $AMI_TYPE != "al2023"*"gpu" ]]; then 
+    # system-release-nvidia creates an nvidia repo file at /etc/yum.repos.d/amzn2-nvidia.repo
+    sudo yum install -y system-release-nvidia
+    sudo rm /etc/yum.repos.d/amzn2-nvidia-tmp.repo
+fi
 
 # for building AMIs for GPUs with Kepler architecture, fix package versions
 # also exclude nvidia and cuda packages to update. Newer Nvidia drivers do not support Kepler architecture
@@ -130,6 +153,26 @@ if [[ $AMI_TYPE == "al2keplergpu" ]]; then
 
     sudo yum install -y cuda-toolkit-11-4
     echo "exclude=*nvidia* *cuda*" | sudo tee -a /etc/yum.conf
+elif [[ $AMI_TYPE == "al2023"*"gpu" ]]; then
+    kernel_release=$(uname -r)
+
+    sudo dnf install -y kernel-devel-"$kernel_release" \
+        kernel-modules-extra-"$kernel_release" \
+        nvidia-driver \
+        nvidia-fabric-manager \
+        pciutils \
+        xorg-x11-server-Xorg \
+        oci-add-hooks \
+        libnvidia-container1 \
+        libnvidia-container-tools \
+        nvidia-container-toolkit
+
+    sudo dnf install -y cuda-drivers \
+        cuda
+
+    # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker
+    sudo nvidia-ctk runtime configure --runtime=docker
+    sudo systemctl restart docker
 else
     # Default GPU AMI
     sudo yum install -y kernel-devel-$(uname -r) \
