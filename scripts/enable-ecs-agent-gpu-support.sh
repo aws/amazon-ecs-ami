@@ -160,15 +160,9 @@ elif [[ $AMI_TYPE == "al2023"*"gpu" ]]; then
         kernel-modules-extra-"$kernel_release" \
         nvidia-driver \
         nvidia-fabric-manager \
-        pciutils \
-        xorg-x11-server-Xorg \
-        oci-add-hooks \
         libnvidia-container1 \
         libnvidia-container-tools \
         nvidia-container-toolkit
-
-    sudo dnf install -y cuda-drivers \
-        cuda
 
     # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker
     sudo nvidia-ctk runtime configure --runtime=docker
