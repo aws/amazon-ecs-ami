@@ -164,9 +164,11 @@ elif [[ $AMI_TYPE == "al2023"*"gpu" ]]; then
         libnvidia-container-tools \
         nvidia-container-toolkit
 
-    # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker
+    # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
     sudo nvidia-ctk runtime configure --runtime=docker
+    sudo nvidia-ctk runtime configure --runtime=containerd
     sudo systemctl restart docker
+    sudo systemctl restart containerd
 else
     # Default GPU AMI
     sudo yum install -y kernel-devel-$(uname -r) \
