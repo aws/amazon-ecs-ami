@@ -4,7 +4,10 @@ set -ex
 # Attempts to download a file using curl and exits the script gracefully if the download fails.
 # Usage: download_or_exit_gracefully <url> <output_file>
 download_or_exit_gracefully() {
-    curl -fLSs "$1" -o "$2" || { echo "Error: Failed to download $2"; exit 0; }
+    curl -fLSs "$1" -o "$2" || {
+        echo "Error: Failed to download $2"
+        exit 0
+    }
 }
 
 get_dns_suffix() {
@@ -20,7 +23,7 @@ get_dns_suffix() {
     fi
 
     local host_suffix=""
-    if grep -q "^cn-" <<< "$REGION"; then
+    if grep -q "^cn-" <<<"$REGION"; then
         host_suffix=".cn"
     fi
     echo "amazonaws.com${host_suffix}"
