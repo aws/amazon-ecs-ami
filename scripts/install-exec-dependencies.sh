@@ -10,6 +10,8 @@ download_or_exit_gracefully() {
     }
 }
 
+# Returns AWS DNS suffix from $REGION_DNS_SUFFIX if set, errors if no dns suffix set for air-gapped regions.
+# Defaults to amazonaws.com[.cn]
 get_dns_suffix() {
     # If $REGION_DNS_SUFFIX is assigned and non-empty, use that
     if [ -n "$REGION_DNS_SUFFIX" ]; then
