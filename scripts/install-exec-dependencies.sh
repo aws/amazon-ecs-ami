@@ -15,7 +15,7 @@ download_or_exit_gracefully() {
 get_dns_suffix() {
     # If $REGION_DNS_SUFFIX is assigned and non-empty, use that
     if [ -n "$REGION_DNS_SUFFIX" ]; then
-        >&2 echo "Using configured DNS suffix: $REGION_DNS_SUFFIX"
+        echo >&2 "Using configured DNS suffix: $REGION_DNS_SUFFIX"
         echo "$REGION_DNS_SUFFIX"
         return
     fi
