@@ -35,6 +35,7 @@ export REGION=us-west-2
 echo "block_device_size_gb = 8" > ./overrides.auto.pkrvars.hcl
 make al2
 ```
+
 ## Additional Packages
 
 Any rpm package placed into the additional-packages/ directory will be uploaded to the instance and installed.
