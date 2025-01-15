@@ -35,14 +35,6 @@ export REGION=us-west-2
 echo "block_device_size_gb = 8" > ./overrides.auto.pkrvars.hcl
 make al2
 ```
-
-## Important Note on SSM Binaries Installation
-
-The build process includes downloading and installing Amazon SSM Agent binaries for ECS Exec functionality:
-
-1. Failed binary downloads will NOT halt AMI creation, but the resulting AMI will lack ECS Exec support. To verify, check for no "Failed to download amazon-ssm-agent.tar.gz" or "Failed to download amazon-ssm-agent.tar.gz.sig" messages in logs.
-2. The build process will stop for all other failures (such as DNS suffix resolution, GPG verification, or binary extraction).
-
 ## Additional Packages
 
 Any rpm package placed into the additional-packages/ directory will be uploaded to the instance and installed.
