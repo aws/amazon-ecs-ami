@@ -268,3 +268,9 @@ variable "run_tags" {
   description = "Tags to apply to resources (key-pair, SG, IAM, snapshot, interfaces and instance) used when building the AMI."
   default     = {}
 }
+
+variable "region_dns_suffix" {
+  type        = string
+  description = "DNS Suffix to use for in region URLs"
+  default     = ""
+}
