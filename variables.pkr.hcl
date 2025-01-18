@@ -60,7 +60,7 @@ variable "block_device_size_gb" {
 variable "ecs_agent_version" {
   type        = string
   description = "ECS agent version to build AMI with."
-  default     = "1.89.2"
+  default     = "1.89.3"
 }
 
 variable "ecs_init_rev" {
