@@ -5,6 +5,60 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250121
+- ecs version: 1.89.3
+
+## 20250117
+- al2 ami version: 20250117
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20250116.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250116.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20250116.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20250116.0-arm64-ebs
+- al2023 ami version: 20250117
+- source al2023 ami: al2023-ami-minimal-2023.6.20250115.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.6.20250115.0-kernel-6.1-arm64
+- distribution al2023 release: 2023.6.20250115
+
+## 20250115
+- al2 ami version: 20250115
+- enhancement: Support existing ECS Exec feature in air-gapped regions
+
+## 20250113
+- al2 ami version: 20250113
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20250108.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250108.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20250108.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20250108.0-arm64-ebs
+
+## 20250110
+- al2023 ami version: 20250110
+- source al2023 ami: al2023-ami-minimal-2023.6.20250107.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.6.20250107.0-kernel-6.1-arm64
+- distribution al2023 release: 2023.6.20250107
+
+## 20250102
+- al2 ami version: 20250102
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20241217.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20241217.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20241217.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20241217.0-arm64-ebs
+
+## 20241217
+- ecs version: 1.89.2
+- al2 ami version: 20241217
+- al2023 ami version: 20241217
+- source al2023 ami: al2023-ami-minimal-2023.6.20241212.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.6.20241212.0-kernel-6.1-arm64
+- distribution al2023 release: 20241212
+
+## 20241213
+- ecs version: 1.89.1
+- al2 ami version: 20241213
+- al2023 ami version: 20241213
+- source al2023 ami: al2023-ami-minimal-2023.6.20241121.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.6.20241121.0-kernel-6.1-arm64
+- distribution al2023 release: 20241121
+
 ## 20241120
 - al2 ami version: 20241120
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20241113.1-x86_64-ebs

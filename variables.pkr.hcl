@@ -60,7 +60,7 @@ variable "block_device_size_gb" {
 variable "ecs_agent_version" {
   type        = string
   description = "ECS agent version to build AMI with."
-  default     = "1.88.0"
+  default     = "1.89.3"
 }
 
 variable "ecs_init_rev" {
@@ -236,5 +236,41 @@ variable "managed_daemon_base_url" {
 variable "ebs_csi_driver_version" {
   type        = string
   description = "EBS CSI driver version to build AMI with."
+  default     = ""
+}
+
+variable "ami_ou_arns" {
+  type        = list(string)
+  description = "A list of Amazon Resource Names (ARN) of AWS Organizations organizational units (OU) that have access to launch the resulting AMI(s)."
+  default     = []
+}
+
+variable "ami_org_arns" {
+  type        = list(string)
+  description = "A list of Amazon Resource Names (ARN) of AWS Organizations that have access to launch the resulting AMI(s)."
+  default     = []
+}
+
+variable "ami_users" {
+  type        = list(string)
+  description = "A list of account IDs that have access to launch the resulting AMI(s)."
+  default     = []
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Tags to apply to the built AMI."
+  default     = {}
+}
+
+variable "run_tags" {
+  type        = map(string)
+  description = "Tags to apply to resources (key-pair, SG, IAM, snapshot, interfaces and instance) used when building the AMI."
+  default     = {}
+}
+
+variable "region_dns_suffix" {
+  type        = string
+  description = "DNS Suffix to use for in region URLs"
   default     = ""
 }

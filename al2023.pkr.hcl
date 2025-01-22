@@ -1,5 +1,14 @@
 locals {
   ami_name_al2023 = "${var.ami_name_prefix_al2023}-hvm-2023.0.${var.ami_version_al2023}${var.kernel_version_al2023}-x86_64"
+  default_tags = {
+    os_version          = "Amazon Linux 2023"
+    source_image_name   = "{{ .SourceAMIName }}"
+    ecs_runtime_version = "Docker version ${var.docker_version_al2023}"
+    ecs_agent_version   = "${var.ecs_agent_version}"
+    ami_type            = "al2023"
+    ami_version         = "2023.0.${var.ami_version_al2023}"
+  }
+  merged_tags = merge("${local.default_tags}", "${var.tags}")
 }
 
 source "amazon-ebs" "al2023" {
@@ -21,16 +30,13 @@ source "amazon-ebs" "al2023" {
     most_recent        = true
     include_deprecated = true
   }
+  ami_ou_arns   = "${var.ami_ou_arns}"
+  ami_org_arns  = "${var.ami_org_arns}"
+  ami_users     = "${var.ami_users}"
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
-  tags = {
-    os_version          = "Amazon Linux 2023"
-    source_image_name   = "{{ .SourceAMIName }}"
-    ecs_runtime_version = "Docker version ${var.docker_version_al2023}"
-    ecs_agent_version   = "${var.ecs_agent_version}"
-    ami_type            = "al2023"
-    ami_version         = "2023.0.${var.ami_version_al2023}"
-  }
+  tags          = "${local.merged_tags}"
+  run_tags      = "${var.run_tags}"
 }
 
 build {
@@ -142,7 +148,8 @@ build {
     environment_vars = [
       "REGION=${var.region}",
       "EXEC_SSM_VERSION=${var.exec_ssm_version}",
-      "AIR_GAPPED=${var.air_gapped}"
+      "AIR_GAPPED=${var.air_gapped}",
+      "REGION_DNS_SUFFIX=${var.region_dns_suffix}"
     ]
   }
 
