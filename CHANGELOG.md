@@ -5,6 +5,18 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250127
+- al2 ami version: 20250117
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20250123.4-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250123.4-arm64-ebs
+- source al2 kernel 5.10 ami:  amzn2-ami-minimal-hvm-2.0.20250123.4-x86_64-ebs
+- source al2 kernel 5.10 arm ami: mzn2-ami-minimal-hvm-2.0.20250123.4-arm64-ebs
+- al2023 ami version: 20250117
+- source al2023 ami: al2023-ami-minimal-2023.6.20250123.4-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.6.20250123.4-kernel-6.1-arm64
+- distribution al2023 release: 2023.6.20250123
+- enhancement: Update SSM GPG key for ECS Exec SSM Agent [#377](https://github.com/aws/amazon-ecs-ami/pull/377) 
+
 ## 20250121
 - ecs version: 1.89.3
 
