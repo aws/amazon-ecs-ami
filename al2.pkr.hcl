@@ -27,6 +27,11 @@ source "amazon-ebs" "al2" {
     volume_type           = "gp2"
     device_name           = "/dev/xvda"
   }
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required" // This enforces IMDSv2
+    http_put_response_hop_limit = 2
+  }
   region = var.region
   source_ami_filter {
     filters = {
