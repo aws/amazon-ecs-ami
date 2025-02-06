@@ -5,6 +5,20 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250206
+- al2 ami version: 20250206
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20250201.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250201.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20250201.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20250201.0-arm64-ebs
+- al2023 ami version: 20250206
+- source al2023 ami: al2023-ami-minimal-2023.6.20250203.1-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.6.20250203.1-kernel-6.1-arm64
+- distribution al2023 release: 2023.6.20250203
+- feature: add AL2023 GPU recipe [#370](https://github.com/aws/amazon-ecs-ami/pull/370)
+- enhancement: Update ECS Agent version to 1.90.0 [#382](https://github.com/aws/amazon-ecs-ami/pull/382)
+- enhancement: Bump containerd to 1.7.25 [#384](https://github.com/aws/amazon-ecs-ami/pull/384)
+
 ## 20250129
 - al2 ami version: 20250129
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20250123.4-x86_64-ebs
