@@ -5,6 +5,15 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250224
+- al1 ami version: 20250224
+- al2 ami version: 20250224
+- al2023 ami version: 20250224
+- source al2023 ami: al2023-ami-minimal-2023.6.20250218.2-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.6.20250218.2-kernel-6.1-arm64
+- distribution al2023 release: 2023.6.20250218
+- enhancement: Update amazon-ssm-agent version for exec to 3.3.1802.0 [#391](https://github.com/aws/amazon-ecs-ami/pull/391)
+
 ## 20250214
 - al2023 ami version: 20250214
 - source al2023 ami: al2023-ami-minimal-2023.6.20250211.0-kernel-6.1-x86_64
