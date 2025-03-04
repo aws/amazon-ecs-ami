@@ -152,6 +152,7 @@ build {
   provisioner "shell" {
     script = "scripts/install-exec-dependencies.sh"
     environment_vars = [
+      "AMI_TYPE=${source.name}",
       "REGION=${var.region}",
       "EXEC_SSM_VERSION=${var.exec_ssm_version}",
       "AIR_GAPPED=${var.air_gapped}",
