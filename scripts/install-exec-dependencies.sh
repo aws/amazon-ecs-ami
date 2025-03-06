@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-if [[ -n "$AIR_GAPPED" && "$AMI_TYPE" = "al1" ]]; then
+if [[ -n $AIR_GAPPED && $AMI_TYPE == "al1" ]]; then
     echo "For Air-gapped region, exec feature is not supported for AL1 AMIs"
     exit 0
 fi
