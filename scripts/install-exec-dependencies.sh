@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -ex
 
+if [[ -n $AIR_GAPPED && $AMI_TYPE == "al1" ]]; then
+    echo "For Air-gapped region, exec feature is not supported for AL1 AMIs"
+    exit 0
+fi
+
 # Returns AWS DNS suffix from $REGION_DNS_SUFFIX if set, errors if no dns suffix set for air-gapped regions.
 # Defaults to amazonaws.com[.cn]
 get_dns_suffix() {
