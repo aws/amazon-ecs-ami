@@ -227,18 +227,6 @@ variable "neu_instance_types" {
   default     = ["inf1.xlarge"]
 }
 
-variable "managed_daemon_base_url" {
-  type        = string
-  description = "Base URL (minus file name) to download managed daemons from."
-  default     = ""
-}
-
-variable "ebs_csi_driver_version" {
-  type        = string
-  description = "EBS CSI driver version to build AMI with."
-  default     = ""
-}
-
 variable "ami_ou_arns" {
   type        = list(string)
   description = "A list of Amazon Resource Names (ARN) of AWS Organizations organizational units (OU) that have access to launch the resulting AMI(s)."
