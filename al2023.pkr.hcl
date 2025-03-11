@@ -124,17 +124,6 @@ build {
   }
 
   provisioner "shell" {
-    script = "scripts/install-managed-daemons.sh"
-    environment_vars = [
-      "REGION=${var.region}",
-      "AGENT_VERSION=${var.ecs_agent_version}",
-      "EBS_CSI_DRIVER_VERSION=${var.ebs_csi_driver_version}",
-      "AIR_GAPPED=${var.air_gapped}",
-      "MANAGED_DAEMON_BASE_URL=${var.managed_daemon_base_url}"
-    ]
-  }
-
-  provisioner "shell" {
     script = "scripts/append-efs-client-info.sh"
   }
 
