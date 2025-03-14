@@ -7,6 +7,7 @@ AL2_GPU_NVIDIA_VERSION=""
 AL2_GPU_CUDA_VERSION=""
 AL1_CONTAINERD_VERSION=""
 AL1_RUNC_VERSION=""
+AL2023_GPU_NVIDIA_VERSION=""
 EXCLUDE_AMI=""
 
 usage() {
@@ -19,10 +20,11 @@ Options:
 	--al2-gpu-cuda-ver    (Optional) AL2 GPU CUDA version. If specified, then  --al2-gpu-nvidia-ver option is also required to be specified.
 	--al1-containerd-ver  (Optional) AL1 containerd version.
 	--al1-runc-ver        (Optional) AL1 runc version.
+        --al2023-gpu-nvidia-ver (Optional) AL2023 GPU NVIDIA version.
 	--exclude-ami         (Optional) comma separated list of AMI variants that are excluded in the release.
 
 Example:
-  $0 --al2-gpu-nvidia-ver 000.00.00 --al2-gpu-cuda-ver 00.0.0 --al1-containerd-ver 0.0.0 --al1-runc-ver 0.0.0 --exclude-ami al2023neu,al2inf
+  $0 --al2-gpu-nvidia-ver 000.00.00 --al2-gpu-cuda-ver 00.0.0 --al1-containerd-ver 0.0.0 --al1-runc-ver 0.0.0 --al2023-gpu-nvidia-ver 000.00.00 --exclude-ami al2023neu,al2inf
 EOF
 }
 
@@ -50,6 +52,10 @@ parse_args() {
             ;;
         --al1-runc-ver)
             AL1_RUNC_VERSION="$2"
+            shift
+            ;;
+        --al2023-gpu-nvidia-ver)
+            AL2023_GPU_NVIDIA_VERSION="$2"
             shift
             ;;
         --exclude-ami)
@@ -88,6 +94,11 @@ validate_args() {
 
     if [ -z "$AL1_RUNC_VERSION" ] && ! is_ami_excluded "al1"; then
         printf "Error: AL1 runc version is empty when releasing AL1\n\n"
+        usage
+        exit 1
+    fi
+    if [ -z "$AL2023_GPU_NVIDIA_VERSION" ] && ! is_ami_excluded "al2023gpu"; then
+        printf "Error: AL2023 GPU NVIDIA version is empty when releasing AL2023 GPU \n\n"
         usage
         exit 1
     fi
@@ -130,7 +141,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 "
 
     # AL2023
-    if ! { is_ami_excluded "al2023" && is_ami_excluded "al2023arm" && is_ami_excluded "al2023neu"; }; then
+    if ! { is_ami_excluded "al2023" && is_ami_excluded "al2023arm" && is_ami_excluded "al2023neu" && is_ami_excluded "al2023gpu"; }; then
         # Get AL2023 AMI family details
         readonly containerd_version_al2023=$(cat $variablespkr | sed -n '/containerd_version_al2023"/,/}/p' | grep -w 'default' | cut -d '"' -f2)
         readonly runc_version_al2023=$(cat $variablespkr | sed -n '/runc_version_al2023"/,/}/p' | grep -w 'default' | cut -d '"' -f2)
@@ -173,6 +184,13 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
             # AL2023 Neuron AMI details
             read ami_name_al2023_neuron agent_version_al2023_neuron docker_version_al2023_neuron source_ami_name_al2023_neuron <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2023/neuron/recommended")
             add_ami_to_release_notes "#### Neuron" "$ami_name_al2023_neuron" "$agent_version_al2023_neuron" "$docker_version_al2023_neuron" "$containerd_version_al2023" "$runc_version_al2023" "" "" "$source_ami_name_al2023_neuron" "$distribution_release_al2023"
+        fi
+
+        # Include AL2023 GPU release notes if there was an al2023gpu release
+        if ! is_ami_excluded "al2023gpu"; then
+            # AL2023 GPU AMI details
+            read ami_name_al2023_gpu agent_version_al2023_gpu docker_version_al2023_gpu source_ami_name_al2023_gpu <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2023/gpu/recommended")
+            add_ami_to_release_notes "#### GPU" "$ami_name_al2023_gpu" "$agent_version_al2023_gpu" "$docker_version_al2023_gpu" "$containerd_version_al2023" "$runc_version_al2023" "$AL2023_GPU_NVIDIA_VERSION" "" "$source_ami_name_al2023_gpu" "$distribution_release_al2023"
         fi
     fi
 

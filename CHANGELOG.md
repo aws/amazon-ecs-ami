@@ -5,6 +5,44 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250314
+- al2023 ami version: 20250314
+- al2 ami version: 20250314
+- enhancement: Bump docker version to 25.0.8 and runc version to 1.2.4 [#404](https://github.com/aws/amazon-ecs-ami/pull/404)
+
+## 20250310
+- al2023 ami version: 20250310
+- al2 ami version: 20250310
+- source al2023 ami: al2023-ami-minimal-2023.6.20250303.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.6.20250303.0-kernel-6.1-arm64
+- distribution al2023 release: 2023.6.20250303
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20250305.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250305.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20250305.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20250305.0-arm64-ebs
+- Bug-fix: Skip SSM Agent installation for AL1 in Isolated Regions [399](https://github.com/aws/amazon-ecs-ami/pull/399)
+
+## 20250304
+- al2 ami version: 20250304
+- al2023 ami version: 20250304
+- ecs version: 1.91.0
+
+## 20250226
+- al2 ami version: 20250226
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20250220.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250220.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20250220.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20250201.0-arm64-ebs
+
+## 20250224
+- al1 ami version: 20250224
+- al2 ami version: 20250224
+- al2023 ami version: 20250224
+- source al2023 ami: al2023-ami-minimal-2023.6.20250218.2-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.6.20250218.2-kernel-6.1-arm64
+- distribution al2023 release: 2023.6.20250218
+- enhancement: Update amazon-ssm-agent version for exec to 3.3.1802.0 [#391](https://github.com/aws/amazon-ecs-ami/pull/391)
+
 ## 20250214
 - al2023 ami version: 20250214
 - source al2023 ami: al2023-ami-minimal-2023.6.20250211.0-kernel-6.1-x86_64
