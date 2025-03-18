@@ -5,6 +5,11 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250318
+- ecs version: 1.91.1
+- bug fix: Remove AL1 AMI build automation [#406](https://github.com/aws/amazon-ecs-ami/pull/406)
+- enhancement: Removing install-managed-daemons.sh from al2 and al2023 packer build files [#403](https://github.com/aws/amazon-ecs-ami/pull/403)
+
 ## 20250314
 - al2023 ami version: 20250314
 - al2 ami version: 20250314
