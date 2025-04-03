@@ -8,7 +8,7 @@ fi
 
 ### Install GPU Drivers and Required Packages
 # Install base requirements
-sudo dnf install -y dkms kernel-modules-extra
+sudo dnf install -y dkms kernel-modules-extra kernel-devel-$(uname -r)
 
 # Enable DKMS service
 sudo systemctl enable --now dkms
