@@ -1,8 +1,8 @@
 name: InitiateRelease
 
-on: 
+on:
   workflow_dispatch:
-  schedule: 
+  schedule:
     - cron: 0 18 * * 1-5
 
 jobs:
@@ -16,8 +16,8 @@ jobs:
       id-token: write
       contents: write
       pull-requests: write
-    env: 
-      IAM_INSTANCE_PROFILE_ARN: ${{ secrets.IAM_INSTANCE_PROFILE_ARN }} 
+    env:
+      IAM_INSTANCE_PROFILE_ARN: ${{ secrets.IAM_INSTANCE_PROFILE_ARN }}
       GH_TOKEN: ${{ github.token }}
     steps:
     - name: Checkout
@@ -28,19 +28,17 @@ jobs:
         git checkout -b release-${date}
     - name: Install xmllint
       run: |
-        # generate-release-vars.sh depends on these packages 
+        # generate-release-vars.sh depends on these packages
         sudo apt-get update && sudo apt-get install libxml2-utils
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
-      with: 
+      with:
         role-to-assume: ${{ secrets.AMI_GENERATE_CONFIG_ROLE }}
         aws-region: us-west-2
     - name: Configure Bot Alias
       run: |
         git config --global user.name "GenerateConfig Action"
         git config --global user.email "gcaction@github.com"
-    - name: Check AL1 Update
-      run: ./scripts/check-update.sh al1
     - name: Check AL2 Update
       run: ./scripts/check-update.sh al2
     - name: Check AL2023 Update
@@ -51,7 +49,7 @@ jobs:
         # Git diff returns exit code of 1 when there is a change staged
         # We need the set statements to prevent erroring out
         set +e
-        git diff --cached --quiet 
+        git diff --cached --quiet
         echo "stage_exit_code=$?" >> "$GITHUB_OUTPUT"
         set -e
     - name: Commit and Push Changes
@@ -63,7 +61,7 @@ jobs:
         git status
         git push --set-upstream origin release-${date}
         echo "push_exit_code=$?" >> "$GITHUB_OUTPUT"
-    - name: Open PR for Branch 
+    - name: Open PR for Branch
       id: pr
       if: ${{ steps.stage.outputs.stage_exit_code == 1 && steps.push.outputs.push_exit_code == 0 }}
       run: |
@@ -82,22 +80,22 @@ jobs:
       uses: actions/checkout@v4
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
-      with: 
+      with:
         role-to-assume: ${{secrets.AMI_MIRROR_ROLE}}
         aws-region: us-west-2
     - name: Delete shinkansen branch on codecommit repository
       run: |
         aws codecommit delete-branch --repository-name amazon-ecs-ami-mirror --branch-name shinkansen
-    - name: Sleeping for 30 seconds after CodeCommit branch deletion and before recreating it
+    - name: Sleeping for 60 seconds after CodeCommit branch deletion and before recreating it
       run: |
-        sleep 30
+        sleep 60
     - name: Configure prereqs
       run: |
         git config --global user.name "Github Action"
         git config --global user.email "action@github.com"
         pip install git-remote-codecommit
     - name: Mirror to shinkansen branch on codecommit repository
-      run: | 
+      run: |
         date=$(date '+%Y%m%d')
         git clone --single-branch --branch release-${date} https://github.com/aws/amazon-ecs-ami ecsAmiGithub
         git clone codecommit::us-west-2://amazon-ecs-ami-mirror ecsAmiCodeCommit
@@ -119,7 +117,7 @@ jobs:
       uses: actions/checkout@v4
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
-      with: 
+      with:
         role-to-assume: ${{secrets.AMI_MIRROR_ROLE}}
         aws-region: us-west-2
     - name: Failure Scenario

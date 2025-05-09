@@ -1,5 +1,14 @@
 locals {
   ami_name_al2023 = "${var.ami_name_prefix_al2023}-hvm-2023.0.${var.ami_version_al2023}${var.kernel_version_al2023}-x86_64"
+  default_tags = {
+    os_version          = "Amazon Linux 2023"
+    source_image_name   = "{{ .SourceAMIName }}"
+    ecs_runtime_version = "Docker version ${var.docker_version_al2023}"
+    ecs_agent_version   = "${var.ecs_agent_version}"
+    ami_type            = "al2023"
+    ami_version         = "2023.0.${var.ami_version_al2023}"
+  }
+  merged_tags = merge("${local.default_tags}", "${var.tags}")
 }
 
 source "amazon-ebs" "al2023" {
@@ -12,6 +21,11 @@ source "amazon-ebs" "al2023" {
     volume_type           = "gp3"
     device_name           = "/dev/xvda"
   }
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required" // This enforces IMDSv2
+    http_put_response_hop_limit = 2
+  }
   region = var.region
   source_ami_filter {
     filters = {
@@ -21,23 +35,21 @@ source "amazon-ebs" "al2023" {
     most_recent        = true
     include_deprecated = true
   }
+  ami_ou_arns   = "${var.ami_ou_arns}"
+  ami_org_arns  = "${var.ami_org_arns}"
+  ami_users     = "${var.ami_users}"
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
-  tags = {
-    os_version          = "Amazon Linux 2023"
-    source_image_name   = "{{ .SourceAMIName }}"
-    ecs_runtime_version = "Docker version ${var.docker_version_al2023}"
-    ecs_agent_version   = "${var.ecs_agent_version}"
-    ami_type            = "al2023"
-    ami_version         = "2023.0.${var.ami_version_al2023}"
-  }
+  tags          = "${local.merged_tags}"
+  run_tags      = "${var.run_tags}"
 }
 
 build {
   sources = [
     "source.amazon-ebs.al2023",
     "source.amazon-ebs.al2023arm",
-    "source.amazon-ebs.al2023neu"
+    "source.amazon-ebs.al2023neu",
+    "source.amazon-ebs.al2023gpu"
   ]
 
   provisioner "file" {
@@ -112,17 +124,6 @@ build {
   }
 
   provisioner "shell" {
-    script = "scripts/install-managed-daemons.sh"
-    environment_vars = [
-      "REGION=${var.region}",
-      "AGENT_VERSION=${var.ecs_agent_version}",
-      "EBS_CSI_DRIVER_VERSION=${var.ebs_csi_driver_version}",
-      "AIR_GAPPED=${var.air_gapped}",
-      "MANAGED_DAEMON_BASE_URL=${var.managed_daemon_base_url}"
-    ]
-  }
-
-  provisioner "shell" {
     script = "scripts/append-efs-client-info.sh"
   }
 
@@ -140,9 +141,11 @@ build {
   provisioner "shell" {
     script = "scripts/install-exec-dependencies.sh"
     environment_vars = [
+      "AMI_TYPE=${source.name}",
       "REGION=${var.region}",
       "EXEC_SSM_VERSION=${var.exec_ssm_version}",
-      "AIR_GAPPED=${var.air_gapped}"
+      "AIR_GAPPED=${var.air_gapped}",
+      "REGION_DNS_SUFFIX=${var.region_dns_suffix}"
     ]
   }
 
@@ -164,6 +167,13 @@ build {
     start_retry_timeout = "40s" # wait before start retry
     max_retries         = 3
     script              = "scripts/enable-ecs-agent-inferentia-support.sh"
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "AMI_TYPE=${source.name}"
+    ]
+    script = "scripts/enable-ecs-agent-gpu-support-al2023.sh"
   }
 
   provisioner "shell" {

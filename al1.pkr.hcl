@@ -1,5 +1,14 @@
 locals {
   ami_name_al1 = "${var.ami_name_prefix_al1}${var.ami_version_al1}-amazon-ecs-optimized"
+  default_tags = {
+    os_version          = "Amazon Linux"
+    source_image_name   = "{{ .SourceAMIName }}"
+    ecs_runtime_version = "Docker version ${var.docker_version_al1}"
+    ecs_agent_version   = "${var.ecs_version_al1}"
+    ami_type            = "al1"
+    ami_version         = "2018.03.${var.ami_version_al1}"
+  }
+  merged_tags = merge("${local.default_tags}", "${var.tags}")
 }
 
 source "amazon-ebs" "al1" {
@@ -18,6 +27,11 @@ source "amazon-ebs" "al1" {
     volume_type           = "gp2"
     device_name           = "/dev/xvdcz"
   }
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required" // This enforces IMDSv2
+    http_put_response_hop_limit = 2
+  }
   region = var.region
   source_ami_filter {
     filters = {
@@ -27,17 +41,14 @@ source "amazon-ebs" "al1" {
     most_recent        = true
     include_deprecated = true
   }
+  ami_ou_arns    = "${var.ami_ou_arns}"
+  ami_org_arns   = "${var.ami_org_arns}"
+  ami_users      = "${var.ami_users}"
   user_data_file = "scripts/al1/user_data.sh"
   ssh_interface  = "public_ip"
   ssh_username   = "ec2-user"
-  tags = {
-    os_version          = "Amazon Linux"
-    source_image_name   = "{{ .SourceAMIName }}"
-    ecs_runtime_version = "Docker version ${var.docker_version_al1}"
-    ecs_agent_version   = "${var.ecs_version_al1}"
-    ami_type            = "al1"
-    ami_version         = "2018.03.${var.ami_version_al1}"
-  }
+  tags           = "${local.merged_tags}"
+  run_tags       = "${var.run_tags}"
 }
 
 build {
@@ -112,6 +123,7 @@ build {
   provisioner "shell" {
     script = "scripts/install-exec-dependencies.sh"
     environment_vars = [
+      "AMI_TYPE=${source.name}",
       "REGION=${var.region}",
       "EXEC_SSM_VERSION=${var.exec_ssm_version}",
       "AIR_GAPPED=${var.air_gapped}"

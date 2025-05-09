@@ -9,8 +9,8 @@ packer {
 
 locals {
   packages_al1    = "amazon-efs-utils ec2-net-utils acpid irqbalance numactl rng-tools docker-storage-setup"
-  packages_al2    = "acpid amazon-efs-utils amazon-ssm-agent ec2-instance-connect ec2-net-utils yum-plugin-upgrade-helper"
-  packages_al2023 = "amazon-efs-utils amazon-ssm-agent amazon-ec2-net-utils acpid ec2-instance-connect"
+  packages_al2    = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent ec2-instance-connect yum-plugin-upgrade-helper iproute-tc"
+  packages_al2023 = "amazon-efs-utils amazon-ssm-agent amazon-ec2-net-utils acpid ec2-instance-connect iproute-tc"
 }
 
 variable "ami_name_prefix_al1" {
@@ -60,7 +60,7 @@ variable "block_device_size_gb" {
 variable "ecs_agent_version" {
   type        = string
   description = "ECS agent version to build AMI with."
-  default     = "1.86.2"
+  default     = "1.93.0"
 }
 
 variable "ecs_init_rev" {
@@ -72,43 +72,43 @@ variable "ecs_init_rev" {
 variable "docker_version" {
   type        = string
   description = "Docker version to build AMI with."
-  default     = "25.0.6"
+  default     = "25.0.8"
 }
 
 variable "containerd_version" {
   type        = string
   description = "Containerd version to build AMI with."
-  default     = "1.7.20"
+  default     = "1.7.27"
 }
 
 variable "runc_version" {
   type        = string
   description = "Runc version to build AMI with."
-  default     = "1.1.11"
+  default     = "1.2.4"
 }
 
 variable "docker_version_al2023" {
   type        = string
   description = "Docker version to build AL2023 AMI with."
-  default     = "25.0.6"
+  default     = "25.0.8"
 }
 
 variable "containerd_version_al2023" {
   type        = string
   description = "Containerd version to build AL2023 AMI with."
-  default     = "1.7.20"
+  default     = "1.7.27"
 }
 
 variable "runc_version_al2023" {
   type        = string
   description = "Runc version to build AL2023 AMI with."
-  default     = "1.1.11"
+  default     = "1.2.4"
 }
 
 variable "exec_ssm_version" {
   type        = string
   description = "SSM binary version to build ECS exec support with."
-  default     = "3.2.2303.0"
+  default     = "3.3.1802.0"
 }
 
 variable "source_ami_al2" {
@@ -227,14 +227,38 @@ variable "neu_instance_types" {
   default     = ["inf1.xlarge"]
 }
 
-variable "managed_daemon_base_url" {
-  type        = string
-  description = "Base URL (minus file name) to download managed daemons from."
-  default     = ""
+variable "ami_ou_arns" {
+  type        = list(string)
+  description = "A list of Amazon Resource Names (ARN) of AWS Organizations organizational units (OU) that have access to launch the resulting AMI(s)."
+  default     = []
 }
 
-variable "ebs_csi_driver_version" {
+variable "ami_org_arns" {
+  type        = list(string)
+  description = "A list of Amazon Resource Names (ARN) of AWS Organizations that have access to launch the resulting AMI(s)."
+  default     = []
+}
+
+variable "ami_users" {
+  type        = list(string)
+  description = "A list of account IDs that have access to launch the resulting AMI(s)."
+  default     = []
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Tags to apply to the built AMI."
+  default     = {}
+}
+
+variable "run_tags" {
+  type        = map(string)
+  description = "Tags to apply to resources (key-pair, SG, IAM, snapshot, interfaces and instance) used when building the AMI."
+  default     = {}
+}
+
+variable "region_dns_suffix" {
   type        = string
-  description = "EBS CSI driver version to build AMI with."
+  description = "DNS Suffix to use for in region URLs"
   default     = ""
 }

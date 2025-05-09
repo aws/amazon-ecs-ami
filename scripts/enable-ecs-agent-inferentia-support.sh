@@ -27,7 +27,12 @@ sudo mv /tmp/neuron.repo /etc/yum.repos.d/neuron.repo
 sudo yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
 
 # Install Neuron Driver
-sudo yum install -y aws-neuronx-dkms-2.*
+if [[ $AMI_TYPE == "al2inf" ]]; then
+    # Pin the aws-neuronx-dkms package version to 2.17.17.0 only for al2inf, since the newest versions of the Neuron SDK are no longer supporting linux kernel 4.14
+    sudo yum install -y aws-neuronx-dkms-2.17.17.0
+else
+    sudo yum install -y aws-neuronx-dkms-2.*
+fi
 sudo yum install -y aws-neuronx-oci-hook-2.*
 
 # Install oci-add-hooks
