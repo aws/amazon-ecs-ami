@@ -7,7 +7,7 @@ usage() {
     echo "  $0 AMI_PLATFORM"
     echo "Example:"
     echo "  $0 al2_arm"
-    echo "AMI_PLATFORM Must be one of: al1, al2, al2_arm"
+    echo "AMI_PLATFORM Must be one of: al1, al2, al2_arm, al2_gpu, al2023_gpu"
 }
 
 error_msg() {
@@ -19,6 +19,8 @@ error_msg() {
 AL1_PATH="/aws/service/ecs/optimized-ami/amazon-linux/recommended"
 AL2_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 AL2_ARM_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/arm64/recommended"
+AL2_GPU_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended"
+AL2023_GPU_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/gpu/recommended"
 
 # Indicates that an update exists
 UPDATE_EXISTS_CODE="100"
@@ -66,6 +68,13 @@ case "$platform" in
 "al2_arm")
     ami_path=$AL2_ARM_PATH
     instance_type="c6g.medium"
+    ;;
+"al2_gpu")
+    ami_path=$AL2_GPU_PATH
+    ;;
+"al2023_gpu")
+    ami_path=$AL2023_GPU_PATH
+    instance_type="g4dn.xlarge"
     ;;
 *)
     error_msg "Incorrect platform selection"
@@ -122,7 +131,20 @@ instance_id=$(aws ec2 run-instances \
     --user-data file://user_data.txt \
     --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value='$platform-check-update-security'}]' |
     jq -r '.Instances[0].InstanceId')
-command_params='commands=["yum check-update --security --sec-severity=critical --exclude=nvidia*,docker*,cuda*,containerd*,runc* -q"]'
+
+# check-update based on platform
+if [ "$platform" = "al2_gpu" ]; then
+    # The amzn2-nvidia repository does not provide updateinfo metadata (updateinfo.xml),
+    # which YUM relies on to classify updates as security-related. The --security flag
+    # would not detect updates without this metadata. Therefore, we check for all updates
+    # to nvidia-driver packages and handle them as potential security updates.
+    command_params='commands=["yum check-update nvidia-driver-latest-dkms -q"]'
+elif [ "$platform" = "al2023_gpu" ]; then
+    # Run check-update in a loop to ensure that the repo metadata is up to date
+    command_params='commands=["for i in {1..5}; do dnf clean expire-cache; dnf --refresh check-upgrade nvidia-driver-cuda -q; code=$?; if [ $code -eq 100 ]; then exit 100; fi; sleep 5; done; exit 0"]'
+else
+    command_params='commands=["yum check-update --security --sec-severity=critical --exclude=nvidia*,docker*,cuda*,containerd*,runc* -q"]'
+fi
 
 # Wait for instance status to reach ok, fail at timeout code
 aws ec2 wait instance-running --instance-ids $instance_id
@@ -170,7 +192,7 @@ command_status() {
         --query 'Status' \
         --output text
 }
-max_retries=20
+max_retries=25
 success=0
 for ((r = 0; r < max_retries; r++)); do
     sleep 5
@@ -187,17 +209,31 @@ if [ $success -ne 1 ]; then
 fi
 
 # Get command output
-cmd_response_code=$(aws ssm get-command-invocation \
+cmd_output=$(aws ssm get-command-invocation \
     --command-id $cmd_id \
-    --instance-id $instance_id |
-    jq -r '.ResponseCode')
+    --instance-id $instance_id)
+
+cmd_response_code=$(echo "$cmd_output" | jq -r '.ResponseCode')
+std_output=$(echo "$cmd_output" | jq -r '.StandardOutputContent')
 
 # Delete the instance
 terminate_out=$(aws ec2 terminate-instances --instance-ids $instance_id)
 
 # Return whether update is necessary
 if [ "$cmd_response_code" -eq "$UPDATE_EXISTS_CODE" ]; then
-    echo "true"
+    if [ "$platform" = "al2_gpu" ]; then
+        nvidia_driver_version=$(echo "$std_output" | grep "nvidia-driver-latest-dkms" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://')
+        if [ -n "$nvidia_driver_version" ]; then
+            echo "true $nvidia_driver_version"
+        else
+            echo "true"
+        fi
+    elif [ "$platform" = "al2023_gpu" ]; then
+        nvidia_driver_version=$(echo "$std_output" | grep "nvidia-driver-cuda" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://')
+        echo "true $nvidia_driver_version"
+    else
+        echo "true"
+    fi
 elif [ "$cmd_response_code" -ne "$SUCCESS_CODE" ]; then
     # If update doesn't exist and there was a fail code, something went wrong
     echo "Unknown issue with the command execution"
