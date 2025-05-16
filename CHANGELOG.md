@@ -5,6 +5,11 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250515
+- ecs version: 1.93.0
+- al2 ami version: 20250515
+- bug fix: Pinning kernel version to 5.10.235* and downgrading agent version back to 1.93.0 [#437](https://github.com/aws/amazon-ecs-ami/pull/437)
+
 ## 20250514
 - ecs version: 1.93.1
 - al2 ami version: 20250514
