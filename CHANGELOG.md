@@ -15,7 +15,11 @@
 - source al2023 ami: al2023-ami-minimal-2023.7.20250527.1-kernel-6.1-x86_64
 - source al2023 arm ami: al2023-ami-minimal-2023.7.20250527.1-kernel-6.1-arm64
 - distribution al2023 release: 2023.7.20250527
+<<<<<<< HEAD
 - bug fix: Unpinning kernel version from 5.10.235* [#446](https://github.com/aws/amazon-ecs-ami/pull/446)
+=======
+- bug fix: Unpinning AL2 kernel5dot10 version from 5.10.235* [#446](https://github.com/aws/amazon-ecs-ami/pull/446)
+>>>>>>> b379375 (Update CHANGELOG 20250604)
 
 ## 20250523
 - ecs version: 1.94.0
