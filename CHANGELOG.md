@@ -5,6 +5,9 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250618
+- ecs version: 1.95.0
+
 ## 20250613
 - al2 ami version: 20250613
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20250610.0-x86_64-ebs
