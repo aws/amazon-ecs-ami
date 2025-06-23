@@ -8,7 +8,7 @@ fi
 
 ### Install GPU Drivers and Required Packages
 # Install base requirements
-sudo dnf install -y dkms kernel-modules-extra kernel-devel-$(uname -r)
+sudo dnf install -y dkms kernel-modules-extra-$(uname -r) kernel-devel-$(uname -r)
 
 # Enable DKMS service
 sudo systemctl enable --now dkms
@@ -23,6 +23,16 @@ sudo dnf install -y nvidia-driver \
     xorg-x11-server-Xorg \
     nvidia-container-toolkit \
     oci-add-hooks
+
+### Package installation and setup to support P6 instances
+# Install base requirements
+sudo dnf install -y libibumad infiniband-diags nvlsm
+
+# Load the User Mode API driver for InfiniBand
+sudo modprobe ib_umad
+
+# Ensure the ib_umad module is loaded at boot
+echo ib_umad | sudo tee /etc/modules-load.d/ib_umad.conf
 
 ### Configure NVIDIA Services
 # The Fabric Manager service needs to be started and enabled on EC2 P4d instances
