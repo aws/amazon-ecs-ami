@@ -1,4 +1,6 @@
 # ECS-optimized AMI Build Recipes
+> [!IMPORTANT]
+> The ECS-optimized Amazon Linux AMI (also called Amazon Linux 1) will reach its end of life on September 15, 2025. We encourage customers to upgrade their applications to use Amazon Linux 2023, which includes long term support through 2028.
 
 This is a [packer](https://packer.io) recipe for creating an ECS-optimized AMI.
 It will create a private AMI in whatever account you are running it in.
