@@ -6,6 +6,7 @@
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
 ## 20250714
+- al2 ami version: 20250714
 - al2023 ami version: 20250714
 - source al2023 ami: al2023-ami-minimal-2023.8.20250707.0-kernel-6.1-x86_64
 - source al2023 arm ami: al2023-ami-minimal-2023.8.20250707.0-kernel-6.1-arm64
