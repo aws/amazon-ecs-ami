@@ -78,13 +78,13 @@ variable "docker_version" {
 variable "containerd_version" {
   type        = string
   description = "Containerd version to build AMI with."
-  default     = "1.7.27"
+  default     = "2.0.5"
 }
 
 variable "runc_version" {
   type        = string
   description = "Runc version to build AMI with."
-  default     = "1.2.4"
+  default     = "1.2.6"
 }
 
 variable "docker_version_al2023" {
@@ -96,13 +96,13 @@ variable "docker_version_al2023" {
 variable "containerd_version_al2023" {
   type        = string
   description = "Containerd version to build AL2023 AMI with."
-  default     = "1.7.27"
+  default     = "2.0.5"
 }
 
 variable "runc_version_al2023" {
   type        = string
   description = "Runc version to build AL2023 AMI with."
-  default     = "1.2.4"
+  default     = "1.2.6"
 }
 
 variable "exec_ssm_version" {
