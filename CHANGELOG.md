@@ -5,6 +5,17 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250716
+- al2 ami version: 20250716
+- al2023 ami version: 20250716
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20250707.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250707.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20250707.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20250707.0-arm64-ebs
+- runc version: 1.2.6 [#478](https://github.com/aws/amazon-ecs-ami/pull/478)
+- containerd version: 2.0.5 [#478](https://github.com/aws/amazon-ecs-ami/pull/478)
+- ecs version: 1.96.0 [#479](https://github.com/aws/amazon-ecs-ami/pull/479)
+
 ## 20250714
 - al2 ami version: 20250714
 - al2023 ami version: 20250714
