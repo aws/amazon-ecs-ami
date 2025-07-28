@@ -15,11 +15,16 @@ error_msg() {
     echo "ERROR: $msg"
 }
 
+# Package to exclude when checking for security updates
+EXCLUDE_SEC_UPDATES_PKGS="nvidia*,docker*,cuda*,containerd*,runc*"
+
 # Paths to get the ami ids from ssm params
 AL1_PATH="/aws/service/ecs/optimized-ami/amazon-linux/recommended"
 AL2_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 AL2_ARM_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/arm64/recommended"
 AL2_GPU_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended"
+AL2023_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
+AL2023_ARM_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
 AL2023_GPU_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/gpu/recommended"
 
 # Indicates that an update exists
@@ -71,6 +76,13 @@ case "$platform" in
     ;;
 "al2_gpu")
     ami_path=$AL2_GPU_PATH
+    ;;
+"al2023")
+    ami_path=$AL2023_PATH
+    ;;
+"al2023_arm")
+    ami_path=$AL2023_ARM_PATH
+    instance_type="c6g.medium"
     ;;
 "al2023_gpu")
     ami_path=$AL2023_GPU_PATH
@@ -133,17 +145,21 @@ instance_id=$(aws ec2 run-instances \
     jq -r '.Instances[0].InstanceId')
 
 # check-update based on platform
-if [ "$platform" = "al2_gpu" ]; then
+if [[ $platform == al2023* ]]; then
+    check_upgrade_options="--releasever=latest --sec-severity Critical --exclude=$EXCLUDE_SEC_UPDATES_PKGS"
+    if [[ $platform == *gpu ]]; then
+        check_upgrade_options="nvidia-driver-cuda"
+    fi
+    # Run check-upgrade in a loop to ensure that the repo metadata is up to date
+    command_params="commands=[\"for i in {1..5}; do dnf clean expire-cache; dnf --refresh check-upgrade $check_upgrade_options -q; code=$?; if [ $code -eq 100 ]; then exit 100; fi; sleep 5; done; exit 0\"]"
+elif [ "$platform" = "al2_gpu" ]; then
     # The amzn2-nvidia repository does not provide updateinfo metadata (updateinfo.xml),
     # which YUM relies on to classify updates as security-related. The --security flag
     # would not detect updates without this metadata. Therefore, we check for all updates
     # to nvidia-driver packages and handle them as potential security updates.
     command_params='commands=["yum check-update nvidia-driver-latest-dkms -q"]'
-elif [ "$platform" = "al2023_gpu" ]; then
-    # Run check-update in a loop to ensure that the repo metadata is up to date
-    command_params='commands=["for i in {1..5}; do dnf clean expire-cache; dnf --refresh check-upgrade nvidia-driver-cuda -q; code=$?; if [ $code -eq 100 ]; then exit 100; fi; sleep 5; done; exit 0"]'
 else
-    command_params='commands=["yum check-update --security --sec-severity=critical --exclude=nvidia*,docker*,cuda*,containerd*,runc* -q"]'
+    command_params="commands=[\"yum check-update --security --sec-severity=critical --exclude=$EXCLUDE_SEC_UPDATES_PKGS -q\"]"
 fi
 
 # Wait for instance status to reach ok, fail at timeout code

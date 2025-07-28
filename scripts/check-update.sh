@@ -65,14 +65,11 @@ fi
 if [ -z "$diff_val" ]; then
     Update="false"
     case "$ami_type" in
-    "al2023")
-        # AL2023 version already generates a diff in dependency file if it has security updates, so no check necessary if AL2023
-        ;;
     "al1")
         Update=$(./scripts/check-update-security.sh $ami_type)
         ;;
-    "al2")
-        # Check all AL2 variants
+    "al2" | "al2023")
+        # Check security updates for each architecture type
         amd_update=$(./scripts/check-update-security.sh $ami_type)
         arm_update=$(./scripts/check-update-security.sh "${ami_type}_arm")
 
