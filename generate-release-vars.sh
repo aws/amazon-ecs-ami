@@ -92,12 +92,7 @@ EOF
     ami_name_al2023_arm=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al2023_arm" --query 'Images[0].Name' --output text)
     kernel_version_al2023_arm=$(grep -o -e "-kernel-[1-9.]*" <<<"$ami_name_al2023_arm")
 
-    # Get the latest AL2023 distribution release
-    # Ref: https://docs.aws.amazon.com/linux/al2023/ug/managing-repos-os-updates.html
-    # xmllint is required to find the latest distribution release from releasemd.xml in us-west-2
-    distribution_release_al2023=$(curl -s https://al2023-repos-us-west-2-de612dc2.s3.dualstack.us-west-2.amazonaws.com/core/releasemd.xml | xmllint --xpath "string(//root/releases/release[last()]/@version)" -)
-
-    readonly ami_name_al2023_x86 ami_name_al2023_arm distribution_release_al2023
+    readonly ami_name_al2023_x86 ami_name_al2023_arm
 
     readonly ecs_agent_version=$(sed -n '/variable "ecs_agent_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly ecs_init_rev=$(sed -n '/variable "ecs_init_rev" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
@@ -118,7 +113,6 @@ source_ami_al2023           = "$ami_name_al2023_x86"
 source_ami_al2023arm        = "$ami_name_al2023_arm"
 kernel_version_al2023       = "$kernel_version_al2023_x86"
 kernel_version_al2023arm    = "$kernel_version_al2023_arm"
-distribution_release_al2023 = "$distribution_release_al2023"
 EOF
     ;;
 *)

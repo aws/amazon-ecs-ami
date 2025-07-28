@@ -141,11 +141,6 @@ variable "source_ami_al2023arm" {
   description = "Amazon Linux 2023 ARM source AMI to build from."
 }
 
-variable "distribution_release_al2023" {
-  type        = string
-  description = "Amazon Linux 2023 distribution release."
-}
-
 variable "kernel_version_al2023" {
   type        = string
   description = "Amazon Linux 2023 kernel version."

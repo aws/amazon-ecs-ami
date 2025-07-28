@@ -145,17 +145,12 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
         # Get AL2023 AMI family details
         readonly containerd_version_al2023=$(cat $variablespkr | sed -n '/containerd_version_al2023"/,/}/p' | grep -w 'default' | cut -d '"' -f2)
         readonly runc_version_al2023=$(cat $variablespkr | sed -n '/runc_version_al2023"/,/}/p' | grep -w 'default' | cut -d '"' -f2)
-        readonly distribution_release_al2023=$(cat $al2023pkrvars | grep -w 'distribution_release_al2023' | cut -d '"' -f2)
         if [ -z "$containerd_version_al2023" ]; then
             echo "Error: Containerd version was not found for AL2023 in $variablespkr"
             exit 1
         fi
         if [ -z "$runc_version_al2023" ]; then
             echo "Error: Runc version was not found for AL2023 in $variablespkr"
-            exit 1
-        fi
-        if [ -z "$distribution_release_al2023" ]; then
-            echo "Error: Distribution release version was not found for AL2023 in $al2023pkrvars"
             exit 1
         fi
 
@@ -169,28 +164,28 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
         if ! is_ami_excluded "al2023"; then
             # AL2023 AMD64 AMI details
             read ami_name_al2023_x86 agent_version_al2023_x86 docker_version_al2023_x86 source_ami_name_al2023_x86 <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended")
-            add_ami_to_release_notes "#### AMD64" "$ami_name_al2023_x86" "$agent_version_al2023_x86" "$docker_version_al2023_x86" "$containerd_version_al2023" "$runc_version_al2023" "" "" "$source_ami_name_al2023_x86" "$distribution_release_al2023"
+            add_ami_to_release_notes "#### AMD64" "$ami_name_al2023_x86" "$agent_version_al2023_x86" "$docker_version_al2023_x86" "$containerd_version_al2023" "$runc_version_al2023" "" "" "$source_ami_name_al2023_x86"
         fi
 
         # Include AL2023 ARM64 release notes if there was an al2023arm release
         if ! is_ami_excluded "al2023arm"; then
             # AL2023 ARM64 AMI details
             read ami_name_al2023_arm agent_version_al2023_arm docker_version_al2023_arm source_ami_name_al2023_arm <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended")
-            add_ami_to_release_notes "#### ARM64" "$ami_name_al2023_arm" "$agent_version_al2023_arm" "$docker_version_al2023_arm" "$containerd_version_al2023" "$runc_version_al2023" "" "" "$source_ami_name_al2023_arm" "$distribution_release_al2023"
+            add_ami_to_release_notes "#### ARM64" "$ami_name_al2023_arm" "$agent_version_al2023_arm" "$docker_version_al2023_arm" "$containerd_version_al2023" "$runc_version_al2023" "" "" "$source_ami_name_al2023_arm"
         fi
 
         # Include AL2023 Neuron release notes if there was an al2023neu release
         if ! is_ami_excluded "al2023neu"; then
             # AL2023 Neuron AMI details
             read ami_name_al2023_neuron agent_version_al2023_neuron docker_version_al2023_neuron source_ami_name_al2023_neuron <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2023/neuron/recommended")
-            add_ami_to_release_notes "#### Neuron" "$ami_name_al2023_neuron" "$agent_version_al2023_neuron" "$docker_version_al2023_neuron" "$containerd_version_al2023" "$runc_version_al2023" "" "" "$source_ami_name_al2023_neuron" "$distribution_release_al2023"
+            add_ami_to_release_notes "#### Neuron" "$ami_name_al2023_neuron" "$agent_version_al2023_neuron" "$docker_version_al2023_neuron" "$containerd_version_al2023" "$runc_version_al2023" "" "" "$source_ami_name_al2023_neuron"
         fi
 
         # Include AL2023 GPU release notes if there was an al2023gpu release
         if ! is_ami_excluded "al2023gpu"; then
             # AL2023 GPU AMI details
             read ami_name_al2023_gpu agent_version_al2023_gpu docker_version_al2023_gpu source_ami_name_al2023_gpu <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2023/gpu/recommended")
-            add_ami_to_release_notes "#### GPU" "$ami_name_al2023_gpu" "$agent_version_al2023_gpu" "$docker_version_al2023_gpu" "$containerd_version_al2023" "$runc_version_al2023" "$AL2023_GPU_NVIDIA_VERSION" "" "$source_ami_name_al2023_gpu" "$distribution_release_al2023"
+            add_ami_to_release_notes "#### GPU" "$ami_name_al2023_gpu" "$agent_version_al2023_gpu" "$docker_version_al2023_gpu" "$containerd_version_al2023" "$runc_version_al2023" "$AL2023_GPU_NVIDIA_VERSION" "" "$source_ami_name_al2023_gpu"
         fi
     fi
 
@@ -220,56 +215,56 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
         if ! is_ami_excluded "al2"; then
             # AL2 AMD64 (Kernel 4.14) AMI details
             read ami_name_al2_x86 agent_version_al2_x86 docker_version_al2_x86 source_ami_name_al2_x86 <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended")
-            add_ami_to_release_notes "#### AMD64 (Kernel 4.14)" "$ami_name_al2_x86" "$agent_version_al2_x86" "$docker_version_al2_x86" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_x86" ""
+            add_ami_to_release_notes "#### AMD64 (Kernel 4.14)" "$ami_name_al2_x86" "$agent_version_al2_x86" "$docker_version_al2_x86" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_x86"
         fi
 
         # Include AL2 ARM64 (Kernel 4.14) release notes if there was an al2arm release
         if ! is_ami_excluded "al2arm"; then
             # AL2 ARM64 (Kernel 4.14) AMI details
             read ami_name_al2_arm agent_version_al2_arm docker_version_al2_arm source_ami_name_al2_arm <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/arm64/recommended")
-            add_ami_to_release_notes "#### ARM64 (Kernel 4.14)" "$ami_name_al2_arm" "$agent_version_al2_arm" "$docker_version_al2_arm" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_arm" ""
+            add_ami_to_release_notes "#### ARM64 (Kernel 4.14)" "$ami_name_al2_arm" "$agent_version_al2_arm" "$docker_version_al2_arm" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_arm"
         fi
 
         # Include AL2 Neuron (Kernel 4.14) release notes if there was an al2inf release
         if ! is_ami_excluded "al2inf"; then
             # AL2 Neuron AMI details
             read ami_name_al2_inf agent_version_al2_inf docker_version_al2_inf source_ami_name_al2_inf <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/inf/recommended")
-            add_ami_to_release_notes "#### Neuron (Kernel 4.14)" "$ami_name_al2_inf" "$agent_version_al2_inf" "$docker_version_al2_inf" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_inf" ""
+            add_ami_to_release_notes "#### Neuron (Kernel 4.14)" "$ami_name_al2_inf" "$agent_version_al2_inf" "$docker_version_al2_inf" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_inf"
         fi
 
         # Include AL2 GPU (Kernel 4.14) release notes if there was an al2gpu release
         if ! is_ami_excluded "al2gpu"; then
             # AL2 GPU AMI details
             read ami_name_al2_gpu agent_version_al2_gpu docker_version_al2_gpu source_ami_name_al2_gpu <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended")
-            add_ami_to_release_notes "#### GPU (Kernel 4.14)" "$ami_name_al2_gpu" "$agent_version_al2_gpu" "$docker_version_al2_gpu" "$containerd_version" "$runc_version" "$AL2_GPU_NVIDIA_VERSION" "$AL2_GPU_CUDA_VERSION" "$source_ami_name_al2_gpu" ""
+            add_ami_to_release_notes "#### GPU (Kernel 4.14)" "$ami_name_al2_gpu" "$agent_version_al2_gpu" "$docker_version_al2_gpu" "$containerd_version" "$runc_version" "$AL2_GPU_NVIDIA_VERSION" "$AL2_GPU_CUDA_VERSION" "$source_ami_name_al2_gpu"
         fi
 
         # Include AL2 AMD64 (Kernel 5.10) release notes if there was an al2kernel5dot10 release
         if ! is_ami_excluded "al2kernel5dot10"; then
             # AL2 AMD64 (Kernel 5.10) AMI details
             read ami_name_al2_kernel_5_10 agent_version_al2_kernel_5_10 docker_version_al2_kernel_5_10 source_ami_name_al2_kernel_5_10 <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/kernel-5.10/recommended")
-            add_ami_to_release_notes "#### AMD64 (Kernel 5.10)" "$ami_name_al2_kernel_5_10" "$agent_version_al2_kernel_5_10" "$docker_version_al2_kernel_5_10" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_kernel_5_10" ""
+            add_ami_to_release_notes "#### AMD64 (Kernel 5.10)" "$ami_name_al2_kernel_5_10" "$agent_version_al2_kernel_5_10" "$docker_version_al2_kernel_5_10" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_kernel_5_10"
         fi
 
         # Include AL2 ARM64 (Kernel 5.10) release notes if there was an al2kernel5dot10arm release
         if ! is_ami_excluded "al2kernel5dot10arm"; then
             # AL2 ARM64 (Kernel 5.10) AMI details
             read ami_name_al2_kernel_5_10_arm agent_version_al2_kernel_5_10_arm docker_version_al2_kernel_5_10_arm source_ami_name_al2_kernel_5_10_arm <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/kernel-5.10/arm64/recommended")
-            add_ami_to_release_notes "#### ARM64 (Kernel 5.10)" "$ami_name_al2_kernel_5_10_arm" "$agent_version_al2_kernel_5_10_arm" "$docker_version_al2_kernel_5_10_arm" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_kernel_5_10_arm" ""
+            add_ami_to_release_notes "#### ARM64 (Kernel 5.10)" "$ami_name_al2_kernel_5_10_arm" "$agent_version_al2_kernel_5_10_arm" "$docker_version_al2_kernel_5_10_arm" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_kernel_5_10_arm"
         fi
 
         # Include AL2 Neuron (Kernel 5.10) release notes if there was an al2kernel5dot10inf release
         if ! is_ami_excluded "al2kernel5dot10inf"; then
             # AL2 Neuron (Kernel 5.10) AMI details
             read ami_name_al2_kernel_5_10_inf agent_version_al2_kernel_5_10_inf docker_version_al2_kernel_5_10_inf source_ami_name_al2_kernel_5_10_inf <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/kernel-5.10/inf/recommended")
-            add_ami_to_release_notes "#### Neuron (Kernel 5.10)" "$ami_name_al2_kernel_5_10_inf" "$agent_version_al2_kernel_5_10_inf" "$docker_version_al2_kernel_5_10_inf" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_kernel_5_10_inf" ""
+            add_ami_to_release_notes "#### Neuron (Kernel 5.10)" "$ami_name_al2_kernel_5_10_inf" "$agent_version_al2_kernel_5_10_inf" "$docker_version_al2_kernel_5_10_inf" "$containerd_version" "$runc_version" "" "" "$source_ami_name_al2_kernel_5_10_inf"
         fi
 
         # Include AL2 GPU (Kernel 5.10) release notes if there was an al2kernel5dot10gpu release
         if ! is_ami_excluded "al2kernel5dot10gpu"; then
             # AL2 GPU (Kernel 5.10) AMI details
             read ami_name_al2_kernel_5_10_gpu agent_version_al2_kernel_5_10_gpu docker_version_al2_kernel_5_10_gpu source_ami_name_al2_kernel_5_10_gpu <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/kernel-5.10/gpu/recommended")
-            add_ami_to_release_notes "#### GPU (Kernel 5.10)" "$ami_name_al2_kernel_5_10_gpu" "$agent_version_al2_kernel_5_10_gpu" "$docker_version_al2_kernel_5_10_gpu" "$containerd_version" "$runc_version" "$AL2_GPU_NVIDIA_VERSION" "$AL2_GPU_CUDA_VERSION" "$source_ami_name_al2_kernel_5_10_gpu" ""
+            add_ami_to_release_notes "#### GPU (Kernel 5.10)" "$ami_name_al2_kernel_5_10_gpu" "$agent_version_al2_kernel_5_10_gpu" "$docker_version_al2_kernel_5_10_gpu" "$containerd_version" "$runc_version" "$AL2_GPU_NVIDIA_VERSION" "$AL2_GPU_CUDA_VERSION" "$source_ami_name_al2_kernel_5_10_gpu"
         fi
     fi
 
@@ -283,7 +278,7 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
 
         read ami_name_al1 agent_version_al1 docker_version_al1 source_ami_name_al1 <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux/recommended")
         add_ami_to_release_notes "The Amazon ECS-optimized Amazon Linux AMI is deprecated as of April 15, 2021. After that date, Amazon ECS will continue providing critical and important security updates for the AMI but will not add support for new features.
-" "$ami_name_al1" "$agent_version_al1" "$docker_version_al1" "$AL1_CONTAINERD_VERSION" "$AL1_RUNC_VERSION" "" "" "$source_ami_name_al1" ""
+" "$ami_name_al1" "$agent_version_al1" "$docker_version_al1" "$AL1_CONTAINERD_VERSION" "$AL1_RUNC_VERSION" "" "" "$source_ami_name_al1"
     fi
 
     echo -n "$release_notes"
@@ -319,7 +314,6 @@ add_ami_to_release_notes() {
     local nvidia_ver="$7" # Optional (i.e., "" is allowed)
     local cuda_ver="$8"   # Optional (i.e., "" is allowed)
     local source_name="$9"
-    local dist_al2023_release="${10}" # Optional (i.e., "" is allowed)
 
     if [ -n "$subheader" ]; then
         release_notes="${release_notes}
@@ -345,11 +339,6 @@ ${subheader}"
 
     release_notes="${release_notes}
 - Source AMI name: $source_name"
-
-    if [ -n "$dist_al2023_release" ]; then
-        release_notes="${release_notes}
-- Distribution al2023 release: $dist_al2023_release"
-    fi
 
     release_notes="${release_notes}
 "
