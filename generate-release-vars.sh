@@ -102,17 +102,17 @@ EOF
     readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
 
     cat >|release-al2023.auto.pkrvars.hcl <<EOF
-ami_version_al2023          = "$ami_version"
-ecs_agent_version           = "$ecs_agent_version"
-ecs_init_rev                = "$ecs_init_rev"
-docker_version_al2023       = "$docker_version_al2023"
-containerd_version_al2023   = "$containerd_version_al2023"
-runc_version_al2023         = "$runc_version_al2023"
-exec_ssm_version            = "$exec_ssm_version"
-source_ami_al2023           = "$ami_name_al2023_x86"
-source_ami_al2023arm        = "$ami_name_al2023_arm"
-kernel_version_al2023       = "$kernel_version_al2023_x86"
-kernel_version_al2023arm    = "$kernel_version_al2023_arm"
+ami_version_al2023        = "$ami_version"
+ecs_agent_version         = "$ecs_agent_version"
+ecs_init_rev              = "$ecs_init_rev"
+docker_version_al2023     = "$docker_version_al2023"
+containerd_version_al2023 = "$containerd_version_al2023"
+runc_version_al2023       = "$runc_version_al2023"
+exec_ssm_version          = "$exec_ssm_version"
+source_ami_al2023         = "$ami_name_al2023_x86"
+source_ami_al2023arm      = "$ami_name_al2023_arm"
+kernel_version_al2023     = "$kernel_version_al2023_x86"
+kernel_version_al2023arm  = "$kernel_version_al2023_arm"
 EOF
     ;;
 *)
