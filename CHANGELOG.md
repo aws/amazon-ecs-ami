@@ -5,6 +5,9 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 2025730
+- ecs version: 1.97.0
+
 ## 20250725
 - al2 ami version: 20250725
 - al2023 ami version: 20250725
