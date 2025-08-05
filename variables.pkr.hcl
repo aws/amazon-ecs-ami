@@ -192,6 +192,12 @@ variable "ecs_init_local_override" {
   default     = ""
 }
 
+variable "instance_type_override" {
+  type        = string
+  description = "Specify a specific instance type to build the AMI with."
+  default     = ""
+}
+
 variable "general_purpose_instance_types" {
   type        = list(string)
   description = "List of available in-region instance types for general-purpose platform"

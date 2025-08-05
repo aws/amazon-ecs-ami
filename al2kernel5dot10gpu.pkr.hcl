@@ -14,7 +14,7 @@ locals {
 source "amazon-ebs" "al2kernel5dot10gpu" {
   ami_name        = "${local.ami_name_al2kernel5dot10gpu}"
   ami_description = "Amazon Linux AMI 2.0.${var.ami_version_al2} Kernel 5.10 x86_64 ECS HVM GP2"
-  instance_type   = var.gpu_instance_types[0]
+  instance_type   = coalesce(var.instance_type_override, var.gpu_instance_types[0])
   launch_block_device_mappings {
     volume_size           = var.block_device_size_gb
     delete_on_termination = true

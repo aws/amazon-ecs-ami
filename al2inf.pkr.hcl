@@ -14,7 +14,7 @@ locals {
 source "amazon-ebs" "al2inf" {
   ami_name        = "${local.ami_name_al2inf}"
   ami_description = "Amazon Linux AMI 2.0.${var.ami_version_al2} x86_64 ECS HVM GP2"
-  instance_type   = var.inf_instance_types[0]
+  instance_type   = coalesce(var.instance_type_override, var.inf_instance_types[0])
   launch_block_device_mappings {
     volume_size           = var.block_device_size_gb
     delete_on_termination = true
