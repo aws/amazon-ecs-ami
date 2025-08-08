@@ -192,34 +192,34 @@ variable "ecs_init_local_override" {
   default     = ""
 }
 
-variable "general_purpose_instance_types" {
-  type        = list(string)
-  description = "List of available in-region instance types for general-purpose platform"
-  default     = ["c5.large"]
+variable "general_purpose_instance_type" {
+  type        = string
+  description = "Instance type used to build for general-purpose platform"
+  default     = "c5.large"
 }
 
-variable "gpu_instance_types" {
-  type        = list(string)
-  description = "List of available in-region instance types for GPU platform"
-  default     = ["c5.4xlarge"]
+variable "gpu_instance_type" {
+  type        = string
+  description = "Instance type used to build for GPU platform"
+  default     = "c5.4xlarge"
 }
 
-variable "arm_instance_types" {
-  type        = list(string)
-  description = "List of available in-region instance types for ARM platform"
-  default     = ["m6g.xlarge"]
+variable "arm_instance_type" {
+  type        = string
+  description = "Instance type used to build for ARM platform"
+  default     = "m6g.xlarge"
 }
 
-variable "inf_instance_types" {
-  type        = list(string)
-  description = "List of available in-region instance types for INF platform"
-  default     = ["inf1.xlarge"]
+variable "inf_instance_type" {
+  type        = string
+  description = "Instance type used to build for INF platform"
+  default     = "inf1.xlarge"
 }
 
-variable "neu_instance_types" {
-  type        = list(string)
-  description = "List of available in-region instance types for NEU platform"
-  default     = ["inf1.xlarge"]
+variable "neu_instance_type" {
+  type        = string
+  description = "Instance type used to build for NEU platform"
+  default     = "inf1.xlarge"
 }
 
 variable "ami_ou_arns" {
