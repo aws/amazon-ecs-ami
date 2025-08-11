@@ -12,9 +12,10 @@ locals {
 }
 
 source "amazon-ebs" "al1" {
-  ami_name        = "${local.ami_name_al1}"
-  ami_description = "Amazon Linux AMI amzn-ami-2018.03.${var.ami_version_al1} x86_64 ECS HVM GP2"
-  instance_type   = var.general_purpose_instance_type
+  ami_name            = "${local.ami_name_al1}"
+  ami_description     = "Amazon Linux AMI amzn-ami-2018.03.${var.ami_version_al1} x86_64 ECS HVM GP2"
+  instance_type       = var.general_purpose_instance_type
+  custom_endpoint_ec2 = var.custom_endpoint_ec2
   launch_block_device_mappings {
     volume_size           = 8
     delete_on_termination = true

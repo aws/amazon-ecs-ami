@@ -257,3 +257,9 @@ variable "region_dns_suffix" {
   description = "DNS Suffix to use for in region URLs"
   default     = ""
 }
+
+variable "custom_endpoint_ec2" {
+  type        = string
+  description = "Custom EC2 endpoint to use for building AMIs"
+  default     = ""
+}
