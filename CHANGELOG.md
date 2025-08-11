@@ -5,6 +5,18 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250811
+- al2 ami version: 20250811
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20250808.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250808.1-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20250808.1-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20250808.1-arm64-ebs
+- al2023 ami version: 20250811
+- source al2023 ami: al2023-ami-minimal-2023.8.20250808.1-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.8.20250808.1-kernel-6.1-arm64
+- ecs version: 1.97.1
+- enhancement: Set amazon plugin component of Packer to v1.3.9 [#503](https://github.com/aws/amazon-ecs-ami/pull/503)
+
 ## 20250801
 - al2 ami version: 20250801
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20250728.1-x86_64-ebs
