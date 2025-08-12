@@ -63,7 +63,8 @@ SSH_FILES=(
 )
 echo "Cleaning up ssh files"
 cleanup "${SSH_FILES[@]}"
-USERS=$(ls /home/)
+# USERS=$(ls /home/)
+USERS="ec2-user"
 for user in $USERS; do
     echo Deleting /home/"$user"/.ssh/authorized_keys
     sudo find /home/"$user"/.ssh/authorized_keys -type f -exec shred -zuf {} \;
@@ -160,7 +161,6 @@ fi
 
 # delete a few items missed in https://docs.aws.amazon.com/imagebuilder/latest/userguide/security-best-practices.html
 sudo rm -rf \
-    /etc/machine-id \
     /var/cache/dnf \
     /var/cache/yum \
     /tmp/* \
@@ -171,4 +171,5 @@ sudo rm -rf \
     /var/log/wtmp \
     /etc/ssh/ssh_host*
 
-sudo touch /etc/machine-id
+#sudo touch /etc/machine-id
+sudo truncate -s 0 /etc/machine-id

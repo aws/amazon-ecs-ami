@@ -60,6 +60,6 @@ sudo cp ssm-session-worker "${BINARY_PATH}"/ssm-session-worker
 rm -rf /tmp/ssm-binaries
 
 # Copy certs with 400 permission in CERTS_PATH
-sudo mkdir -p ${CERTS_PATH} && cd ${CERTS_PATH}
-sudo cp /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem tls-ca-bundle.pem
-sudo chmod 400 tls-ca-bundle.pem
+sudo mkdir -p ${CERTS_PATH}
+sudo cp /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem ${CERTS_PATH}/tls-ca-bundle.pem
+sudo chmod 400 ${CERTS_PATH}/tls-ca-bundle.pem

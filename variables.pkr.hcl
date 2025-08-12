@@ -262,3 +262,23 @@ variable "region_dns_suffix" {
   description = "DNS Suffix to use for in region URLs"
   default     = ""
 }
+
+### Custom IDX Environment variables
+
+variable "profile" {
+  type        = string
+  description = "Specify aws credentials profile to use"
+  default     = "devacct"
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "ID of VPC to deploy to"
+  default     = "vpc-0a21b99c4a2bd5ff5"
+}
+
+variable "subnet_id" {
+  type        = string
+  description = "ID of subnet to deploy to"
+  default     = "subnet-00fd52dae17659894"
+}

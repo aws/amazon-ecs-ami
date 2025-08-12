@@ -1,5 +1,5 @@
 locals {
-  ami_name_al2023 = "${var.ami_name_prefix_al2023}-hvm-2023.0.${var.ami_version_al2023}${var.kernel_version_al2023}-x86_64"
+  ami_name_al2023 = "hardened-ecs-container-instance-unverified-al2-image-${formatdate("YYYY-MM-DD", timestamp())}"
   default_tags = {
     os_version          = "Amazon Linux 2023"
     source_image_name   = "{{ .SourceAMIName }}"
@@ -20,6 +20,7 @@ source "amazon-ebs" "al2023" {
     delete_on_termination = true
     volume_type           = "gp3"
     device_name           = "/dev/xvda"
+    encrypted             = true
   }
   metadata_options {
     http_endpoint               = "enabled"
@@ -31,17 +32,20 @@ source "amazon-ebs" "al2023" {
     filters = {
       name = "${var.source_ami_al2023}"
     }
-    owners             = ["amazon"]
+    owners             = ["679593333241"]
     most_recent        = true
     include_deprecated = true
   }
   ami_ou_arns   = "${var.ami_ou_arns}"
   ami_org_arns  = "${var.ami_org_arns}"
   ami_users     = "${var.ami_users}"
-  ssh_interface = "public_ip"
+  ssh_interface = "public_dns"
   ssh_username  = "ec2-user"
   tags          = "${local.merged_tags}"
   run_tags      = "${var.run_tags}"
+  profile       = var.profile
+  vpc_id        = var.vpc_id
+  subnet_id     = var.subnet_id
 }
 
 build {
@@ -58,6 +62,7 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     inline_shebang = "/bin/sh -ex"
     inline = [
       "sudo mv /tmp/90_ecs.cfg /etc/cloud/cloud.cfg.d/90_ecs.cfg",
@@ -66,10 +71,12 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/al2023/setup-motd.sh"
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     inline_shebang = "/bin/sh -ex"
     inline = [
       "mkdir /tmp/additional-packages"
@@ -77,6 +84,7 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     inline_shebang = "/bin/sh -ex"
     inline = [
       "sudo dnf update -y --releasever=${var.distribution_release_al2023}"
@@ -89,6 +97,7 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     inline_shebang = "/bin/sh -ex"
     inline = [
       "sudo dnf install -y ${local.packages_al2023}",
@@ -97,10 +106,12 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/setup-ecs-config-dir.sh"
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/install-docker.sh"
     environment_vars = [
       "DOCKER_VERSION=${var.docker_version_al2023}",
@@ -111,6 +122,7 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/install-ecs-init.sh"
     environment_vars = [
       "REGION=${var.region}",
@@ -124,10 +136,12 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/append-efs-client-info.sh"
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/install-additional-packages.sh"
   }
 
@@ -139,6 +153,7 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/install-exec-dependencies.sh"
     environment_vars = [
       "AMI_TYPE=${source.name}",
@@ -152,6 +167,7 @@ build {
   ### reboot worker instance to install kernel update. enable-ecs-agent-inferentia-support needs
   ### new kernel (if there is) to be installed.
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     inline_shebang    = "/bin/sh -ex"
     expect_disconnect = "true"
     inline = [
@@ -166,6 +182,7 @@ build {
     pause_before        = "10s" # pause for starting the reboot
     start_retry_timeout = "40s" # wait before start retry
     max_retries         = 3
+    execute_command     = "{{.Vars}} bash '{{.Path}}'"
     script              = "scripts/enable-ecs-agent-inferentia-support.sh"
   }
 
@@ -173,10 +190,12 @@ build {
     environment_vars = [
       "AMI_TYPE=${source.name}"
     ]
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/enable-ecs-agent-gpu-support-al2023.sh"
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     inline_shebang = "/bin/sh -ex"
     inline = [
       "sudo usermod -a -G docker ec2-user"
@@ -184,14 +203,17 @@ build {
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/enable-services.sh"
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/install-service-connect-appnet.sh"
   }
 
   provisioner "shell" {
+    execute_command = "{{.Vars}} bash '{{.Path}}'"
     script = "scripts/cleanup.sh"
   }
 
