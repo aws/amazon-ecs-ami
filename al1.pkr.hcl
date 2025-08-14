@@ -65,6 +65,11 @@ build {
   }
 
   provisioner "file" {
+    source      = "scripts/functions.sh"
+    destination = "/tmp/functions.sh"
+  }
+
+  provisioner "file" {
     source      = "files/al1/90_ecs.cfg"
     destination = "/tmp/90_ecs.cfg"
   }

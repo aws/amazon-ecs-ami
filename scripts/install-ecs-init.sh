@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -ex
 
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+# Load common functions.
+. "${DIR}/functions.sh" || exit 1
+
 if [ -n "$AIR_GAPPED" ]; then
     echo "Air-gapped region, assuming ecs-init and dependencies will be in additional-packages/ directory"
     exit 0
@@ -150,10 +154,7 @@ EOF
 
 if [ -z "$ECS_INIT_URL" ]; then
     ARCH=$(uname -m)
-    host_suffix=""
-    if grep -q "^cn-" <<<"$REGION"; then
-        host_suffix=".cn"
-    fi
+    host_suffix=$(get_default_aws_host_suffix "$REGION")
     ECS_INIT_URL="https://s3.$REGION.amazonaws.com${host_suffix}/amazon-ecs-agent-$REGION/ecs-init-$AGENT_VERSION-$INIT_REV.$AL_NAME.$ARCH.rpm"
 fi
 

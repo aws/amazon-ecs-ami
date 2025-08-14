@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 set -ex
 
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+# Load common functions.
+. "${DIR}/functions.sh" || exit 1
+
 if [[ -n $AIR_GAPPED && $AMI_TYPE == "al1" ]]; then
     echo "For Air-gapped region, exec feature is not supported for AL1 AMIs"
     exit 0
 fi
 
 # Returns AWS DNS suffix from $REGION_DNS_SUFFIX if set, errors if no dns suffix set for air-gapped regions.
-# Defaults to amazonaws.com[.cn]
+# Otherwise, return default host suffix for the region.
 get_dns_suffix() {
     # If $REGION_DNS_SUFFIX is assigned and non-empty, use that
     if [ -n "$REGION_DNS_SUFFIX" ]; then
@@ -21,11 +25,7 @@ get_dns_suffix() {
         exit 1
     fi
 
-    local host_suffix=""
-    if grep -q "^cn-" <<<"$REGION"; then
-        host_suffix=".cn"
-    fi
-    echo "amazonaws.com${host_suffix}"
+    get_default_aws_host_suffix "$REGION"
 }
 
 DNS_SUFFIX=$(get_dns_suffix)
