@@ -155,7 +155,7 @@ EOF
 if [ -z "$ECS_INIT_URL" ]; then
     ARCH=$(uname -m)
     host_suffix=$(get_default_aws_host_suffix "$REGION")
-    ECS_INIT_URL="https://s3.$REGION.amazonaws.com${host_suffix}/amazon-ecs-agent-$REGION/ecs-init-$AGENT_VERSION-$INIT_REV.$AL_NAME.$ARCH.rpm"
+    ECS_INIT_URL="https://s3.$REGION.${host_suffix}/amazon-ecs-agent-$REGION/ecs-init-$AGENT_VERSION-$INIT_REV.$AL_NAME.$ARCH.rpm"
 fi
 
 curl -fLSs -o "$WORK_DIR/ecs-init.rpm" "$ECS_INIT_URL"
