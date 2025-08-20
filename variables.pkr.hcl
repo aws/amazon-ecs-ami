@@ -263,3 +263,9 @@ variable "custom_endpoint_ec2" {
   description = "Custom EC2 endpoint to use for building AMIs"
   default     = ""
 }
+
+variable "ecs_logs_collector_commit_hash" {
+  type        = string
+  description = "Commit hash for the ECS logs collector version to install from aws/amazon-ecs-logs-collector repository"
+  default     = "03a216022fcb1304068a57feca412316192d858a"
+}

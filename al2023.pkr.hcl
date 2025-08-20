@@ -198,6 +198,13 @@ build {
   }
 
   provisioner "shell" {
+    script = "scripts/install-ecs-logs-collector.sh"
+    environment_vars = [
+      "ECS_LOGS_COLLECTOR_COMMIT_HASH=${var.ecs_logs_collector_commit_hash}"
+    ]
+  }
+
+  provisioner "shell" {
     script = "scripts/cleanup.sh"
   }
 
