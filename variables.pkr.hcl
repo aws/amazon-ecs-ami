@@ -4,7 +4,15 @@ packer {
       version = "1.2.8"
       source  = "github.com/hashicorp/amazon"
     }
+    git = {
+      version = ">= 0.6.2"
+      source  = "github.com/ethanmdavidson/git"
+    }
   }
+}
+
+data "git-commit" "ecs-logs-collector" {
+  path = "amazon-ecs-logs-collector/ecs-logs-collector.sh"
 }
 
 locals {
@@ -262,10 +270,4 @@ variable "custom_endpoint_ec2" {
   type        = string
   description = "Custom EC2 endpoint to use for building AMIs"
   default     = ""
-}
-
-variable "ecs_logs_collector_commit_hash" {
-  type        = string
-  description = "Commit hash for the ECS logs collector version to install from aws/amazon-ecs-logs-collector repository"
-  default     = "03a216022fcb1304068a57feca412316192d858a"
 }

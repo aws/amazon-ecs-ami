@@ -230,10 +230,19 @@ build {
     script = "scripts/install-service-connect-appnet.sh"
   }
 
+  provisioner "file" {
+    source      = "amazon-ecs-logs-collector/ecs-logs-collector.sh"
+    destination = "/tmp/ecs-logs-collector.sh"
+  }
+
   provisioner "shell" {
     script = "scripts/install-ecs-logs-collector.sh"
-    environment_vars = [
-      "ECS_LOGS_COLLECTOR_COMMIT_HASH=${var.ecs_logs_collector_commit_hash}"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "echo ${data.git-commit.ecs-logs-collector.hash} | sudo tee /opt/amazon/ecs/ECS_LOG_COLLECTOR_VERSION",
+      "sudo chmod 644 /opt/amazon/ecs/ECS_LOG_COLLECTOR_VERSION"
     ]
   }
 

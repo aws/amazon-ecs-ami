@@ -55,83 +55,11 @@ The ECS logs collector is a shell script that helps gather diagnostic informatio
 The ECS logs collector is installed during the AMI build process with the following characteristics:
 
 - **Installation Location**: `/opt/amazon/ecs/ecs-logs-collector.sh`
-- **Version Tracking**: A version file is created at `/opt/amazon/ecs/ECS_LOG_COLLECTOR_VERSION` containing the commit hash
+- **Version Tracking**: A version file is created at `/opt/amazon/ecs/ECS_LOG_COLLECTOR_VERSION` containing the git commit hash
 - **Permissions**: The script is executable and ready to use immediately after AMI launch
-- **Source**: Downloaded directly from the official [aws/amazon-ecs-logs-collector](https://github.com/aws/amazon-ecs-logs-collector) GitHub repository
+- **Source**: Installed from the local script directory `./amazon-ecs-logs-collector/`
 
-### Version Control
-
-The installation script pins to a specific commit hash to ensure reproducible builds and version consistency. You can control which version is installed by setting the `ecs_logs_collector_commit_hash` variable:
-
-```hcl
-ecs_logs_collector_commit_hash = "03a216022fcb1304068a57feca412316192d858a"  # Default stable version
-```
-
-If not specified, the build will use the default commit hash defined in `variables.pkr.hcl`.
-
-### Usage
-
-To run the logs collector on an instance launched from the AMI:
-
-```bash
-# Run with default settings
-sudo /opt/amazon/ecs/ecs-logs-collector.sh
-
-# Run with custom options (see script help for available options)
-sudo /opt/amazon/ecs/ecs-logs-collector.sh --help
-
-# Check installed version
-cat /opt/amazon/ecs/ECS_LOG_COLLECTOR_VERSION
-```
-
-The script will collect various logs and diagnostic information related to ECS and save them to a compressed archive for easy sharing with AWS support.
-
-### Customizing the Version
-
-To specify a different commit hash from the [aws/amazon-ecs-logs-collector](https://github.com/aws/amazon-ecs-logs-collector) repository:
-
-1. Find the desired commit hash from the GitHub repository
-2. Set the variable in your configuration file (e.g., `overrides.auto.pkrvars.hcl`):
-   ```hcl
-   ecs_logs_collector_commit_hash = "your-desired-commit-hash"
-   ```
-3. Build your AMI as usual
-
-The build process will download and install the specific version of the logs collector corresponding to that commit hash, ensuring version consistency across your infrastructure.
-
-### Finding and Updating the Commit Hash for ECS Logs Collector
-
-To find the latest commit hash or a specific version of the ECS Logs Collector, you can use git commands with a minimal clone approach that only fetches commit history without downloading file contents:
-
-```bash
-# Create a minimal clone (no working directory, only git metadata)
-git clone --bare --single-branch --branch master https://github.com/aws/amazon-ecs-logs-collector.git /tmp/ecs-logs-collector
-
-# Navigate to the repository
-cd /tmp/ecs-logs-collector
-
-# Get the latest commit hash with subject that modified the ecs-logs-collector.sh script
-git log -n 1 --pretty=format:"%H %s" -- ecs-logs-collector.sh
-
-# Clean up the temporary directory
-cd /
-rm -rf /tmp/ecs-logs-collector
-```
-
-If the commit has the required changes then update the default commit hash for all builds, modify the `variables.pkr.hcl` file:
-
-> Ensure we are in amazon-ecs-ami repository to avoid update failures
-
-```bash
-# Set the expected commit hash
-LATEST_HASH=
-
-# Update the default value in variables.pkr.hcl (handles any existing hash format)
-sed -i "/ecs_logs_collector_commit_hash/,/default.*=/ s/default.*=.*/default     = \"$LATEST_HASH\"/" variables.pkr.hcl
-
-# Verify the change
-grep "ecs_logs_collector_commit_hash" -A 3 variables.pkr.hcl
-```
+> For detailed usage information, visit: https://github.com/aws/amazon-ecs-logs-collector/?tab=readme-ov-file#usage
 
 ## Cleanup
 
