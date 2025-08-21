@@ -5,6 +5,17 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250821
+- ecs version: 1.98.0
+- al2 ami version: 20250821
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20250818.2-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250818.2-arm64-ebs
+- source al2 kernel 5.10 ami:  amzn2-ami-minimal-hvm-2.0.20250818.2-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20250818.2-arm64-ebs
+- al2023 ami version: 20250821
+- source al2023 ami: al2023-ami-minimal-2023.8.20250818.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.8.20250818.0-kernel-6.1-arm64
+
 ## 20250812
 - al2 ami version: 20250812
 - al2023 ami version: 20250812
@@ -524,7 +535,7 @@
 - al2 ami version: 20240709
 - al2023 ami version: 20240709
 - enhancement: Update ECS Agent version to 1.85.0 [#268](https://github.com/aws/amazon-ecs-ami/pull/268)
-- enhancement: Update AL2 Docker version to 25.0.3 [#267](https://github.com/aws/amazon-ecs-ami/pull/267) 
+- enhancement: Update AL2 Docker version to 25.0.3 [#267](https://github.com/aws/amazon-ecs-ami/pull/267)
 
 ## 20240702
 - al2023 ami version: 20240702
@@ -1002,7 +1013,7 @@
 - ecs version: 1.67.2-1
 - source al1 ami: amzn-ami-minimal-hvm-2018.03.0.20221209.1-x86_64-ebs
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20221210.1-x86_64-ebs
-- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20221210.1-arm64-ebs 
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20221210.1-arm64-ebs
 - source al2022 ami: al2022-ami-minimal-2022.0.20221207.4-kernel-5.15-x86_64
 - source al2022 arm ami: al2022-ami-minimal-2022.0.20221207.4-kernel-5.15-arm64
 
@@ -1035,7 +1046,7 @@
 - ecs version: 1.65.1-1
 - source al2022 ami: al2022-ami-minimal-2022.0.20221101.0-kernel-5.15-x86_64
 - source al2022 arm ami: al2022-ami-minimal-2022.0.20221101.0-kernel-5.15-arm64
-- distribution al2022 release: 2022.0.20221101 
+- distribution al2022 release: 2022.0.20221101
 
 ## 20221025
 
