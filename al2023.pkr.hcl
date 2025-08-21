@@ -207,13 +207,6 @@ build {
   }
 
   provisioner "shell" {
-    inline = [
-      "echo ${data.git-commit.ecs-logs-collector.hash} | sudo tee /opt/amazon/ecs/ECS_LOG_COLLECTOR_VERSION",
-      "sudo chmod 644 /opt/amazon/ecs/ECS_LOG_COLLECTOR_VERSION"
-    ]
-  }
-
-  provisioner "shell" {
     script = "scripts/cleanup.sh"
   }
 

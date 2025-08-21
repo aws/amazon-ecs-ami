@@ -5,7 +5,6 @@ set -exo pipefail
 
 # Configuration
 readonly INSTALLATION_DIR="/opt/amazon/ecs"
-readonly VERSION_FILE="ECS_LOG_COLLECTOR_VERSION"
 readonly SCRIPT_FILE="ecs-logs-collector.sh"
 readonly SOURCE_DIR="amazon-ecs-logs-collector"
 

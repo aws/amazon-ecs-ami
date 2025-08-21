@@ -55,7 +55,7 @@ The ECS logs collector is a shell script that helps gather diagnostic informatio
 The ECS logs collector is installed during the AMI build process with the following characteristics:
 
 - **Installation Location**: `/opt/amazon/ecs/ecs-logs-collector.sh`
-- **Version Tracking**: A version file is created at `/opt/amazon/ecs/ECS_LOG_COLLECTOR_VERSION` containing the git commit hash
+- **Version Tracking**: A version file is created at `/opt/amazon/ecs/ECS_LOG_COLLECTOR_VERSION` containing the git commit hash (created during AMI build)
 - **Permissions**: The script is executable and ready to use immediately after AMI launch
 - **Source**: Installed from the local script directory `./amazon-ecs-logs-collector/`
 

@@ -4,15 +4,7 @@ packer {
       version = "1.2.8"
       source  = "github.com/hashicorp/amazon"
     }
-    git = {
-      version = ">= 0.6.2"
-      source  = "github.com/ethanmdavidson/git"
-    }
   }
-}
-
-data "git-commit" "ecs-logs-collector" {
-  path = "amazon-ecs-logs-collector/ecs-logs-collector.sh"
 }
 
 locals {
