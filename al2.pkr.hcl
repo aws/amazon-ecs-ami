@@ -231,8 +231,8 @@ build {
   }
 
   provisioner "file" {
-    source      = "amazon-ecs-logs-collector/ecs-logs-collector.sh"
-    destination = "/tmp/ecs-logs-collector.sh"
+    source      = "amazon-ecs-logs-collector"
+    destination = "/tmp"
   }
 
   provisioner "shell" {
