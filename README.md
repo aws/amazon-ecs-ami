@@ -46,6 +46,21 @@ Any rpm package placed into the additional-packages/ directory will be uploaded 
 
 **NOTE**: All packages must end with extension `"$(uname -m).rpm"`, ie `.x86_64.rpm` or `.aarch64.rpm`.
 
+## ECS Logs Collector
+
+The ECS logs collector is a shell script that helps gather diagnostic information for troubleshooting ECS-related issues. This script is automatically installed on all ECS-optimized AMIs built with this recipe.
+
+### Installation Details
+
+The ECS logs collector is installed during the AMI build process with the following characteristics:
+
+- **Installation Location**: `/opt/amazon/ecs/ecs-logs-collector.sh`
+- **Version Tracking**: A version file is stored at `/opt/amazon/ecs/ECS_LOGS_COLLECTOR_VERSION` containing the git commit hash
+- **Permissions**: The script is executable and ready to use immediately after AMI launch
+- **Source**: Installed from the local script directory `./amazon-ecs-logs-collector/`
+
+> For detailed usage information, visit: https://github.com/aws/amazon-ecs-logs-collector/?tab=readme-ov-file#usage
+
 ## Cleanup
 
 1. Deregister the AMI from EC2 Images via cli or console.

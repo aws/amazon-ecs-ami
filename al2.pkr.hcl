@@ -230,6 +230,15 @@ build {
     script = "scripts/install-service-connect-appnet.sh"
   }
 
+  provisioner "file" {
+    source      = "amazon-ecs-logs-collector"
+    destination = "/tmp"
+  }
+
+  provisioner "shell" {
+    script = "scripts/install-ecs-logs-collector.sh"
+  }
+
   provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
