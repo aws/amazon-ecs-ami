@@ -5,6 +5,11 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20250828
+- al2 ami version: 20250828
+- al2023 ami version: 20250828
+- enhancement: Update exec ssm version to 3.3.2958.0
+
 ## 20250821
 - ecs version: 1.98.0
 - al2 ami version: 20250821
