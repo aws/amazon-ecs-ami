@@ -12,7 +12,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v5
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v5
       with: 
         role-to-assume: ${{secrets.AMI_MIRROR_ROLE}}
         aws-region: us-west-2
@@ -47,7 +47,7 @@ jobs:
       contents: read
     steps:
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v5
       with: 
         role-to-assume: ${{secrets.AMI_MIRROR_ROLE}}
         aws-region: us-west-2

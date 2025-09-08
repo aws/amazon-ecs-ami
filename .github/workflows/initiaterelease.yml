@@ -31,7 +31,7 @@ jobs:
         # generate-release-vars.sh depends on these packages
         sudo apt-get update && sudo apt-get install libxml2-utils
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v5
       with:
         role-to-assume: ${{ secrets.AMI_GENERATE_CONFIG_ROLE }}
         aws-region: us-west-2
@@ -79,7 +79,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v5
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v5
       with:
         role-to-assume: ${{secrets.AMI_MIRROR_ROLE}}
         aws-region: us-west-2
@@ -116,7 +116,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v5
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v5
       with:
         role-to-assume: ${{secrets.AMI_MIRROR_ROLE}}
         aws-region: us-west-2
