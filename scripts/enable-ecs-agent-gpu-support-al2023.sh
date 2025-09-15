@@ -22,7 +22,8 @@ sudo dnf install -y nvidia-driver \
     pciutils \
     xorg-x11-server-Xorg \
     nvidia-container-toolkit \
-    oci-add-hooks
+    oci-add-hooks \
+    nvidia-persistenced
 
 ### Package installation and setup to support P6 instances
 # Install base requirements

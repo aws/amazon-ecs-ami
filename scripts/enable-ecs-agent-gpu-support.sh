@@ -143,7 +143,8 @@ else
         libnvidia-container1 \
         libnvidia-container-tools \
         nvidia-container-toolkit-base \
-        nvidia-container-toolkit
+        nvidia-container-toolkit \
+        nvidia-persistenced
 
     sudo yum install -y cuda-drivers \
         cuda
