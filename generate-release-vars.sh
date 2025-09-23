@@ -3,10 +3,12 @@ set -eo pipefail
 
 usage() {
     echo "Usage:"
-    echo "  $0 AMI_TYPE"
-    echo "Example:"
+    echo "  $0 AMI_TYPE (REGION; optional)"
+    echo "Examples:"
     echo "  $0 al2"
+    echo "  $0 al2023 ap-northeast-2"
     echo "AMI_TYPE Must be one of: al1, al2, al2023"
+    echo "REGION (if specified) must be a valid AWS region"
 }
 
 error() {
@@ -23,8 +25,8 @@ fi
 
 readonly ami_version=$(date +"%Y%m%d")
 
-# this can be any region, as we use it to grab the latest AL2 AMI name so it should be the same across regions.
-readonly region="us-west-2"
+# Default region to us-west-2 if region is not provided.
+readonly region="${2:-us-west-2}"
 
 # Get the latest source AMI names (based on type)
 case "$ami_type" in
