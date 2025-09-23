@@ -39,7 +39,12 @@ sudo yum install -y aws-neuronx-oci-hook-2.*
 sudo yum install -y oci-add-hooks
 
 # Install Neuron Tools
-sudo yum install -y aws-neuronx-tools
+if [[ $AMI_TYPE == "al2inf" || $AMI_TYPE == "al2kernel5dot10inf" ]]; then
+    # Pin the aws-neuronx-tools package version to 2.25.145.0, newer versions have incompatiblity with glibc 2.26.0 installed on AL2
+    sudo yum install -y aws-neuronx-tools-2.25.145.0
+else
+    sudo yum install -y aws-neuronx-tools
+fi
 
 # disable neuron package upgrades by deleting the yum repo
 sudo rm /etc/yum.repos.d/neuron.repo
