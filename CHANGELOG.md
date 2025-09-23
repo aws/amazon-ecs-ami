@@ -5,16 +5,18 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
-## 20250919
-- al2 ami version: 20250919
+## 20250923
+- ecs version: 1.99.1
+- al2 ami version: 20250923
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20250915.0-x86_64-ebs
 - source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20250915.0-arm64-ebs
 - source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20250915.0-x86_64-ebs
 - source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20250915.0-arm64-ebs
-- al2023 ami version: 20250919
+- al2023 ami version: 20250923
 - source al2023 ami: al2023-ami-minimal-2023.8.20250915.0-kernel-6.1-x86_64
 - source al2023 arm ami: al2023-ami-minimal-2023.8.20250915.0-kernel-6.1-arm64
 - bugfix: remove nvidia-persistenced from the installation list [#535](https://github.com/aws/amazon-ecs-ami/pull/535)
+- bugfix: Pin aws-neuronx-tools on al2 to 2.25.145.0 [#539](https://github.com/aws/amazon-ecs-ami/pull/539)
 
 ## 20250916
 - al2023 ami version: 20250916
