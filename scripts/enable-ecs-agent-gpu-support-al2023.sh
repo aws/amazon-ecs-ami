@@ -25,7 +25,6 @@ sudo dnf install -y nvidia-open \
     pciutils \
     xorg-x11-server-Xorg \
     nvidia-container-toolkit \
-    oci-add-hooks \
     nvidia-persistenced
 
 ### Package installation and setup to support P6 instances
@@ -55,33 +54,15 @@ sudo mv /tmp/ecs/ecs.config /var/lib/ecs/ecs.config
 ### Configure GPU Container Runtime
 # Create required directories
 sudo mkdir -p /etc/docker-runtimes.d
-sudo mkdir -p /usr/share/docker-runtime-nvidia
 
-# Create the nvidia runtime script
+# Create the NVIDIA runtime script
 sudo tee /etc/docker-runtimes.d/nvidia <<'EOF'
 #!/bin/sh
-if [ ! -x /usr/sbin/runc ]; then
-    runc_path=/usr/bin/docker-runc
-else
-    runc_path=/usr/sbin/runc
-fi
-exec /usr/bin/oci-add-hooks --hook-config-path /usr/share/docker-runtime-nvidia/hook-config.json --runtime-path "$runc_path" "$@"
+exec /usr/bin/nvidia-container-runtime "$@"
 EOF
 
-# Create the NVIDIA container hook configuration
-sudo tee /usr/share/docker-runtime-nvidia/hook-config.json <<'EOF'
-{
-  "hooks": {
-    "prestart": [
-      {
-        "path": "/usr/bin/nvidia-container-runtime-hook",
-        "args": ["/usr/bin/nvidia-container-runtime-hook", "prestart"]
-      }
-    ]
-  }
-}
-EOF
+# Configure NVIDIA Container Runtime to use CDI mode
+sudo nvidia-ctk config --in-place --set nvidia-container-runtime.mode=cdi
 
 # Set appropriate file permissions
 sudo chmod 755 /etc/docker-runtimes.d/nvidia
-sudo chmod 644 /usr/share/docker-runtime-nvidia/hook-config.json
