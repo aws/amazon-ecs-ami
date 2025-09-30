@@ -7,7 +7,7 @@ usage() {
     echo "  $0 AMI_PLATFORM"
     echo "Example:"
     echo "  $0 al2_arm"
-    echo "AMI_PLATFORM Must be one of: al1, al2, al2_arm, al2_gpu, al2023_gpu"
+    echo "AMI_PLATFORM Must be one of: al2, al2_arm, al2_gpu, al2023_gpu"
 }
 
 error_msg() {
@@ -19,7 +19,6 @@ error_msg() {
 EXCLUDE_SEC_UPDATES_PKGS="nvidia*,docker*,cuda*,containerd*,runc*"
 
 # Paths to get the ami ids from ssm params
-AL1_PATH="/aws/service/ecs/optimized-ami/amazon-linux/recommended"
 AL2_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 AL2_ARM_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/arm64/recommended"
 AL2_GPU_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended"
@@ -63,10 +62,6 @@ platform=$1
 instance_type="c5.large"
 install_and_start_ssm_agent=0
 case "$platform" in
-"al1")
-    ami_path=$AL1_PATH
-    install_and_start_ssm_agent=1 # AL1 Requires Installation of SSM Agent
-    ;;
 "al2")
     ami_path=$AL2_PATH
     ;;

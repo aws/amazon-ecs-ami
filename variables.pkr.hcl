@@ -8,15 +8,8 @@ packer {
 }
 
 locals {
-  packages_al1    = "amazon-efs-utils ec2-net-utils acpid irqbalance numactl rng-tools docker-storage-setup"
   packages_al2    = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent yum-plugin-upgrade-helper iproute-tc"
   packages_al2023 = "amazon-efs-utils amazon-ssm-agent amazon-ec2-net-utils acpid iproute-tc"
-}
-
-variable "ami_name_prefix_al1" {
-  type        = string
-  description = "Outputted AMI name prefix."
-  default     = "unofficial-amzn-ami-2018.03."
 }
 
 variable "ami_name_prefix_al2" {
@@ -29,11 +22,6 @@ variable "ami_name_prefix_al2023" {
   type        = string
   description = "Outputted AMI name prefix."
   default     = "unofficial-amzn2023-ami-ecs"
-}
-
-variable "ami_version_al1" {
-  type        = string
-  description = "Outputted AMI version."
 }
 
 variable "ami_version_al2" {
@@ -149,23 +137,6 @@ variable "kernel_version_al2023" {
 variable "kernel_version_al2023arm" {
   type        = string
   description = "Amazon Linux 2023 ARM kernel version."
-}
-
-variable "source_ami_al1" {
-  type        = string
-  description = "Amazon Linux 1 source AMI to build from."
-}
-
-variable "docker_version_al1" {
-  type        = string
-  description = "Docker version to build AL1 AMI with."
-  default     = "20.10.13"
-}
-
-variable "ecs_version_al1" {
-  type        = string
-  description = "ECS version to build AL1 AMI with."
-  default     = "1.51.0"
 }
 
 variable "air_gapped" {

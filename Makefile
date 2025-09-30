@@ -21,10 +21,6 @@ packer:
 	unzip ./packer.zip
 	rm ./packer.zip
 
-release-al1.auto.pkrvars.hcl:
-	echo "Missing configuration file: release-al1.auto.pkrvars.hcl."
-	exit 1
-
 release-al2.auto.pkrvars.hcl:
 	echo "Missing configuration file: release-al2.auto.pkrvars.hcl."
 	exit 1
@@ -48,10 +44,6 @@ packer-fmt: packer
 .PHONY: validate
 validate: check-region init
 	./packer validate -var "region=${REGION}" .
-
-.PHONY: al1
-al1: check-region init validate release-al1.auto.pkrvars.hcl
-	./packer build -only="amazon-ebs.al1" -var "region=${REGION}" .
 
 .PHONY: al2
 al2: check-region init validate release-al2.auto.pkrvars.hcl
