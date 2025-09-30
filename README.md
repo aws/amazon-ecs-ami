@@ -1,6 +1,6 @@
 # ECS-optimized AMI Build Recipes
 > [!IMPORTANT]
-> The ECS-optimized Amazon Linux 1 AMI (AL1) will reach its end-of-life (EOL) on September 15, 2025.
+> The ECS-optimized Amazon Linux 1 AMI (AL1) has reached its end-of-life (EOL) on September 15, 2025.
 > The ECS-optimized Amazon Linux 2 AMI (AL2) will reach its EOL on June 30, 2026, mirroring the same EOL date of the upstream [Amazon Linux 2 Operating System](https://aws.amazon.com/amazon-linux-2/faqs).
 > We encourage customers to upgrade their applications to use Amazon Linux 2023, which includes long term support through 2028.
 
@@ -10,7 +10,7 @@ It will create a private AMI in whatever account you are running it in.
 ## Instructions
 
 1. Setup AWS cli credentials.
-2. Make the recipe that you want, REGION must be specified. Options are: al1, al2, al2arm, al2gpu, al2keplergpu, al2inf,
+2. Make the recipe that you want, REGION must be specified. Options are: al2, al2arm, al2gpu, al2keplergpu, al2inf,
 al2kernel5dot10, al2kernel5dot10arm, al2kernel5dot10gpu, al2kernel5dot10inf, al2023, al2023arm, al2023neu, al2023gpu.
 ```
 REGION=us-west-2 make al2023

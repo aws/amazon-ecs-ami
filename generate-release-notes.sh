@@ -5,8 +5,6 @@ set -eo pipefail
 # Flags
 AL2_GPU_NVIDIA_VERSION=""
 AL2_GPU_CUDA_VERSION=""
-AL1_CONTAINERD_VERSION=""
-AL1_RUNC_VERSION=""
 AL2023_GPU_NVIDIA_VERSION=""
 EXCLUDE_AMI=""
 
@@ -18,13 +16,11 @@ Usage:
 Options:
 	--al2-gpu-nvidia-ver  (Optional) AL2 GPU NVIDIA version. If specified, then --al2-gpu-cuda-ver option is also required to be specified.
 	--al2-gpu-cuda-ver    (Optional) AL2 GPU CUDA version. If specified, then  --al2-gpu-nvidia-ver option is also required to be specified.
-	--al1-containerd-ver  (Optional) AL1 containerd version.
-	--al1-runc-ver        (Optional) AL1 runc version.
-        --al2023-gpu-nvidia-ver (Optional) AL2023 GPU NVIDIA version.
+    --al2023-gpu-nvidia-ver (Optional) AL2023 GPU NVIDIA version.
 	--exclude-ami         (Optional) comma separated list of AMI variants that are excluded in the release.
 
 Example:
-  $0 --al2-gpu-nvidia-ver 000.00.00 --al2-gpu-cuda-ver 00.0.0 --al1-containerd-ver 0.0.0 --al1-runc-ver 0.0.0 --al2023-gpu-nvidia-ver 000.00.00 --exclude-ami al2023neu,al2inf
+  $0 --al2-gpu-nvidia-ver 000.00.00 --al2-gpu-cuda-ver 00.0.0 --al2023-gpu-nvidia-ver 000.00.00 --exclude-ami al2023neu,al2inf
 EOF
 }
 
@@ -44,14 +40,6 @@ parse_args() {
             ;;
         --al2-gpu-cuda-ver)
             AL2_GPU_CUDA_VERSION="$2"
-            shift
-            ;;
-        --al1-containerd-ver)
-            AL1_CONTAINERD_VERSION="$2"
-            shift
-            ;;
-        --al1-runc-ver)
-            AL1_RUNC_VERSION="$2"
             shift
             ;;
         --al2023-gpu-nvidia-ver)
@@ -86,17 +74,6 @@ validate_args() {
             exit 1
         fi
     fi
-    if [ -z "$AL1_CONTAINERD_VERSION" ] && ! is_ami_excluded "al1"; then
-        printf "Error: AL1 containerd version is empty when releasing AL1\n\n"
-        usage
-        exit 1
-    fi
-
-    if [ -z "$AL1_RUNC_VERSION" ] && ! is_ami_excluded "al1"; then
-        printf "Error: AL1 runc version is empty when releasing AL1\n\n"
-        usage
-        exit 1
-    fi
     if [ -z "$AL2023_GPU_NVIDIA_VERSION" ] && ! is_ami_excluded "al2023gpu"; then
         printf "Error: AL2023 GPU NVIDIA version is empty when releasing AL2023 GPU \n\n"
         usage
@@ -114,8 +91,7 @@ generate_release_notes() {
     ami_version="$placeholder_version"
     readonly al2023pkrvars="release-al2023.auto.pkrvars.hcl"
     readonly al2pkrvars="release-al2.auto.pkrvars.hcl"
-    readonly al1pkrvars="release-al1.auto.pkrvars.hcl"
-    pkvars_files="$al2023pkrvars $al2pkrvars $al1pkrvars"
+    pkvars_files="$al2023pkrvars $al2pkrvars"
     for file in $pkvars_files; do
         file_ami_version=$(cat $file | grep 'ami_version' | cut -d '"' -f2)
         if [[ $file_ami_version -gt $ami_version ]]; then
@@ -266,19 +242,6 @@ https://github.com/aws/amazon-ecs-ami/blob/main/CHANGELOG.md#$ami_version
             read ami_name_al2_kernel_5_10_gpu agent_version_al2_kernel_5_10_gpu docker_version_al2_kernel_5_10_gpu source_ami_name_al2_kernel_5_10_gpu <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux-2/kernel-5.10/gpu/recommended")
             add_ami_to_release_notes "#### GPU (Kernel 5.10)" "$ami_name_al2_kernel_5_10_gpu" "$agent_version_al2_kernel_5_10_gpu" "$docker_version_al2_kernel_5_10_gpu" "$containerd_version" "$runc_version" "$AL2_GPU_NVIDIA_VERSION" "$AL2_GPU_CUDA_VERSION" "$source_ami_name_al2_kernel_5_10_gpu"
         fi
-    fi
-
-    # AL1
-    # Include AL1 release notes if there was an al1 release
-    if ! is_ami_excluded "al1"; then
-        al1_header="
-### Amazon ECS-optimized Amazon Linux AMI
----"
-        release_notes="${release_notes}${al1_header}"
-
-        read ami_name_al1 agent_version_al1 docker_version_al1 source_ami_name_al1 <<<$(get_ami_details "/aws/service/ecs/optimized-ami/amazon-linux/recommended")
-        add_ami_to_release_notes "The Amazon ECS-optimized Amazon Linux AMI is deprecated as of April 15, 2021. After that date, Amazon ECS will continue providing critical and important security updates for the AMI but will not add support for new features.
-" "$ami_name_al1" "$agent_version_al1" "$docker_version_al1" "$AL1_CONTAINERD_VERSION" "$AL1_RUNC_VERSION" "" "" "$source_ami_name_al1"
     fi
 
     echo -n "$release_notes"

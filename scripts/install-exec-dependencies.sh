@@ -5,11 +5,6 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 # Load common functions.
 . "${DIR}/functions.sh" || exit 1
 
-if [[ -n $AIR_GAPPED && $AMI_TYPE == "al1" ]]; then
-    echo "For Air-gapped region, exec feature is not supported for AL1 AMIs"
-    exit 0
-fi
-
 # Returns AWS DNS suffix from $REGION_DNS_SUFFIX if set, errors if no dns suffix set for air-gapped regions.
 # Otherwise, return default host suffix for the region.
 get_dns_suffix() {
