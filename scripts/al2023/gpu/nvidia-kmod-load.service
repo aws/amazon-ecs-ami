@@ -1,0 +1,11 @@
+[Unit]
+Description=NVIDIA kernel module loader
+Before=nvidia-fabricmanager.service nvidia-persistenced.service ecs.service
+
+[Service]
+Type=oneshot
+ExecStart=/etc/ecs/nvidia-kmod-load.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
