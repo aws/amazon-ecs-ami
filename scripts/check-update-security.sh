@@ -141,12 +141,11 @@ instance_id=$(aws ec2 run-instances \
 
 # check-update based on platform
 if [[ $platform == al2023* ]]; then
-    check_upgrade_options="--releasever=latest --sec-severity Critical --exclude=$EXCLUDE_SEC_UPDATES_PKGS"
+    check_upgrade_options="--sec-severity Critical --exclude=$EXCLUDE_SEC_UPDATES_PKGS"
     if [[ $platform == *gpu ]]; then
         check_upgrade_options="nvidia-driver-cuda"
     fi
-    # Run check-upgrade in a loop to ensure that the repo metadata is up to date
-    command_params="commands=[\"for i in {1..5}; do dnf clean expire-cache; dnf --refresh check-upgrade $check_upgrade_options -q; code=$?; if [ $code -eq 100 ]; then exit 100; fi; sleep 5; done; exit 0\"]"
+    command_params="commands=[\"dnf --refresh check-upgrade --releasever=latest $check_upgrade_options -q\"]"
 elif [ "$platform" = "al2_gpu" ]; then
     # The amzn2-nvidia repository does not provide updateinfo metadata (updateinfo.xml),
     # which YUM relies on to classify updates as security-related. The --security flag
