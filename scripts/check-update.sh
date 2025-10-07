@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -exo pipefail
+set -euo pipefail
 
 usage() {
     echo "Usage:"
@@ -33,63 +33,74 @@ handle_nvidia_version() {
         version=$(echo "$gpu_update" | cut -d' ' -f2)
     fi
 
-    # Update version entry if version is available and file exists
-    if [ -n "$version" ] && [ -f NVIDIA_DRIVER_VERSION ]; then
+    # Update version entry if version is available
+    if [ -n "$version" ]; then
         if grep -q "^${version_key} = " NVIDIA_DRIVER_VERSION; then
-            sed -i "s/^${version_key} = .*/${version_key} = \"${version}\"/" NVIDIA_DRIVER_VERSION
+            if ! sed -i "s/^${version_key} = .*/${version_key} = \"${version}\"/" NVIDIA_DRIVER_VERSION; then
+                echo "Failed to update NVIDIA driver version in NVIDIA_DRIVER_VERSION file"
+            fi
         fi
     fi
 }
 
-readonly ami_type="$1"
+readonly ami_type="${1:-}"
 if [ -z "$ami_type" ]; then
     error "AMI_TYPE must be provided"
 fi
 
+# Validate AMI type
+case "$ami_type" in
+al2 | al2023)
+    # Valid AMI types
+    ;;
+*)
+    error "Invalid AMI type: $ami_type"
+    ;;
+esac
+
+# Backup current release file and generate new one
 cp release-$ami_type.auto.pkrvars.hcl release-$ami_type.old.hcl
 ./generate-release-vars.sh $ami_type
+
+# Compare release files (excluding ami_version)
 set +e
 diff_val=$(diff <(grep -v ami_version release-$ami_type.old.hcl) <(grep -v ami_version release-$ami_type.auto.pkrvars.hcl))
 set -e
 
-# Check for NVIDIA driver version for both AL2 and AL2023
-if [ "$ami_type" = "al2" ] || [ "$ami_type" = "al2023" ]; then
-    gpu_update=$(./scripts/check-update-security.sh "${ami_type}_gpu")
-    handle_nvidia_version "$ami_type" "$gpu_update"
-    if [[ $gpu_update == true* ]]; then
-        Update="true"
-    fi
+# Initialize update flag
+Update="false"
+
+# Check for NVIDIA driver version updates
+gpu_update=$(./scripts/check-update-security.sh "${ami_type}_gpu")
+handle_nvidia_version "$ami_type" "$gpu_update"
+if [[ $gpu_update == true* ]]; then
+    Update="true"
 fi
 
-# If no difference in dependencies, check for security update
+# Check for security updates if no dependency changes
 if [ -z "$diff_val" ]; then
-    Update="false"
-    case "$ami_type" in
-    "al2" | "al2023")
-        # Check security updates for each architecture type
-        amd_update=$(./scripts/check-update-security.sh $ami_type)
-        arm_update=$(./scripts/check-update-security.sh "${ami_type}_arm")
+    # Check security updates for each architecture type
+    amd_update=$(./scripts/check-update-security.sh $ami_type)
+    arm_update=$(./scripts/check-update-security.sh "${ami_type}_arm")
 
-        # Combine results
-        if [[ $amd_update == true* ]] || [[ $arm_update == true* ]]; then
-            Update="true"
-        fi
-        ;;
-    *)
-        echo "Error: Invalid AMI type: $ami_type"
-        exit 1
-        ;;
-    esac
+    # Combine results
+    if [[ $amd_update == true* ]] || [[ $arm_update == true* ]]; then
+        Update="true"
+    fi
 else
     Update="true"
 fi
 
+# Clean up temporary file
 rm "release-$ami_type.old.hcl"
 
+# Handle git operations based on update status
 if [ "$Update" = "true" ]; then
     echo "Update exists for $ami_type"
     git add release-$ami_type.auto.pkrvars.hcl
-    if [ -f NVIDIA_DRIVER_VERSION ] && ! git diff --quiet NVIDIA_DRIVER_VERSION; then
+
+    # Add NVIDIA_DRIVER_VERSION if it has changes
+    if ! git diff --quiet NVIDIA_DRIVER_VERSION; then
         echo "NVIDIA driver version changes detected"
         git add NVIDIA_DRIVER_VERSION
     fi
