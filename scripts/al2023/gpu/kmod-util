@@ -1,0 +1,217 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+# Enable nullglob to handle empty glob patterns safely
+shopt -s nullglob
+
+# dkms may not be on the PATH. Discover the path from known paths
+DKMS=""
+for path in /usr/bin/dkms /usr/sbin/dkms; do
+  if [ -x "$path" ]; then
+    DKMS=$path
+    break
+  fi
+done
+
+if [ -z "$DKMS" ]; then
+  echo >&2 "$(date '+%Y-%m-%dT%H:%M:%S%z')" "[kmod-util]" "ERROR: dkms not found"
+  exit 1
+fi
+
+# Custom directory for storing DKMS module archives
+# This path is used to store compressed kernel module tarballs that can be loaded on demand
+DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
+
+LOCK_FILE=/var/lock/kmod-util.lock
+
+function log() {
+  echo >&2 "$(date '+%Y-%m-%dT%H:%M:%S%z')" "[kmod-util]" "$@"
+}
+
+# lock mechanism to prevent concurrent operations
+function acquire_lock() {
+  local timeout=60
+  local count=0
+  
+  while [ $count -lt $timeout ]; do
+    if (set -C; echo $$ > "$LOCK_FILE") 2>/dev/null; then
+      return 0
+    fi
+    sleep 1
+    count=$((count + 1))
+  done
+  
+  log "ERROR: Failed to acquire lock after $timeout seconds"
+  return 1
+}
+
+function release_lock() {
+  rm -f "$LOCK_FILE"
+}
+
+# Function to detect NVIDIA GPU devices
+function has-nvidia-device() {
+  local NVIDIA_VENDOR_ID="10de"  # NVIDIA's PCI vendor ID
+  local NVIDIA_DEVICES
+  NVIDIA_DEVICES=$(lspci -d "${NVIDIA_VENDOR_ID}::" | wc -l)
+  if [ ${NVIDIA_DEVICES} -gt 0 ]; then
+    return 0
+  fi
+  return 1
+}
+
+# get the version of a registered kernel module using dkms status
+function module-version() {
+  local MODULE_NAME="${1}"
+  local status_output
+  status_output=$(${DKMS} status -m "${MODULE_NAME}" 2>/dev/null | head -n 1)
+  
+  if [ -z "$status_output" ]; then
+    log "ERROR: No DKMS status found for module: ${MODULE_NAME}"
+    return 1
+  fi
+  
+  # Parse version from dkms status output (format: module/version, kernel, arch: status)
+  echo "$status_output" | cut -d',' -f1 | cut -d'/' -f2 | cut -d':' -f1 | xargs
+}
+
+# load a kernel module from the archives
+function load() {
+  local MODULE_NAME="${1}"
+  acquire_lock || return 1
+  
+  log "unpacking: ${MODULE_NAME}"
+  local MODULE_ARCHIVE="${DKMS_ARCHIVE_DIR}/${MODULE_NAME}/*.tar.gz"
+  local archives=($MODULE_ARCHIVE)
+  
+  if [ ${#archives[@]} -eq 0 ]; then
+    log "ERROR: No archive found for ${MODULE_NAME}"
+    return 1
+  fi
+  
+  ${DKMS} ldtarball "${archives[0]}"
+  log "unpacked: ${MODULE_NAME}"
+  log "installing: ${MODULE_NAME}"
+  local MODULE_VERSION
+  MODULE_VERSION=$(module-version "${MODULE_NAME}")
+  ${DKMS} install -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
+  log "installed: ${MODULE_NAME}"
+}
+
+# remove a kernel module
+function remove() {
+  local MODULE_NAME="${1}"
+  acquire_lock || return 1
+  
+  log "removing: ${MODULE_NAME}"
+  local MODULE_VERSION
+  MODULE_VERSION=$(module-version "${MODULE_NAME}")
+  ${DKMS} remove -m "${MODULE_NAME}" -v "${MODULE_VERSION}" --all
+  log "removed: ${MODULE_NAME}"
+}
+
+# archive a kernel module
+function archive() {
+  local MODULE_NAME="${1}"
+  acquire_lock || return 1
+  
+  log "archiving: ${MODULE_NAME}"
+  mkdir -p "${DKMS_ARCHIVE_DIR}/${MODULE_NAME}"
+  local MODULE_VERSION
+  MODULE_VERSION=$(module-version "${MODULE_NAME}")
+  ${DKMS} mktarball -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
+  cp /var/lib/dkms/${MODULE_NAME}/${MODULE_VERSION}/tarball/*.tar.gz "${DKMS_ARCHIVE_DIR}/${MODULE_NAME}/"
+  log "archived: ${MODULE_NAME}"
+}
+
+# build a kernel module
+function build() {
+  local MODULE_NAME="${1}"
+  acquire_lock || return 1
+  
+  local MODULE_VERSION
+  MODULE_VERSION=$(module-version "${MODULE_NAME}")
+  ${DKMS} build -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
+}
+
+function usage() {
+  cat >&2 << EOF
+usage: $0 COMMAND [MODULE_NAME]
+
+Kernel module utilities for dynamic GPU driver management.
+Supports load/remove/archive/build/module-version operations for DKMS modules.
+
+COMMANDS:
+  load MODULE_NAME     Load a kernel module from archives
+  remove MODULE_NAME   Remove an installed kernel module  
+  archive MODULE_NAME  Archive an installed kernel module
+  build MODULE_NAME    Build a kernel module
+  module-version MODULE_NAME  Get the version of a registered kernel module
+
+EXAMPLES:
+  $0 load nvidia                  # Load nvidia module
+  $0 remove nvidia                # Remove nvidia module
+  $0 archive nvidia               # Archive nvidia module for later use
+  $0 build nvidia                 # Build nvidia module
+  $0 module-version nvidia        # Get nvidia module version
+
+NOTES:
+  - Operations are protected by file locking to prevent conflicts
+  - Archives are stored in $DKMS_ARCHIVE_DIR
+EOF
+}
+
+function parse_args() {
+  # Check for at least one argument
+  if [ "$#" -eq 0 ]; then
+    usage
+    exit 1
+  fi
+
+  COMMAND="$1"
+  MODULE_NAME="${2:-}"
+}
+
+function verify_args() {
+  case "$COMMAND" in
+    load|remove|archive|build|module-version)
+      if [ -z "$MODULE_NAME" ]; then
+        log "ERROR: Command '$COMMAND' requires a module name"
+        usage
+        exit 1
+      fi
+      ;;
+    has-nvidia-device)
+      if [ -n "$MODULE_NAME" ]; then
+        log "ERROR: Command '$COMMAND' takes no arguments"
+        usage
+        exit 1
+      fi
+      ;;
+    *)
+      log "ERROR: Unknown command: $COMMAND"
+      usage
+      exit 1
+      ;;
+  esac
+}
+
+function main() {
+  # Cleanup on exit
+  trap 'release_lock' EXIT
+
+  parse_args "$@"
+  verify_args
+
+  case "$COMMAND" in
+    load|remove|archive|build|module-version)
+      "${COMMAND}" "$MODULE_NAME"
+      ;;
+    has-nvidia-device)
+      "${COMMAND}"
+      ;;
+  esac
+}
+
+main "$@"

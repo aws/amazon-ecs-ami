@@ -7,7 +7,7 @@ usage() {
     echo "Examples:"
     echo "  $0 al2"
     echo "  $0 al2023 ap-northeast-2"
-    echo "AMI_TYPE Must be one of: al1, al2, al2023"
+    echo "AMI_TYPE Must be one of: al2, al2023"
     echo "REGION (if specified) must be a valid AWS region"
 }
 
@@ -30,25 +30,6 @@ readonly region="${2:-us-west-2}"
 
 # Get the latest source AMI names (based on type)
 case "$ami_type" in
-"al1")
-    # AL1
-    ami_id_al1=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn-ami-minimal-hvm-x86_64-ebs --query 'Parameters[0].[Value]' --output text)
-    ami_name_al1=$(aws ec2 describe-images --region "$region" --owner amazon --image-id "$ami_id_al1" --query 'Images[0].Name' --output text)
-
-    readonly ami_name_al1
-
-    readonly ecs_version_al1=$(sed -n '/variable "ecs_version_al1" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
-    readonly docker_version_al1=$(sed -n '/variable "docker_version_al1" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
-    readonly exec_ssm_version=$(sed -n '/variable "exec_ssm_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
-
-    cat >|release-al1.auto.pkrvars.hcl <<EOF
-ami_version_al1    = "$ami_version"
-ecs_version_al1    = "$ecs_version_al1"
-docker_version_al1 = "$docker_version_al1"
-exec_ssm_version   = "$exec_ssm_version"
-source_ami_al1     = "$ami_name_al1"
-EOF
-    ;;
 "al2")
     # AL2
     ami_id_al2_x86=$(aws ssm get-parameters --region "$region" --names /aws/service/ami-amazon-linux-latest/amzn2-ami-minimal-hvm-x86_64-ebs --query 'Parameters[0].[Value]' --output text)

@@ -6,7 +6,7 @@ usage() {
     echo "  $0 AMI_TYPE"
     echo "Example:"
     echo "  $0 al2"
-    echo "AMI_TYPE Must be one of: al1, al2, al2023"
+    echo "AMI_TYPE Must be one of: al2, al2023"
 }
 
 error() {
@@ -65,9 +65,6 @@ fi
 if [ -z "$diff_val" ]; then
     Update="false"
     case "$ami_type" in
-    "al1")
-        Update=$(./scripts/check-update-security.sh $ami_type)
-        ;;
     "al2" | "al2023")
         # Check security updates for each architecture type
         amd_update=$(./scripts/check-update-security.sh $ami_type)
