@@ -12,6 +12,6 @@
 # For driver installations or updates, please refer to the appropriate
 # documentation or automation scripts.
 
-nvidia_driver_version_al2 = "540.163.01"
-nvidia_driver_version_al2023 = "570.65.06"
+nvidia_driver_version_al2 = "550.163.01"
+nvidia_driver_version_al2023 = "580.65.06"
 cuda_version_al2 = ""
