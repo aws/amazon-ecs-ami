@@ -21,10 +21,10 @@ EXCLUDE_SEC_UPDATES_PKGS="nvidia*,docker*,cuda*,containerd*,runc*"
 # Paths to get the ami ids from ssm params
 AL2_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 AL2_ARM_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/arm64/recommended"
-AL2_GPU_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended"
+AL2_GPU_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/amzn2-ami-ecs-gpu-hvm-2.0.20250318-x86_64-ebs"
 AL2023_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 AL2023_ARM_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
-AL2023_GPU_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/gpu/recommended"
+AL2023_GPU_PATH="/aws/service/ecs/optimized-ami/amazon-linux-2023/gpu/al2023-ami-ecs-gpu-hvm-2023.0.20250909-kernel-6.1-x86_64-ebs"
 
 # Indicates that an update exists
 UPDATE_EXISTS_CODE="100"
@@ -150,8 +150,8 @@ elif [ "$platform" = "al2_gpu" ]; then
     # The amzn2-nvidia repository does not provide updateinfo metadata (updateinfo.xml),
     # which YUM relies on to classify updates as security-related. The --security flag
     # would not detect updates without this metadata. Therefore, we check for all updates
-    # to nvidia-driver packages and handle them as potential security updates.
-    command_params='commands=["yum check-update nvidia-driver-latest-dkms -q"]'
+    # to nvidia-driver and cuda packages and handle them as potential security updates.
+    command_params='commands=["yum check-update nvidia-driver-latest-dkms cuda -q"]'
 else
     command_params="commands=[\"yum check-update --security --sec-severity=critical --exclude=$EXCLUDE_SEC_UPDATES_PKGS -q\"]"
 fi
@@ -232,9 +232,20 @@ terminate_out=$(aws ec2 terminate-instances --instance-ids $instance_id)
 # Return whether update is necessary
 if [ "$cmd_response_code" -eq "$UPDATE_EXISTS_CODE" ]; then
     if [ "$platform" = "al2_gpu" ]; then
-        nvidia_driver_version=$(echo "$std_output" | grep "nvidia-driver-latest-dkms" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://')
-        if [ -n "$nvidia_driver_version" ]; then
+        nvidia_driver_version=$(echo "$std_output" | grep "nvidia-driver-latest-dkms" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://' || true)
+        cuda_version=$(echo "$std_output" | grep "^cuda" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://' || true)
+        
+        # Handle different update scenarios for AL2:
+        # 1. Both NVIDIA and CUDA updates: "true <nvidia_version> <cuda_version>"
+        # 2. Only NVIDIA update: "true <nvidia_version>"
+        # 3. Only CUDA update: "true cuda:<cuda_version>"
+        # 4. Updates exist but no versions detected: "true"
+        if [ -n "$nvidia_driver_version" ] && [ -n "$cuda_version" ]; then
+            echo "true $nvidia_driver_version $cuda_version"
+        elif [ -n "$nvidia_driver_version" ]; then
             echo "true $nvidia_driver_version"
+        elif [ -n "$cuda_version" ]; then
+            echo "true cuda:$cuda_version"
         else
             echo "true"
         fi

@@ -16,7 +16,7 @@ error() {
     exit 1
 }
 
-# Function to handle NVIDIA driver version extraction and storage
+# Function to handle NVIDIA driver and CUDA version extraction and storage
 handle_nvidia_version() {
     local ami_variant=$1
     local gpu_update=$2
@@ -26,18 +26,42 @@ handle_nvidia_version() {
         return
     fi
 
-    local version=""
-    local version_key="nvidia_driver_version_${ami_variant}"
+    local nvidia_version=""
+    local cuda_version=""
+    local nvidia_version_key="nvidia_driver_version_${ami_variant}"
+    local cuda_version_key="cuda_version_${ami_variant}"
 
     if [[ $gpu_update == true* ]]; then
-        version=$(echo "$gpu_update" | cut -d' ' -f2)
+        # Parse the output format: "true <nvidia_version> <cuda_version>" or "true <nvidia_version>" or "true cuda:<cuda_version>"
+        local update_info=$(echo "$gpu_update" | cut -d' ' -f2-)
+        
+        # Check if it contains both nvidia and cuda versions (space-separated)
+        if [[ $update_info == *" "* ]]; then
+            nvidia_version=$(echo "$update_info" | cut -d' ' -f1)
+            cuda_version=$(echo "$update_info" | cut -d' ' -f2)
+        # Check if it's a cuda-only update
+        elif [[ $update_info == cuda:* ]]; then
+            cuda_version=$(echo "$update_info" | cut -d':' -f2)
+        # Otherwise it's just nvidia version
+        else
+            nvidia_version="$update_info"
+        fi
     fi
 
-    # Update version entry if version is available
-    if [ -n "$version" ]; then
-        if grep -q "^${version_key} = " NVIDIA_DRIVER_VERSION; then
-            if ! sed -i "s/^${version_key} = .*/${version_key} = \"${version}\"/" NVIDIA_DRIVER_VERSION; then
+    # Update NVIDIA driver version entry if available
+    if [ -n "$nvidia_version" ]; then
+        if grep -q "^${nvidia_version_key} = " NVIDIA_DRIVER_VERSION; then
+            if ! sed -i "s/^${nvidia_version_key} = .*/${nvidia_version_key} = \"${nvidia_version}\"/" NVIDIA_DRIVER_VERSION; then
                 echo "Failed to update NVIDIA driver version in NVIDIA_DRIVER_VERSION file"
+            fi
+        fi
+    fi
+
+    # Update CUDA version entry if available (AL2 only)
+    if [ -n "$cuda_version" ] && [ "$ami_variant" = "al2" ]; then
+        if grep -q "^${cuda_version_key} = " NVIDIA_DRIVER_VERSION; then
+            if ! sed -i "s/^${cuda_version_key} = .*/${cuda_version_key} = \"${cuda_version}\"/" NVIDIA_DRIVER_VERSION; then
+                echo "Failed to update CUDA version in NVIDIA_DRIVER_VERSION file"
             fi
         fi
     fi
