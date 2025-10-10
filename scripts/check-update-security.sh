@@ -150,8 +150,8 @@ elif [ "$platform" = "al2_gpu" ]; then
     # The amzn2-nvidia repository does not provide updateinfo metadata (updateinfo.xml),
     # which YUM relies on to classify updates as security-related. The --security flag
     # would not detect updates without this metadata. Therefore, we check for all updates
-    # to nvidia-driver packages and handle them as potential security updates.
-    command_params='commands=["yum check-update nvidia-driver-latest-dkms -q"]'
+    # to nvidia-driver and cuda packages and handle them as potential security updates.
+    command_params='commands=["yum check-update nvidia-driver-latest-dkms cuda -q"]'
 else
     command_params="commands=[\"yum check-update --security --sec-severity=critical --exclude=$EXCLUDE_SEC_UPDATES_PKGS -q\"]"
 fi
@@ -232,12 +232,32 @@ terminate_out=$(aws ec2 terminate-instances --instance-ids $instance_id)
 # Return whether update is necessary
 if [ "$cmd_response_code" -eq "$UPDATE_EXISTS_CODE" ]; then
     if [ "$platform" = "al2_gpu" ]; then
-        nvidia_driver_version=$(echo "$std_output" | grep "nvidia-driver-latest-dkms" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://')
-        if [ -n "$nvidia_driver_version" ]; then
+        nvidia_driver_version=$(echo "$std_output" | grep "nvidia-driver-latest-dkms" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://' || true)
+        cuda_version=$(echo "$std_output" | grep "^cuda" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://' || true)
+
+        # Determine output format based on available version combinations
+        version_pattern=""
+        [ -n "$nvidia_driver_version" ] && version_pattern="${version_pattern}nvidia"
+        [ -n "$cuda_version" ] && version_pattern="${version_pattern}_cuda"
+
+        case "$version_pattern" in
+        "nvidia_cuda")
+            # Both NVIDIA and CUDA updates available
+            echo "true $nvidia_driver_version $cuda_version"
+            ;;
+        "nvidia")
+            # Only NVIDIA driver update available
             echo "true $nvidia_driver_version"
-        else
+            ;;
+        "_cuda")
+            # Only CUDA package update available
+            echo "true cuda:$cuda_version"
+            ;;
+        *)
+            # No specific versions detected, but updates exist
             echo "true"
-        fi
+            ;;
+        esac
     elif [ "$platform" = "al2023_gpu" ]; then
         nvidia_driver_version=$(echo "$std_output" | grep "nvidia-driver-cuda" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://')
         echo "true $nvidia_driver_version"
