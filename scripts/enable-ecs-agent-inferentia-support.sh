@@ -31,7 +31,9 @@ if [[ $AMI_TYPE == "al2inf" ]]; then
     # Pin the aws-neuronx-dkms package version to 2.17.17.0 only for al2inf, since the newest versions of the Neuron SDK are no longer supporting linux kernel 4.14
     sudo yum install -y aws-neuronx-dkms-2.17.17.0
 else
-    sudo yum install -y aws-neuronx-dkms-2.*
+    # Pin the aws-neuron-dkms package version to 2.21* for al2kernel5dot10inf and al2023neu
+    # Refer: https://awsdocs-neuron.readthedocs-hosted.com/en/latest/general/announcements/neuron2.x/announce-eos-neuron-driver-support-inf1.html
+    sudo yum install -y aws-neuronx-dkms-2.21.*
 fi
 sudo yum install -y aws-neuronx-oci-hook-2.*
 
