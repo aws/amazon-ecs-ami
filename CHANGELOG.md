@@ -15,6 +15,7 @@
 - al2023 ami version: 20251014
 - enhancement: Update nvidia driver version al2023 to 580.95.05
 - enhancement: Update exec ssm version to 3.3.3050.0
+- enhancement: Pin aws-neuronx-dkms to 2.21* on al2kernel5.10/al2023 [#557](https://github.com/aws/amazon-ecs-ami/pull/557)
 
 ## 20251006
 - al2 ami version: 20251006
