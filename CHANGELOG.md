@@ -13,7 +13,7 @@
 - source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20251014.0-x86_64-ebs
 - source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20251014.0-arm64-ebs
 - al2023 ami version: 20251014
-- nvidia driver version al2023: 580.95.05
+- enhancement: Update nvidia driver version al2023 to 580.95.05
 - enhancement: Update exec ssm version to 3.3.3050.0
 
 ## 20251006
