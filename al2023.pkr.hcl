@@ -179,7 +179,10 @@ build {
     environment_vars = [
       "AMI_TYPE=${source.name}"
     ]
-    script = "scripts/enable-ecs-agent-gpu-support-al2023.sh"
+    scripts = [
+      "scripts/al2023/gpu/install-nvidia-driver.sh",
+      "scripts/al2023/gpu/enable-ecs-agent-gpu-support-al2023.sh"
+    ]
   }
 
   provisioner "shell" {
