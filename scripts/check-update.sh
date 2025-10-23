@@ -97,7 +97,8 @@ Update="false"
 # Check for NVIDIA driver version updates
 gpu_update=$(./scripts/check-update-security.sh "${ami_type}_gpu")
 handle_nvidia_version "$ami_type" "$gpu_update"
-if [[ $gpu_update == true* ]]; then
+# Only trigger update if GPU update detected AND NVIDIA_DRIVER_VERSION file actually changed
+if [[ $gpu_update == true* ]] && ! git diff --quiet NVIDIA_DRIVER_VERSION; then
     Update="true"
 fi
 
