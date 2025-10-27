@@ -5,6 +5,15 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20251027
+- al2 ami version: 20251027
+- al2023 ami version: 20251027
+- source al2023 ami: al2023-ami-minimal-2023.9.20251020.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.9.20251020.0-kernel-6.1-arm64
+- distribution al2023 release: 20251020
+- feature: Enable dynamic NVIDIA driver selection [#564](https://github.com/aws/amazon-ecs-ami/pull/564)
+- enhancement: Update container runtime versions (docker 25.0.13, containerd 2.1.4, runc 1.3.1) [#566](https://github.com/aws/amazon-ecs-ami/pull/566)
+
 ## 20251015
 - ecs version: 1.100.0
 - al2 ami version: 20251015
