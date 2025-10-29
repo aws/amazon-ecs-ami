@@ -109,7 +109,6 @@ generate_release_notes() {
 ---
 * [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 * [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
-* [Amazon Linux release notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes)
 
 ### Changelog
 ---
