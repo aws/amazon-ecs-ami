@@ -91,6 +91,15 @@ sudo dnf versionlock clear
 ```
 > [!IMPORTANT]
 > When updates to these packages are necessary, customers should consider using the latest AMI version that includes the required updates. If updating existing instances is required, a careful approach involving unlocking, updating, and re-locking packages should be employed, always ensuring GPU functionality is maintained throughout the process.
+
+## Memory Overcommit Fix for g6f.large instance type
+
+`g6f.large` instances require memory overcommit configuration to run ECS tasks with NVIDIA GPU support. Add this to your EC2 UserData or run directly on the instance:
+
+```bash
+echo 'vm.overcommit_memory = 1' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+```
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
