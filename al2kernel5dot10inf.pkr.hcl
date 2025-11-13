@@ -1,6 +1,6 @@
 locals {
   ami_name_al2kernel5dot10inf = "${var.ami_name_prefix_al2}-kernel-5.10-inf-hvm-2.0.${var.ami_version_al2}-x86_64-ebs"
-  default_tags = {
+  default_tags_al2kernel5dot10inf = {
     os_version          = "Amazon Linux 2"
     source_image_name   = "{{ .SourceAMIName }}"
     ecs_runtime_version = "Docker version ${var.docker_version}"
@@ -8,7 +8,7 @@ locals {
     ami_type            = "al2kernel5dot10inf"
     ami_version         = "2.0.${var.ami_version_al2}"
   }
-  merged_tags = merge("${local.default_tags}", "${var.tags}")
+  merged_tags_al2kernel5dot10inf = merge("${local.default_tags_al2kernel5dot10inf}", "${var.tags}")
 }
 
 source "amazon-ebs" "al2kernel5dot10inf" {
@@ -41,6 +41,6 @@ source "amazon-ebs" "al2kernel5dot10inf" {
   ami_users     = "${var.ami_users}"
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
-  tags          = "${local.merged_tags}"
+  tags          = "${local.merged_tags_al2kernel5dot10inf}"
   run_tags      = "${var.run_tags}"
 }
