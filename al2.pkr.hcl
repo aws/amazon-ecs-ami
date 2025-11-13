@@ -6,7 +6,7 @@ locals {
     "69-available-updates-begin",
     "71-available-updates-finish"
   ]
-  default_tags = {
+  default_tags_al2 = {
     os_version          = "Amazon Linux 2"
     source_image_name   = "{{ .SourceAMIName }}"
     ecs_runtime_version = "Docker version ${var.docker_version}"
@@ -14,7 +14,7 @@ locals {
     ami_type            = "al2"
     ami_version         = "2.0.${var.ami_version_al2}"
   }
-  merged_tags = merge("${local.default_tags}", "${var.tags}")
+  merged_tags_al2 = merge("${local.default_tags_al2}", "${var.tags}")
 }
 
 source "amazon-ebs" "al2" {
@@ -47,7 +47,7 @@ source "amazon-ebs" "al2" {
   ami_users     = "${var.ami_users}"
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
-  tags          = "${local.merged_tags}"
+  tags          = "${local.merged_tags_al2}"
   run_tags      = "${var.run_tags}"
 }
 

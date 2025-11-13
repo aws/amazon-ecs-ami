@@ -1,6 +1,6 @@
 locals {
   ami_name_al2023neu = "${var.ami_name_prefix_al2023}-neuron-hvm-2023.0.${var.ami_version_al2023}${var.kernel_version_al2023}-x86_64"
-  default_tags = {
+  default_tags_al2023neu = {
     os_version          = "Amazon Linux 2023"
     source_image_name   = "{{ .SourceAMIName }}"
     ecs_runtime_version = "Docker version ${var.docker_version_al2023}"
@@ -8,7 +8,7 @@ locals {
     ami_type            = "al2023neu"
     ami_version         = "2023.0.${var.ami_version_al2023}"
   }
-  merged_tags = merge("${local.default_tags}", "${var.tags}")
+  merged_tags_al2023neu = merge("${local.default_tags_al2023neu}", "${var.tags}")
 }
 
 source "amazon-ebs" "al2023neu" {
@@ -41,6 +41,6 @@ source "amazon-ebs" "al2023neu" {
   ami_users     = "${var.ami_users}"
   ssh_interface = "public_ip"
   ssh_username  = "ec2-user"
-  tags          = "${local.merged_tags}"
+  tags          = "${local.merged_tags_al2023neu}"
   run_tags      = "${var.run_tags}"
 }
