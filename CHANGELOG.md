@@ -6,6 +6,7 @@
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
 ## 20251217
+- al2, al2023 ami version: 20251217
 - ecs version: 1.101.1
 
 ## 20251216
