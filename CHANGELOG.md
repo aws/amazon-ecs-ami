@@ -5,6 +5,10 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20251217
+- al2, al2023 ami version: 20251217
+- ecs version: 1.101.1
+
 ## 20251216
 - al2, al2023 ami version: 20251216
 - enhancement: bump containerd to 2.1.5 [#598](https://github.com/aws/amazon-ecs-ami/pull/598) 
