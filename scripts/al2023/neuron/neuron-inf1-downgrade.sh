@@ -34,6 +34,23 @@ detect_inf1_hardware() {
 downgrade_neuron_packages() {
     log "Starting neuron package downgrade for inf1"
 
+    # aws-neuronx-dkms installation calls `update-pciids || true` to do a best effort PCI ID database
+    # update. However, this makes the installation hang if the instance does not have Internet
+    # access. Since we update the PCI ID database during AMI build, we can skip it during
+    # package installation. To do so, we pass a no-op update-pciids command to the package
+    # installation command as an override.
+    local no_op_dir
+    no_op_dir=$(mktemp -d)
+    cat > "$no_op_dir/update-pciids" << 'EOF'
+#!/bin/bash
+echo "update-pciids: skipped (AMI already has current PCI database)" >&2
+exit 0
+EOF
+    chmod +x "$no_op_dir/update-pciids"
+
+    # Set up cleanup trap to remove no-op directory
+    trap "rm -rf '$no_op_dir'" EXIT
+
     # Find all cached RPM files
     local cached_rpms
     cached_rpms=$(find "$CACHE_DIR" -name "*.rpm" 2>/dev/null)
@@ -83,9 +100,9 @@ downgrade_neuron_packages() {
             log "WARNING: Failed to remove $package_name, may not be installed"
         fi
 
-        # Install inf1-compatible version
+        # Install inf1-compatible version using PATH override macro
         log "Installing inf1-compatible $package_name"
-        if rpm -i "$rpm_file"; then
+        if rpm --define "_install_script_path $no_op_dir:/sbin:/bin:/usr/sbin:/usr/bin" -i "$rpm_file"; then
             log "$package_name downgrade successful"
         else
             log "ERROR: Failed to install inf1-compatible $package_name"
