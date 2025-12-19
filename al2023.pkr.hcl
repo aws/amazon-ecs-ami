@@ -166,7 +166,7 @@ build {
   }
 
   provisioner "file" {
-    sources     = [
+    sources = [
       "scripts/al2023/neuron/neuron-inf1-downgrade.sh",
       "scripts/al2023/neuron/neuron-inf1-downgrade.service"
     ]
