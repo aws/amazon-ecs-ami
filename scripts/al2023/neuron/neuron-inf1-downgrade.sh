@@ -41,6 +41,10 @@ downgrade_neuron_packages() {
     # installation command as an override.
     local no_op_dir
     no_op_dir=$(mktemp -d)
+    if [[ -z "$no_op_dir" ]]; then
+        log "ERROR: Failed to create temporary directory"
+        return 1
+    fi
     cat > "$no_op_dir/update-pciids" << 'EOF'
 #!/bin/bash
 echo "update-pciids: skipped (AMI already has current PCI database)" >&2
@@ -84,6 +88,11 @@ EOF
         local current_version target_version
         current_version=$(rpm -q "$package_name" --queryformat '%{VERSION}' 2>/dev/null || echo "none")
         target_version=$(rpm -qp --queryformat '%{VERSION}' "$rpm_file" 2>/dev/null)
+
+        if [[ -z "$target_version" ]]; then
+            log "ERROR: Could not determine target version for $rpm_file"
+            return 1
+        fi
 
         log "Current $package_name version: $current_version"
         log "Target $package_name version: $target_version"
