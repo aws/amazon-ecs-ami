@@ -166,14 +166,11 @@ build {
   }
 
   provisioner "file" {
-    source      = "scripts/al2023/neuron/neuron-inf1-downgrade.sh"
-    destination = "/tmp/neuron-inf1-downgrade.sh"
-    only        = ["amazon-ebs.al2023neu"]
-  }
-
-  provisioner "file" {
-    source      = "scripts/al2023/neuron/neuron-inf1-downgrade.service"
-    destination = "/tmp/neuron-inf1-downgrade.service"
+    sources     = [
+      "scripts/al2023/neuron/neuron-inf1-downgrade.sh",
+      "scripts/al2023/neuron/neuron-inf1-downgrade.service"
+    ]
+    destination = "/tmp/"
     only        = ["amazon-ebs.al2023neu"]
   }
 
