@@ -71,6 +71,20 @@ build {
     ]
   }
 
+  provisioner "file" {
+    source      = "files/containerd-config.toml"
+    destination = "/tmp/containerd-config.toml"
+  }
+
+  provisioner "shell" {
+    inline_shebang = "/bin/sh -ex"
+    inline = [
+      "sudo mkdir -p /etc/containerd",
+      "sudo mv /tmp/containerd-config.toml /etc/containerd/config.toml",
+      "sudo chown root:root /etc/containerd/config.toml"
+    ]
+  }
+
   provisioner "shell" {
     script = "scripts/al2023/setup-motd.sh"
   }
