@@ -61,8 +61,5 @@ sudo tee /etc/docker-runtimes.d/nvidia <<'EOF'
 exec /usr/bin/nvidia-container-runtime "$@"
 EOF
 
-# Configure NVIDIA Container Runtime to use CDI mode
-sudo nvidia-ctk config --in-place --set nvidia-container-runtime.mode=cdi
-
 # Set appropriate file permissions
 sudo chmod 755 /etc/docker-runtimes.d/nvidia
