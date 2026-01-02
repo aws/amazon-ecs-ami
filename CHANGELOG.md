@@ -5,6 +5,95 @@
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 - [Amazon Linux AMI 2018.03 Release Notes](https://aws.amazon.com/amazon-linux-ami/2018.03-release-notes/)
 
+## 20251217
+- al2, al2023 ami version: 20251217
+- ecs version: 1.101.1
+
+## 20251216
+- al2, al2023 ami version: 20251216
+- enhancement: bump containerd to 2.1.5 [#598](https://github.com/aws/amazon-ecs-ami/pull/598) 
+
+## 20251209
+- al2, al2023 ami version: 20251209
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20251208.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20251208.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20251208.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20251208.0-arm64-ebs
+- source al2023 ami: al2023-ami-minimal-2023.9.20251208.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.9.20251208.0-kernel-6.1-arm64
+
+## 20251205
+- al2 ami version: 20251205
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20251121.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20251121.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20251121.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20251121.0-arm64-ebs
+
+## 20251119
+- al2 ami version: 20251119
+- al2023 ami version: 20251119
+- source al2023 ami: al2023-ami-minimal-2023.9.20251117.1-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.9.20251117.1-kernel-6.1-arm64
+- ecs version: 1.101.0
+
+## 20251112
+- al2 ami version: 20251112
+- source_ami_al2: amzn2-ami-minimal-hvm-2.0.20251110.1-x86_64-ebs
+- source_ami_al2arm: amzn2-ami-minimal-hvm-2.0.20251110.1-arm64-ebs
+- source_ami_al2kernel5dot10: amzn2-ami-minimal-hvm-2.0.20251110.1-x86_64-ebs
+- source_ami_al2kernel5dot10arm: amzn2-ami-minimal-hvm-2.0.20251110.1-arm64-ebs
+
+## 20251111
+- al2023 ami version: 20251111
+- source al2023 ami: al2023-ami-minimal-2023.9.20251110.1-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.9.20251110.1-kernel-6.1-arm64
+
+## 20251108
+- al2 ami version: 20251108
+- al2023 ami version: 20251108
+- source al2023 ami: al2023-ami-minimal-2023.9.20251105.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.9.20251105.0-kernel-6.1-arm64
+- source_ami_al2: amzn2-ami-minimal-hvm-2.0.20251105.0-x86_64-ebs
+- source_ami_al2arm: amzn2-ami-minimal-hvm-2.0.20251105.0-arm64-ebs
+- source_ami_al2kernel5dot10: amzn2-ami-minimal-hvm-2.0.20251105.0-x86_64-ebs
+- source_ami_al2kernel5dot10arm: amzn2-ami-minimal-hvm-2.0.20251105.0-arm64-ebs
+- runc version: 1.3.3
+
+## 20251031
+- al2 ami version: 20251031
+- al2023 ami version: 20251031
+- source al2023 ami: al2023-ami-minimal-2023.9.20251027.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.9.20251027.0-kernel-6.1-arm64
+- source_ami_al2: amzn2-ami-minimal-hvm-2.0.20251027.1-x86_64-ebs
+- source_ami_al2arm: amzn2-ami-minimal-hvm-2.0.20251027.1-arm64-ebs
+- source_ami_al2kernel5dot10: amzn2-ami-minimal-hvm-2.0.20251027.1-x86_64-ebs
+- source_ami_al2kernel5dot10arm: amzn2-ami-minimal-hvm-2.0.20251027.1-arm64-ebs
+- ecs version: 1.100.1
+- runc version: 1.3.2
+
+## 20251027
+- al2 ami version: 20251027
+- al2023 ami version: 20251027
+- source al2023 ami: al2023-ami-minimal-2023.9.20251020.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.9.20251020.0-kernel-6.1-arm64
+- distribution al2023 release: 20251020
+- feature: Enable dynamic NVIDIA driver selection [#564](https://github.com/aws/amazon-ecs-ami/pull/564)
+- enhancement: Update container runtime versions (docker 25.0.13, containerd 2.1.4, runc 1.3.1) [#566](https://github.com/aws/amazon-ecs-ami/pull/566)
+
+## 20251015
+- ecs version: 1.100.0
+- al2 ami version: 20251015
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20251014.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20251014.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20251014.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20251014.0-arm64-ebs
+- al2023 ami version: 20251015
+- source al2023 ami: al2023-ami-minimal-2023.9.20251014.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.9.20251014.0-kernel-6.1-arm64
+- enhancement: Update nvidia driver version al2023 to 580.95.05
+- enhancement: Update exec ssm version to 3.3.3050.0
+- enhancement: Pin aws-neuronx-dkms to 2.21* on al2kernel5.10/al2023 [#557](https://github.com/aws/amazon-ecs-ami/pull/557)
+
 ## 20251006
 - al2 ami version: 20251006
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20250929.2-x86_64-ebs

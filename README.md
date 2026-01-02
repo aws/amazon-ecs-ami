@@ -71,6 +71,35 @@ The ECS logs collector is installed during the AMI build process with the follow
 For details on the minimum IAM permissions required to build the AMI, please see the
 packer docs: https://www.packer.io/docs/builders/amazon#iam-task-or-instance-role
 
+## Version-locked packages in AL2023 ECS GPU AMIs
+
+Certain packages are critical for correct, performant behavior of GPU functionality in AL2023 ECS GPU AMIs. These include: - NVIDIA drivers (`nvidia*`) - Kernel modules (`kmod*`) - NVIDIA libraries (`libnvidia*`) - Kernel packages (`kernel*`)
+
+> [!NOTE]
+> This is not an exhaustive list. The complete list of locked packages are available with `dnf versionlock list`
+
+These packages are version-locked to ensure stability and prevent unintentional changes that could disrupt GPU workloads. As a result, these packages should generally be modified within the bounds of a managed process that gracefully handles potential issues and maintains GPU functionality.
+
+To prevent unintended modifications, the `dnf versionlock` plugin is used on these packages.
+
+If you wish to modify a locked package, you can:
+```
+# unlock a single package
+sudo dnf versionlock delete $PACKAGE_NAME 
+# unlock all packages 
+sudo dnf versionlock clear
+```
+> [!IMPORTANT]
+> When updates to these packages are necessary, customers should consider using the latest AMI version that includes the required updates. If updating existing instances is required, a careful approach involving unlocking, updating, and re-locking packages should be employed, always ensuring GPU functionality is maintained throughout the process.
+
+## Memory Overcommit Fix for g6f.large instance type
+
+`g6f.large` instances require memory overcommit configuration to run ECS tasks with NVIDIA GPU support. Add this to your EC2 UserData or run directly on the instance:
+
+```bash
+echo 'vm.overcommit_memory = 1' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+```
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.

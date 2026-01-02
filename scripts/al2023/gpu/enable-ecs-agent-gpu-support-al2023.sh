@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -ex
+
+# Only proceed for AL2023 GPU AMIs
+if [[ $AMI_TYPE != "al2023"*"gpu" ]]; then
+    exit 0
+fi
+
+### Configure ECS GPU Support
+mkdir -p /tmp/ecs
+echo 'ECS_ENABLE_GPU_SUPPORT=true' >/tmp/ecs/ecs.config
+sudo mv /tmp/ecs/ecs.config /var/lib/ecs/ecs.config
+
+### Configure GPU Container Runtime
+# Create required directories
+sudo mkdir -p /etc/docker-runtimes.d
+
+# Create the NVIDIA runtime script
+sudo tee /etc/docker-runtimes.d/nvidia <<'EOF'
+#!/bin/sh
+exec /usr/bin/nvidia-container-runtime "$@"
+EOF
+
+# Set appropriate file permissions
+sudo chmod 755 /etc/docker-runtimes.d/nvidia

@@ -175,11 +175,24 @@ build {
     script              = "scripts/enable-ecs-agent-inferentia-support.sh"
   }
 
+  provisioner "file" {
+    sources = [
+      "scripts/al2023/gpu/kmod-util",
+      "scripts/al2023/gpu/nvidia-kmod-load.service",
+      "scripts/al2023/gpu/nvidia-kmod-load.sh"
+    ]
+    destination = "/tmp/"
+    only        = ["amazon-ebs.al2023gpu"]
+  }
+
   provisioner "shell" {
     environment_vars = [
       "AMI_TYPE=${source.name}"
     ]
-    script = "scripts/enable-ecs-agent-gpu-support-al2023.sh"
+    scripts = [
+      "scripts/al2023/gpu/install-nvidia-driver.sh",
+      "scripts/al2023/gpu/enable-ecs-agent-gpu-support-al2023.sh"
+    ]
   }
 
   provisioner "shell" {
