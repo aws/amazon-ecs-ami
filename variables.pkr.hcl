@@ -60,7 +60,7 @@ variable "ecs_init_rev" {
 variable "docker_version" {
   type        = string
   description = "Docker version to build AMI with."
-  default     = "25.0.13"
+  default     = "25.0.14"
 }
 
 variable "containerd_version" {
@@ -72,13 +72,13 @@ variable "containerd_version" {
 variable "runc_version" {
   type        = string
   description = "Runc version to build AMI with."
-  default     = "1.3.3"
+  default     = "1.3.4"
 }
 
 variable "docker_version_al2023" {
   type        = string
   description = "Docker version to build AL2023 AMI with."
-  default     = "25.0.13"
+  default     = "25.0.14"
 }
 
 variable "containerd_version_al2023" {
@@ -90,7 +90,7 @@ variable "containerd_version_al2023" {
 variable "runc_version_al2023" {
   type        = string
   description = "Runc version to build AL2023 AMI with."
-  default     = "1.3.3"
+  default     = "1.3.4"
 }
 
 variable "exec_ssm_version" {
