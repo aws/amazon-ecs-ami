@@ -4,6 +4,18 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
+## 20260122
+- al2 ami version: 20260122
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20260120.1-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20260120.1-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20260120.1-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20260120.1-arm64-ebs
+
+## 20260120
+- al2 ami version: 20260120
+- al2023 ami version: 20260120
+- enhancement: Update amazon-ssm-agent version for exec to 3.3.3572.0 [#613](https://github.com/aws/amazon-ecs-ami/pull/613)
+
 ## 20260114
 - al2, al2023 ami version: 20260114
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20260109.1-x86_64-ebs
