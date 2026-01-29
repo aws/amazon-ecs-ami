@@ -4,8 +4,8 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
-## 20260126
-- al2023 ami version: 20260126
+## 20260129
+- al2023 ami version: 20260129
 - source al2023 ami: al2023-ami-minimal-2023.10.20260120.4-kernel-6.1-x86_64
 - source al2023 arm ami: al2023-ami-minimal-2023.10.20260120.4-kernel-6.1-arm64
 
