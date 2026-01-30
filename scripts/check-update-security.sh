@@ -145,7 +145,7 @@ if [[ $platform == al2023* ]]; then
     if [[ $platform == *gpu ]]; then
         check_upgrade_options="nvidia-driver-cuda"
     fi
-    command_params="commands=[\"dnf --refresh check-upgrade --releasever=latest $check_upgrade_options -q\"]"
+    command_params="commands=[\"dnf --refresh check-upgrade --releasever=latest --disableplugin=versionlock $check_upgrade_options -q\"]"
 elif [ "$platform" = "al2_gpu" ]; then
     # The amzn2-nvidia repository does not provide updateinfo metadata (updateinfo.xml),
     # which YUM relies on to classify updates as security-related. The --security flag
