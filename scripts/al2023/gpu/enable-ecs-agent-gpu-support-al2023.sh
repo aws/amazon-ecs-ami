@@ -28,3 +28,14 @@ sudo chmod 755 /etc/docker-runtimes.d/nvidia
 # Use nvidia-ctk config to set log-level to debug and debug log path to /var/log/ecs/
 sudo nvidia-ctk config --in-place --set nvidia-container-runtime.log-level=debug
 sudo nvidia-ctk config --in-place --set nvidia-container-runtime.debug=/var/log/ecs/nvidia-container-runtime.log
+
+### Configure log rotation for nvidia-container-runtime logs
+sudo tee /etc/logrotate.d/nvidia-container-runtime <<'EOF'
+/var/log/ecs/nvidia-container-runtime.log {
+    size 5M
+    rotate 1
+    missingok
+    notifempty
+    copytruncate
+}
+EOF
