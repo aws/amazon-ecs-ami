@@ -23,3 +23,8 @@ EOF
 
 # Set appropriate file permissions
 sudo chmod 755 /etc/docker-runtimes.d/nvidia
+
+### Configure nvidia-container-runtime for debug logging
+# Use nvidia-ctk config to set log-level to debug and debug log path to /var/log/ecs/
+sudo nvidia-ctk config --in-place --set nvidia-container-runtime.log-level=debug
+sudo nvidia-ctk config --in-place --set nvidia-container-runtime.debug=/var/log/ecs/nvidia-container-runtime.log
