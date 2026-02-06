@@ -4,6 +4,11 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
+## 20260206
+- al2, al2023 ami version: 20260206
+- ecs version: 1.101.3
+- enhancement: Switch AL2023 GPU AMI from legacy OCI hooks to CDI [#541](https://github.com/aws/amazon-ecs-ami/pull/541)
+
 ## 20260129
 - al2023 ami version: 20260129
 - source al2023 ami: al2023-ami-minimal-2023.10.20260120.4-kernel-6.1-x86_64
