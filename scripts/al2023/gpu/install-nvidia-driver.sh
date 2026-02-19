@@ -34,7 +34,7 @@ sudo dnf versionlock 'kernel*'
 sudo systemctl enable --now dkms
 
 # nvidia-release creates an nvidia repo file at /etc/yum.repos.d/amazonlinux-nvidia.repo
-sudo dnf install -y nvidia-release
+sudo dnf install -y nvidia-release-2023-2.amzn2023
 
 # Temporary fix: ISO regions cannot use dualstack URLs, remove them from the repo file
 if [ -n "$AIR_GAPPED" ]; then
