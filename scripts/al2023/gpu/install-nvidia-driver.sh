@@ -36,6 +36,12 @@ sudo systemctl enable --now dkms
 # nvidia-release creates an nvidia repo file at /etc/yum.repos.d/amazonlinux-nvidia.repo
 sudo dnf install -y nvidia-release
 
+# Temporary fix: ISO regions cannot use dualstack URLs, remove them from the repo file
+if [ -n "$AIR_GAPPED" ]; then
+    echo "ISO regions cannot use dualstack URLs, removing from nvidia repo"
+    sudo sed -i 's/\$dualstack//g' /etc/yum.repos.d/amazonlinux-nvidia.repo
+fi
+
 ### Kernel Module Archive Functions ###
 # These functions pre-compile and archive different NVIDIA driver variants
 # This allows runtime switching between proprietary, open-source, and GRID drivers
