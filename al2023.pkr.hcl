@@ -196,7 +196,8 @@ build {
 
   provisioner "shell" {
     environment_vars = [
-      "AMI_TYPE=${source.name}"
+      "AMI_TYPE=${source.name}",
+      "AIR_GAPPED=${var.air_gapped}"
     ]
     scripts = [
       "scripts/al2023/gpu/install-nvidia-driver.sh",
