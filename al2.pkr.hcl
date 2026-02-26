@@ -210,7 +210,8 @@ build {
   provisioner "shell" {
     environment_vars = [
       "AMI_TYPE=${source.name}",
-      "AIR_GAPPED=${var.air_gapped}"
+      "AIR_GAPPED=${var.air_gapped}",
+      "REGION=${var.region}"
     ]
     script = "scripts/enable-ecs-agent-gpu-support.sh"
   }
