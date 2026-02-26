@@ -4,9 +4,10 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
-## 20260225
-- al2, al2023 ami version: 20260225
+## 20260226
+- al2, al2023 ami version: 20260226
 - ecs version: 1.102.0
+- enhancement: stop downloading open driver for AL2 4.14 and AL2 5.10 GPU AMIs in China regions [#635](https://github.com/aws/amazon-ecs-ami/pull/635)
 
 ## 20260223
 - al2, al2023 ami version: 20260223
