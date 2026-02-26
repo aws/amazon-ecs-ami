@@ -39,8 +39,8 @@ DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
 # the amzn2-nvidia repo is temporary and only used for installing the system-release-nvidia package
 sudo mv $tmpfile /etc/yum.repos.d/amzn2-nvidia-tmp.repo
 
-# only install open driver for post-kepler gpus, exclude airgapped regions
-if [[ $AMI_TYPE != "al2keplergpu" && -z ${AIR_GAPPED} ]]; then
+# only install open driver for post-kepler gpus, exclude airgapped and China regions
+if [[ $AMI_TYPE != "al2keplergpu" && -z ${AIR_GAPPED} && ! $REGION =~ ^cn- ]]; then
     sudo yum install -y yum-plugin-versionlock yum-utils
     sudo amazon-linux-extras install epel -y
     sudo yum install -y "kernel-devel-uname-r == $(uname -r)"
@@ -102,6 +102,22 @@ ${DKMS} ldtarball ${MODULE_ARCHIVE}
 ${DKMS} install -m nvidia -v ${MODULE_VERSION}
 sudo systemctl daemon-reload
 ${DKMS} status -m nvidia
+EOF
+
+    sudo mv $tmpfile /var/lib/ecs/scripts/install-nvidia-open-kmod.sh
+    sudo chmod +x /var/lib/ecs/scripts/install-nvidia-open-kmod.sh
+fi
+
+# Create stub script for China regions where the above convenience script used to exist until AMI v20260223,
+# but is no longer available.
+if [[ $REGION =~ ^cn- ]]; then
+    sudo mkdir -p /var/lib/ecs/scripts
+
+    tmpfile=$(mktemp)
+    cat >$tmpfile <<"EOF"
+#!/usr/bin/env bash
+echo "ERROR: This script has been deprecated. No changes were made to your system."
+exit 1
 EOF
 
     sudo mv $tmpfile /var/lib/ecs/scripts/install-nvidia-open-kmod.sh
