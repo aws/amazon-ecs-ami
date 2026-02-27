@@ -5,6 +5,15 @@ set -ex
 # See https://docs.aws.amazon.com/linux/al2023/ug/package-management.html for more details.
 sudo yum clean all
 
+function retry_rm() {
+    local path="$1"
+    for i in {1..5}; do
+        sudo rm -rf "$path" && return 0
+        sleep 3
+    done
+    return 1
+}
+
 function cleanup() {
     FILES=("$@")
     for FILE in "${FILES[@]}"; do
@@ -143,8 +152,6 @@ fi
 # delete a few items missed in https://docs.aws.amazon.com/imagebuilder/latest/userguide/security-best-practices.html
 sudo rm -rf \
     /etc/machine-id \
-    /var/cache/dnf \
-    /var/cache/yum \
     /tmp/* \
     /var/lib/dhcp/dhclient.* \
     /var/lib/dnf/history* \
@@ -152,5 +159,11 @@ sudo rm -rf \
     /var/log/secure \
     /var/log/wtmp \
     /etc/ssh/ssh_host*
+
+# Clean yum cache with retry
+retry_rm /var/cache/yum
+
+# Clean dnf cache with retry
+retry_rm /var/cache/dnf
 
 sudo touch /etc/machine-id
