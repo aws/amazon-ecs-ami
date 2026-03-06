@@ -81,7 +81,7 @@ case "$platform" in
     ;;
 "al2023_gpu")
     ami_path=$AL2023_GPU_PATH
-    instance_type="g4dn.xlarge"
+    instance_type="g5.xlarge"
     ;;
 *)
     error_msg "Incorrect platform selection"
