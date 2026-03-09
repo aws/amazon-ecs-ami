@@ -31,6 +31,16 @@ New tests cover the changes: <!-- yes|no -->
 <!--
 Write a short (one line) summary that describes the changes in this
 pull request for inclusion in the changelog.
+
+Format: [Category] Description
+Categories: feature, enhancement, bugfix, housekeeping
+
+Examples:
+- feature - Enable dynamic NVIDIA driver selection
+- enhancement - Bump docker version to x.x.x
+- bugfix - remove nvidia-persistenced from the installation list
+- housekeeping - Fix bug in nvidia driver upgrade check command
+
 You can see our changelog entry style here:
 https://github.com/aws/amazon-ecs-agent/commit/c9aefebc2b3007f09468f651f6308136bd7b384f
 -->
