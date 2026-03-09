@@ -18,10 +18,15 @@ jobs:
       pull-requests: write
     env:
       IAM_INSTANCE_PROFILE_ARN: ${{ secrets.IAM_INSTANCE_PROFILE_ARN }}
-      GH_TOKEN: ${{ github.token }}
     steps:
     - name: Checkout
       uses: actions/checkout@v6
+    - name: Generate App Token
+      id: app-token
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ secrets.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
     - name: Create Release Branch
       run: |
         date=$(date '+%Y%m%d')
@@ -39,6 +44,7 @@ jobs:
       run: |
         git config --global user.name "GenerateConfig Action"
         git config --global user.email "gcaction@github.com"
+        git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
     - name: Check AL2 Update
       run: ./scripts/check-update.sh al2
     - name: Check AL2023 Update
@@ -64,6 +70,8 @@ jobs:
     - name: Open PR for Branch
       id: pr
       if: ${{ steps.stage.outputs.stage_exit_code == 1 && steps.push.outputs.push_exit_code == 0 }}
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
         date=$(date '+%Y%m%d')
         gh pr create --base main --head release-${date} --title "Release ${date}" --body "Enhanced ECS Optimized AMI Release changes"
