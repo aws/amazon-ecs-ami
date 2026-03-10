@@ -72,7 +72,7 @@ jobs:
       if: ${{ steps.stage.outputs.stage_exit_code == 1 }}
       run: |
         date=$(date '+%Y%m%d')
-        git commit -m "Release ${date}" -m "Update CHANGELOG ${date}"
+        git commit -m "Release ${date}"
         git status
         git push --set-upstream origin release-${date}
         echo "push_exit_code=$?" >> "$GITHUB_OUTPUT"

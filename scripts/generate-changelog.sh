@@ -45,8 +45,8 @@ read_old_values() {
         old_source_ami_al2kernel5dot10=$(parse_hcl_value "release-al2.old.values" "source_ami_al2kernel5dot10")
         old_source_ami_al2kernel5dot10arm=$(parse_hcl_value "release-al2.old.values" "source_ami_al2kernel5dot10arm")
     else
-        old_ami_version_al2="" old_ecs_version_al2="" old_source_ami_al2=""
-        old_source_ami_al2arm="" old_source_ami_al2kernel5dot10="" old_source_ami_al2kernel5dot10arm=""
+        echo "ERROR: release-al2.old.values not found. Cannot generate changelog without old values." >&2
+        exit 1
     fi
 
     if [ -f "release-al2023.old.values" ]; then
@@ -55,7 +55,8 @@ read_old_values() {
         old_source_ami_al2023=$(parse_hcl_value "release-al2023.old.values" "source_ami_al2023")
         old_source_ami_al2023arm=$(parse_hcl_value "release-al2023.old.values" "source_ami_al2023arm")
     else
-        old_ami_version_al2023="" old_ecs_version_al2023="" old_source_ami_al2023="" old_source_ami_al2023arm=""
+        echo "ERROR: release-al2023.old.values not found. Cannot generate changelog without old values." >&2
+        exit 1
     fi
 }
 
@@ -74,7 +75,7 @@ detect_updates() {
 
 # Append a line to the entry file
 add_line() {
-    echo "$1" >> "$ENTRY_FILE"
+    echo "$1" >>"$ENTRY_FILE"
 }
 
 # Build the changelog entry into a temp file
@@ -82,7 +83,7 @@ build_changelog_entry() {
     ENTRY_FILE=$(mktemp)
 
     # Header
-    echo "## ${DATE}" > "$ENTRY_FILE"
+    echo "## ${DATE}" >"$ENTRY_FILE"
 
     # AMI version line (clubbed if both updated)
     if [ "$al2_updated" = "true" ] && [ "$al2023_updated" = "true" ]; then
@@ -102,21 +103,21 @@ build_changelog_entry() {
 
     # AL2 source AMIs (only changed ones)
     if [ "$al2_updated" = "true" ]; then
-        [ "$new_source_ami_al2" != "$old_source_ami_al2" ] && [ -n "$new_source_ami_al2" ] && \
+        [ "$new_source_ami_al2" != "$old_source_ami_al2" ] && [ -n "$new_source_ami_al2" ] &&
             add_line "- source al2 ami: ${new_source_ami_al2}"
-        [ "$new_source_ami_al2arm" != "$old_source_ami_al2arm" ] && [ -n "$new_source_ami_al2arm" ] && \
+        [ "$new_source_ami_al2arm" != "$old_source_ami_al2arm" ] && [ -n "$new_source_ami_al2arm" ] &&
             add_line "- source al2 arm ami: ${new_source_ami_al2arm}"
-        [ "$new_source_ami_al2kernel5dot10" != "$old_source_ami_al2kernel5dot10" ] && [ -n "$new_source_ami_al2kernel5dot10" ] && \
+        [ "$new_source_ami_al2kernel5dot10" != "$old_source_ami_al2kernel5dot10" ] && [ -n "$new_source_ami_al2kernel5dot10" ] &&
             add_line "- source al2 kernel 5.10 ami: ${new_source_ami_al2kernel5dot10}"
-        [ "$new_source_ami_al2kernel5dot10arm" != "$old_source_ami_al2kernel5dot10arm" ] && [ -n "$new_source_ami_al2kernel5dot10arm" ] && \
+        [ "$new_source_ami_al2kernel5dot10arm" != "$old_source_ami_al2kernel5dot10arm" ] && [ -n "$new_source_ami_al2kernel5dot10arm" ] &&
             add_line "- source al2 kernel 5.10 arm ami: ${new_source_ami_al2kernel5dot10arm}"
     fi
 
     # AL2023 source AMIs (only changed ones)
     if [ "$al2023_updated" = "true" ]; then
-        [ "$new_source_ami_al2023" != "$old_source_ami_al2023" ] && [ -n "$new_source_ami_al2023" ] && \
+        [ "$new_source_ami_al2023" != "$old_source_ami_al2023" ] && [ -n "$new_source_ami_al2023" ] &&
             add_line "- source al2023 ami: ${new_source_ami_al2023}"
-        [ "$new_source_ami_al2023arm" != "$old_source_ami_al2023arm" ] && [ -n "$new_source_ami_al2023arm" ] && \
+        [ "$new_source_ami_al2023arm" != "$old_source_ami_al2023arm" ] && [ -n "$new_source_ami_al2023arm" ] &&
             add_line "- source al2023 arm ami: ${new_source_ami_al2023arm}"
     fi
 
@@ -127,27 +128,33 @@ build_changelog_entry() {
 }
 
 # Fetch merged PR changelog entries since last release
-# Excludes housekeeping entries, sorts: feature > enhancement > bugfix > uncategorized
+# Excludes housekeeping entries, sorts: feature > enhancement > bugfix
 fetch_pr_changelogs() {
-    local last_release_date
-    last_release_date=$(grep -m1 '^## [0-9]' "$CHANGELOG" | sed 's/## //')
+    # Find the merge timestamp of the last release PR
+    local last_release_merged_at
+    last_release_merged_at=$(gh pr list \
+        --repo "$REPO" \
+        --state merged \
+        --base main \
+        --search "head:release-" \
+        --limit 1 \
+        --json mergedAt \
+        --jq '.[0].mergedAt' 2>/dev/null || true)
 
-    if [ -z "$last_release_date" ]; then
-        echo "WARNING: Could not find last release date in CHANGELOG.md" >&2
+    if [ -z "$last_release_merged_at" ] || [ "$last_release_merged_at" = "null" ]; then
+        echo "WARNING: Could not find last release PR merge timestamp" >&2
         return
     fi
 
-    # Convert YYYYMMDD to YYYY-MM-DD for GitHub search
-    local search_date="${last_release_date:0:4}-${last_release_date:4:2}-${last_release_date:6:2}"
-    echo "Fetching merged PRs since ${search_date}..." >&2
+    echo "Fetching merged PRs since last release PR (merged at ${last_release_merged_at})..." >&2
 
-    # Get merged PR numbers since last release, exclude release PRs
+    # Get merged PR numbers since last release PR, exclude release PRs
     local pr_numbers
     pr_numbers=$(gh pr list \
         --repo "$REPO" \
         --state merged \
         --base main \
-        --search "merged:>${search_date}" \
+        --search "merged:>${last_release_merged_at}" \
         --json number,headRefName \
         --jq '.[] | select(.headRefName | startswith("release-") | not) | .number' 2>/dev/null || true)
 
@@ -169,20 +176,20 @@ fetch_pr_changelogs() {
         # Write PR body to temp file for reliable sed processing
         local tmpfile
         tmpfile=$(mktemp)
-        echo "$pr_body" > "$tmpfile"
+        echo "$pr_body" >"$tmpfile"
 
         # Extract changelog section, strip HTML comments, get first non-empty line
         local changelog_entry
-        changelog_entry=$(sed 's/<!--.*-->//g' "$tmpfile" \
-            | tr -d '\r' \
-            | sed '/<!--/,/-->/d' \
-            | sed -n '/### Description for the changelog/,/### Licensing/p' \
-            | grep -v '^###' \
-            | grep -v '^[[:space:]]*$' \
-            | head -1 \
-            | sed 's/^[[:space:]]*-[[:space:]]*//' \
-            | sed 's/^[[:space:]]*//' \
-            || true)
+        changelog_entry=$(sed 's/<!--.*-->//g' "$tmpfile" |
+            tr -d '\r' |
+            sed '/<!--/,/-->/d' |
+            sed -n '/### Description for the changelog/,/### Licensing/p' |
+            grep -v '^###' |
+            grep -v '^[[:space:]]*$' |
+            head -1 |
+            sed 's/^[[:space:]]*-[[:space:]]*//' |
+            sed 's/^[[:space:]]*//' ||
+            true)
 
         rm -f "$tmpfile"
 
@@ -209,9 +216,9 @@ fetch_pr_changelogs() {
     done
 
     # Output in priority order: feature > enhancement > bugfix > other
-    [ -n "$features" ] && printf '%s' "$features" >> "$ENTRY_FILE"
-    [ -n "$enhancements" ] && printf '%s' "$enhancements" >> "$ENTRY_FILE"
-    [ -n "$bugfixes" ] && printf '%s' "$bugfixes" >> "$ENTRY_FILE"
+    [ -n "$features" ] && printf '%s' "$features" >>"$ENTRY_FILE"
+    [ -n "$enhancements" ] && printf '%s' "$enhancements" >>"$ENTRY_FILE"
+    [ -n "$bugfixes" ] && printf '%s' "$bugfixes" >>"$ENTRY_FILE"
 }
 
 # Prepend entry to CHANGELOG.md (after the header section)
@@ -230,10 +237,10 @@ prepend_to_changelog() {
     # Build new changelog: header + new entry + blank line + existing entries
     local tmpfile
     tmpfile=$(mktemp)
-    head -n $((first_release_line - 1)) "$CHANGELOG" > "$tmpfile"
-    cat "$entry_file" >> "$tmpfile"
-    echo "" >> "$tmpfile"
-    tail -n +${first_release_line} "$CHANGELOG" >> "$tmpfile"
+    head -n $((first_release_line - 1)) "$CHANGELOG" >"$tmpfile"
+    cat "$entry_file" >>"$tmpfile"
+    echo "" >>"$tmpfile"
+    tail -n +${first_release_line} "$CHANGELOG" >>"$tmpfile"
     mv "$tmpfile" "$CHANGELOG"
 }
 
