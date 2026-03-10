@@ -45,6 +45,10 @@ jobs:
         git config --global user.name "GenerateConfig Action"
         git config --global user.email "gcaction@github.com"
         git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
+    - name: Save current release values
+      run: |
+        cp release-al2.auto.pkrvars.hcl release-al2.old.values
+        cp release-al2023.auto.pkrvars.hcl release-al2023.old.values
     - name: Check AL2 Update
       run: ./scripts/check-update.sh al2
     - name: Check AL2023 Update
@@ -58,12 +62,17 @@ jobs:
         git diff --cached --quiet
         echo "stage_exit_code=$?" >> "$GITHUB_OUTPUT"
         set -e
+    - name: Generate Changelog
+      if: ${{ steps.stage.outputs.stage_exit_code == 1 }}
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      run: ./scripts/generate-changelog.sh
     - name: Commit and Push Changes
       id: push
       if: ${{ steps.stage.outputs.stage_exit_code == 1 }}
       run: |
         date=$(date '+%Y%m%d')
-        git commit -m "Release ${date}"
+        git commit -m "Release ${date}" -m "Update CHANGELOG ${date}"
         git status
         git push --set-upstream origin release-${date}
         echo "push_exit_code=$?" >> "$GITHUB_OUTPUT"
