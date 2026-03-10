@@ -1,0 +1,38 @@
+name: Validate PR Changelog
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  validate-changelog:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Validate changelog
+      env:
+        PR_BODY: ${{ github.event.pull_request.body }}
+        PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+      run: |
+        echo "Validating changelog"
+
+        # Skip validation for bot PRs (e.g., InitiateRelease via GitHub App)
+        if [[ "$PR_AUTHOR" == "amazon-ecs-bot[bot]" ]]; then
+          echo "Bot PR — skipping changelog validation"
+          exit 0
+        fi
+
+        # Required category keywords
+        keywords=("feature" "enhancement" "bugfix" "housekeeping")
+        pattern=$(IFS='|'; echo "${keywords[*]}")
+
+        # Extract changelog section, strip HTML comments and headers
+        changelog=$(echo "$PR_BODY" | sed 's/<!--.*-->//g' | sed '/<!--/,/-->/d' | sed -n '/### Description for the changelog/,/### Licensing/p' | grep -v '^###' || true)
+
+        if echo "$changelog" | grep -qiE "\b($pattern)\b"; then
+          echo "Changelog validation passed"
+        else
+          echo "PR description must include a changelog entry in the 'Description for the changelog' section with a category: ${keywords[*]}"
+          echo ""
+          echo "Example: 'enhancement - Bump docker version to x.x.x'"
+          exit 1
+        fi
