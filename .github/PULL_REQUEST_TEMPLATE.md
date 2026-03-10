@@ -41,6 +41,8 @@ Examples:
 - bugfix - remove nvidia-persistenced from the installation list
 - housekeeping - Fix bug in nvidia driver upgrade check command
 
+Note: A PR check will fail if this section does not contain a changelog with a valid category keyword.
+
 You can see our changelog entry style here:
 https://github.com/aws/amazon-ecs-agent/commit/c9aefebc2b3007f09468f651f6308136bd7b384f
 -->
