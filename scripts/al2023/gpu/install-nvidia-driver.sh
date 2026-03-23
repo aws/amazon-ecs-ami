@@ -216,8 +216,18 @@ echo ib_umad | sudo tee /etc/modules-load.d/ib_umad.conf
 # This service runs early in boot to ensure the correct driver is loaded before applications start
 sudo mv /tmp/nvidia-kmod-load.sh /etc/ecs/
 sudo mv /tmp/nvidia-kmod-load.service /etc/systemd/system/nvidia-kmod-load.service
+
+### GPU Clock Pinning Setup ###
+# Pin GPU memory and graphics clocks to max at boot for consistent, predictable performance.
+# Disables dynamic GPU Boost to eliminate clock fluctuation and reduce tail latency jitter.
+# see: https://developer.nvidia.com/blog/advanced-api-performance-setstablepowerstate/
+sudo chmod +x /tmp/set-nvidia-clocks
+sudo mv /tmp/set-nvidia-clocks /usr/bin/set-nvidia-clocks
+sudo mv /tmp/set-nvidia-clocks.service /etc/systemd/system/set-nvidia-clocks.service
+
 sudo systemctl daemon-reload
 sudo systemctl enable nvidia-kmod-load.service
+sudo systemctl enable set-nvidia-clocks.service
 
 ### NVIDIA Service Configuration ###
 # The Fabric Manager service needs to be started and enabled on EC2 P4d instances
