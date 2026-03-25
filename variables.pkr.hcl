@@ -144,13 +144,13 @@ variable "ssh_interface" {
 variable "iam_instance_profile" {
   type        = string
   description = "IAM instance profile to attach to the build instance. Required when ssh_interface is 'session_manager'."
-  default     = null
+  default     = ""
 }
 
 variable "subnet_id" {
   type        = string
   description = "VPC subnet ID for the build instance. Must support the connectivity method specified by 'ssh_interface'."
-  default     = null
+  default     = ""
 }
 
 variable "kernel_version_al2023" {
