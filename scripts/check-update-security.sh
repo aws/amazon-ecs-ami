@@ -260,6 +260,18 @@ if [ "$cmd_response_code" -eq "$UPDATE_EXISTS_CODE" ]; then
         esac
     elif [ "$platform" = "al2023_gpu" ]; then
         nvidia_driver_version=$(echo "$std_output" | grep "nvidia-driver-cuda" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://')
+        # The AMI build pins to min(repo, S3 GRID .run) so all three driver
+        # variants can be built at the same version. Mirror that logic here.
+        grid_driver_version=$(aws s3 ls --recursive s3://ec2-linux-nvidia-drivers/ --no-sign-request |
+            grep -Eo "(NVIDIA-Linux-x86_64-)[0-9]+\.[0-9]+\.[0-9]+(-grid-aws\.run)" |
+            cut -d'-' -f4 |
+            sort -V |
+            tail -1)
+        if [ -z "$grid_driver_version" ]; then
+            echo "ERROR: Could not determine NVIDIA GRID driver version from S3"
+            exit 1
+        fi
+        nvidia_driver_version=$(printf '%s\n%s\n' "$nvidia_driver_version" "$grid_driver_version" | sort -V | head -1)
         echo "true $nvidia_driver_version"
     else
         echo "true"
