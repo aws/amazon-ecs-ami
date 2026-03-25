@@ -4,6 +4,13 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
+## 20260323
+- al2, al2023 ami version: 20260323
+- ecs version: 1.102.1
+- enhancement: Update ECS Agent version to 1.102.1 [#655](https://github.com/aws/amazon-ecs-ami/pull/655)
+- enhancement: remove service connect agent version pinning [#651](https://github.com/aws/amazon-ecs-ami/pull/651)
+- bugfix: install GRID driver from .run file to include nvidia-gridd for g6f vGPU licensing [#653](https://github.com/aws/amazon-ecs-ami/pull/653)
+
 ## 20260307
 - al2, al2023 ami version: 20260307
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20260302.0-x86_64-ebs

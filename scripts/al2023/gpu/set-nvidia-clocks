@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# nvidia-smi is required for this script.
+if ! nvidia-smi -q > /tmp/nvidia-smi-check; then
+  echo >&2 "ERROR: nvidia-smi check failed!"
+  cat /tmp/nvidia-smi-check
+  exit 1
+fi
+
+# It's generally recommended to manually set clocks to max for predictable performance.
+# see: https://developer.nvidia.com/blog/advanced-api-performance-setstablepowerstate/
+# see: https://developer.nvidia.com/blog/increase-performance-gpu-boost-k80-autoboost/
+# see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/optimize_gpu.html
+
+# Persist device power states so that you don't incur long start up delay when
+# initializing new contexts on a CUDA GPU.
+sudo nvidia-smi --persistence-mode=1
+
+# Query the highest speed for both memory and graphics GPU clocks.
+# NOTE: su permissions are not required for queries.
+# Some GPUs (e.g. vGPU types like L4-3Q on g6f) do not support clock queries
+# and return [N/A]. Skip clock pinning in that case.
+MEMORY_CLOCK=$(nvidia-smi --query-supported-clocks=memory --format=csv,noheader,nounits | head -n 1 | tr -d '\n')
+GRAPHICS_CLOCK=$(nvidia-smi --query-supported-clocks=graphics --format=csv,noheader,nounits | head -n 1 | tr -d '\n')
+
+if [[ "$MEMORY_CLOCK" == *"N/A"* ]] || [[ "$GRAPHICS_CLOCK" == *"N/A"* ]]; then
+  echo "GPU does not support clock queries (memory=$MEMORY_CLOCK, graphics=$GRAPHICS_CLOCK), skipping clock pinning"
+  exit 0
+fi
+
+# Disable automatic clock boosts. Only supported on G3 and P2 instance GPUs;
+# other GPU types will return an error which is safe to ignore.
+# see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/optimize_gpu.html
+sudo nvidia-smi --auto-boost-default=0 || echo "auto-boost-default not supported on this GPU, skipping"
+
+# Set application clocks to max. Some driver/GPU combinations may not support this;
+# the error "Setting applications clocks is not supported for GPU..." is safe to ignore.
+sudo nvidia-smi --applications-clocks ${MEMORY_CLOCK},${GRAPHICS_CLOCK} || echo "applications-clocks not supported on this GPU, skipping"
