@@ -32,15 +32,17 @@ source "amazon-ebs" "al2023neu" {
     filters = {
       name = "${var.source_ami_al2023}"
     }
-    owners             = ["amazon"]
+    owners             = var.source_ami_owners
     most_recent        = true
     include_deprecated = true
   }
-  ami_ou_arns   = "${var.ami_ou_arns}"
-  ami_org_arns  = "${var.ami_org_arns}"
-  ami_users     = "${var.ami_users}"
-  ssh_interface = "public_ip"
-  ssh_username  = "ec2-user"
-  tags          = "${local.merged_tags_al2023neu}"
-  run_tags      = "${var.run_tags}"
+  ami_ou_arns          = "${var.ami_ou_arns}"
+  ami_org_arns         = "${var.ami_org_arns}"
+  ami_users            = "${var.ami_users}"
+  ssh_interface        = "${var.ssh_interface}"
+  ssh_username         = "ec2-user"
+  iam_instance_profile = "${var.iam_instance_profile}"
+  subnet_id            = "${var.subnet_id}"
+  tags                 = "${local.merged_tags_al2023neu}"
+  run_tags             = "${var.run_tags}"
 }

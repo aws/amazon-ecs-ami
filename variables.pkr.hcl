@@ -129,6 +129,30 @@ variable "source_ami_al2023arm" {
   description = "Amazon Linux 2023 ARM source AMI to build from."
 }
 
+variable "source_ami_owners" {
+  type        = list(string)
+  description = "Accounts to search when filtering source AMIs. Defaults to Amazon-owned AMIs."
+  default     = ["amazon"]
+}
+
+variable "ssh_interface" {
+  type        = string
+  description = "SSH interface for the build instance."
+  default     = "public_ip"
+}
+
+variable "iam_instance_profile" {
+  type        = string
+  description = "IAM instance profile to attach to the build instance. Required when ssh_interface is 'session_manager'."
+  default     = ""
+}
+
+variable "subnet_id" {
+  type        = string
+  description = "VPC subnet ID for the build instance. Must support the connectivity method specified by 'ssh_interface'."
+  default     = ""
+}
+
 variable "kernel_version_al2023" {
   type        = string
   description = "Amazon Linux 2023 kernel version."
