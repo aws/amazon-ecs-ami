@@ -4,6 +4,11 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
+## 20260326
+- al2, al2023 ami version: 20260326
+- feature - Pin NVIDIA GPU clocks to max at boot for consistent GPU workload performance [#657](https://github.com/aws/amazon-ecs-ami/pull/657)
+- bugfix - Fix NVIDIA driver version tracking to account for S3 GRID driver version constraint [#660](https://github.com/aws/amazon-ecs-ami/pull/660)
+
 ## 20260323
 - al2, al2023 ami version: 20260323
 - ecs version: 1.102.1
