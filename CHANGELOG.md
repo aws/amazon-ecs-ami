@@ -4,6 +4,15 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
+## 20260330
+- al2, al2023 ami version: 20260330
+- source al2023 ami: al2023-ami-minimal-2023.10.20260325.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.10.20260325.0-kernel-6.1-arm64
+- feature - Pin NVIDIA GPU clocks to max at boot for consistent GPU workload performance [#657](https://github.com/aws/amazon-ecs-ami/pull/657)
+- enhancement - Bump SSM exec agent version to 3.3.4108.0 [#664](https://github.com/aws/amazon-ecs-ami/pull/664)
+- enhancement - Add variables for custom source AMI owner, SSH interface, IAM instance profile, and subnet to support building from different base AMIs [#654](https://github.com/aws/amazon-ecs-ami/pull/654)
+- bugfix - Fix NVIDIA driver version tracking to account for S3 GRID driver version constraint [#660](https://github.com/aws/amazon-ecs-ami/pull/660)
+
 ## 20260323
 - al2, al2023 ami version: 20260323
 - ecs version: 1.102.1
