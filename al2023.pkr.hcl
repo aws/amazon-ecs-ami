@@ -9,6 +9,8 @@ locals {
     ami_version         = "2023.0.${var.ami_version_al2023}"
   }
   merged_tags = merge("${local.default_tags}", "${var.tags}")
+  # Regions where the GRID driver S3 bucket is unavailable
+  skip_grid_driver_regions = "eusc-de-east-1,eu-isoe-west-1"
 }
 
 source "amazon-ebs" "al2023" {
@@ -201,7 +203,9 @@ build {
   provisioner "shell" {
     environment_vars = [
       "AMI_TYPE=${source.name}",
-      "AIR_GAPPED=${var.air_gapped}"
+      "AIR_GAPPED=${var.air_gapped}",
+      "REGION=${var.region}",
+      "SKIP_GRID_DRIVER_REGIONS=${local.skip_grid_driver_regions}"
     ]
     scripts = [
       "scripts/al2023/gpu/install-nvidia-driver.sh",
