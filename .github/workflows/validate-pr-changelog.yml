@@ -19,7 +19,7 @@ jobs:
         echo "Validating changelog"
 
         # Skip validation for bot PRs (e.g., InitiateRelease via GitHub App)
-        if [[ "$PR_AUTHOR" == "amazon-ecs-bot[bot]" ]]; then
+        if [[ "$PR_AUTHOR" == "amazon-ecs-bot[bot]" || "$PR_AUTHOR" == "dependabot[bot]" ]]; then
           echo "Bot PR — skipping changelog validation"
           exit 0
         fi
