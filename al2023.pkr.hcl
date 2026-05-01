@@ -200,6 +200,12 @@ build {
     only        = ["amazon-ebs.al2023gpu"]
   }
 
+  provisioner "file" {
+    source      = "NVIDIA_DRIVER_VERSION"
+    destination = "/tmp/NVIDIA_DRIVER_VERSION"
+    only        = ["amazon-ebs.al2023gpu"]
+  }
+
   provisioner "shell" {
     environment_vars = [
       "AMI_TYPE=${source.name}",
