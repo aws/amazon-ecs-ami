@@ -16,6 +16,7 @@ readonly NVIDIA_GRID_SUBDEVICES=(
 )
 readonly NVIDIA_PROPRIETARY_SUBDEVICES=(
   "1db1:1212" # P3 instances
+  "1db5:1249" # P3dn instances
   "13f2:113a" # G3 instances
 )
 
