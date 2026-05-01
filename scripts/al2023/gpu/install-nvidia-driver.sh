@@ -47,8 +47,17 @@ fi
 # open, and GRID) in /var/lib/dkms-archive. All three must be on the same driver
 # version to ensure proper functionality. The GRID kmod comes from the EC2 GRID
 # .run file in S3, while proprietary and open come from the AL2023 nvidia repo.
-# If the repo and S3 versions differ, we use the lower of the two to ensure both
-# sources can provide it.
+#
+# The exact driver version is determined by the security check script
+# (check-update-security.sh) as min(repo, S3 GRID) within the pinned major,
+# and tracked in the NVIDIA_DRIVER_VERSION file uploaded by Packer.
+
+NVIDIA_DRIVER_FULL_VERSION=$(grep "^nvidia_driver_version_al2023" /tmp/NVIDIA_DRIVER_VERSION | awk -F'"' '{print $2}')
+if [[ -z "$NVIDIA_DRIVER_FULL_VERSION" ]]; then
+  echo "ERROR: Could not read nvidia_driver_version_al2023 from /tmp/NVIDIA_DRIVER_VERSION"
+  exit 1
+fi
+echo "Using NVIDIA driver version: ${NVIDIA_DRIVER_FULL_VERSION}"
 
 # Some regions do not have access to the GRID driver S3 bucket, skip GRID driver
 skip_grid_driver=""
@@ -58,38 +67,6 @@ if [[ -n "$SKIP_GRID_DRIVER_REGIONS" ]] && echo "$SKIP_GRID_DRIVER_REGIONS" | gr
 fi
 
 EC2_GRID_DRIVER_S3_BUCKET="ec2-linux-nvidia-drivers"
-
-if [[ -z "$skip_grid_driver" ]]; then
-  LATEST_GRID_DRIVER_VERSION=$(aws s3 ls --recursive s3://${EC2_GRID_DRIVER_S3_BUCKET}/ --no-sign-request \
-    | grep -Eo "(NVIDIA-Linux-x86_64-)[0-9]+\.[0-9]+\.[0-9]+(-grid-aws\.run)" \
-    | cut -d'-' -f4 \
-    | sort -V \
-    | tail -1)
-
-  if [[ -z "$LATEST_GRID_DRIVER_VERSION" ]]; then
-    echo "ERROR: Could not determine NVIDIA GRID driver version from S3"
-    exit 1
-  fi
-  echo "Latest GRID .run version in S3: ${LATEST_GRID_DRIVER_VERSION}"
-fi
-
-LATEST_OPEN_MODULE_VERSION=$(dnf repoquery --latest=1 --arch=noarch --queryformat "%{version}" "kmod-nvidia-open-dkms" 2>/dev/null | sort -V | tail -1)
-
-if [[ -z "$LATEST_OPEN_MODULE_VERSION" ]]; then
-  echo "ERROR: Could not determine NVIDIA open module version from repo"
-  exit 1
-fi
-echo "Latest open kmod version in repo: ${LATEST_OPEN_MODULE_VERSION}"
-
-if [[ -n "$skip_grid_driver" ]]; then
-  # No GRID driver available in this region, use open module version directly
-  NVIDIA_DRIVER_FULL_VERSION="$LATEST_OPEN_MODULE_VERSION"
-else
-  # Use the lower version to ensure both sources can provide it
-  NVIDIA_DRIVER_FULL_VERSION=$(printf '%s\n%s\n' "$LATEST_GRID_DRIVER_VERSION" "$LATEST_OPEN_MODULE_VERSION" | sort -V | head -1)
-fi
-
-echo "Selected NVIDIA driver version: ${NVIDIA_DRIVER_FULL_VERSION}"
 
 ### Kernel Module Archive Functions ###
 # These functions pre-compile and archive different NVIDIA driver variants

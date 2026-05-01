@@ -258,3 +258,9 @@ variable "custom_endpoint_ec2" {
   description = "Custom EC2 endpoint to use for building AMIs"
   default     = ""
 }
+
+variable "nvidia_driver_major_al2023" {
+  type        = string
+  description = "Pinned NVIDIA driver major version for AL2023 GPU AMIs. Only driver versions within this major will be installed."
+  default     = "580"
+}
