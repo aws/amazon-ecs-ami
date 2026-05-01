@@ -205,7 +205,8 @@ build {
       "AMI_TYPE=${source.name}",
       "AIR_GAPPED=${var.air_gapped}",
       "REGION=${var.region}",
-      "SKIP_GRID_DRIVER_REGIONS=${local.skip_grid_driver_regions}"
+      "SKIP_GRID_DRIVER_REGIONS=${local.skip_grid_driver_regions}",
+      "NVIDIA_DRIVER_MAJOR=${var.nvidia_driver_major_al2023}"
     ]
     scripts = [
       "scripts/al2023/gpu/install-nvidia-driver.sh",

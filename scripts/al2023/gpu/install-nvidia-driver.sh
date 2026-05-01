@@ -50,6 +50,14 @@ fi
 # If the repo and S3 versions differ, we use the lower of the two to ensure both
 # sources can provide it.
 
+# Read pinned major version from Packer environment variable
+PINNED_MAJOR="${NVIDIA_DRIVER_MAJOR}"
+if [[ -z "$PINNED_MAJOR" ]]; then
+  echo "ERROR: NVIDIA_DRIVER_MAJOR environment variable is not set"
+  exit 1
+fi
+echo "Pinned to NVIDIA driver major version: ${PINNED_MAJOR}"
+
 # Some regions do not have access to the GRID driver S3 bucket, skip GRID driver
 skip_grid_driver=""
 if [[ -n "$SKIP_GRID_DRIVER_REGIONS" ]] && echo "$SKIP_GRID_DRIVER_REGIONS" | grep -q -w "$REGION"; then
@@ -63,20 +71,21 @@ if [[ -z "$skip_grid_driver" ]]; then
   LATEST_GRID_DRIVER_VERSION=$(aws s3 ls --recursive s3://${EC2_GRID_DRIVER_S3_BUCKET}/ --no-sign-request \
     | grep -Eo "(NVIDIA-Linux-x86_64-)[0-9]+\.[0-9]+\.[0-9]+(-grid-aws\.run)" \
     | cut -d'-' -f4 \
+    | grep "^${PINNED_MAJOR}\." \
     | sort -V \
     | tail -1)
 
   if [[ -z "$LATEST_GRID_DRIVER_VERSION" ]]; then
-    echo "ERROR: Could not determine NVIDIA GRID driver version from S3"
+    echo "ERROR: Could not determine NVIDIA GRID driver version from S3 for major ${PINNED_MAJOR}"
     exit 1
   fi
   echo "Latest GRID .run version in S3: ${LATEST_GRID_DRIVER_VERSION}"
 fi
 
-LATEST_OPEN_MODULE_VERSION=$(dnf repoquery --latest=1 --arch=noarch --queryformat "%{version}" "kmod-nvidia-open-dkms" 2>/dev/null | sort -V | tail -1)
+LATEST_OPEN_MODULE_VERSION=$(dnf repoquery --arch=noarch --queryformat "%{version}" "kmod-nvidia-open-dkms" 2>/dev/null | grep "^${PINNED_MAJOR}\." | sort -V | tail -1)
 
 if [[ -z "$LATEST_OPEN_MODULE_VERSION" ]]; then
-  echo "ERROR: Could not determine NVIDIA open module version from repo"
+  echo "ERROR: Could not determine NVIDIA open module version from repo for major ${PINNED_MAJOR}"
   exit 1
 fi
 echo "Latest open kmod version in repo: ${LATEST_OPEN_MODULE_VERSION}"
