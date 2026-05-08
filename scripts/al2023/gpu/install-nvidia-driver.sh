@@ -49,7 +49,8 @@ fi
 # .run file in S3, while proprietary and open come from the AL2023 nvidia repo.
 #
 # The exact driver version is determined by the security check script
-# (check-update-security.sh) as min(repo, S3 GRID) within the pinned major,
+# (check-update-security.sh) as the highest version available in BOTH the
+# AL2023 nvidia repo AND the S3 GRID bucket within the pinned major,
 # and tracked in the NVIDIA_DRIVER_VERSION file uploaded by Packer.
 
 NVIDIA_DRIVER_FULL_VERSION=$(grep "^nvidia_driver_version_al2023" /tmp/NVIDIA_DRIVER_VERSION | awk -F'"' '{print $2}')
