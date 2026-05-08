@@ -60,15 +60,20 @@ read_old_values() {
     fi
 }
 
-# Detect which AMI types were updated
+# Returns 0 (true) if the given file has staged changes
+has_staged_changes() {
+    ! git diff --cached --quiet -- "$1" 2>/dev/null
+}
+
+# Detect which AMI types were updated by checking what's staged in git
 detect_updates() {
     al2_updated="false"
     al2023_updated="false"
 
-    if [ -n "$new_ami_version_al2" ] && [ "$new_ami_version_al2" != "$old_ami_version_al2" ]; then
+    if has_staged_changes release-al2.auto.pkrvars.hcl; then
         al2_updated="true"
     fi
-    if [ -n "$new_ami_version_al2023" ] && [ "$new_ami_version_al2023" != "$old_ami_version_al2023" ]; then
+    if has_staged_changes release-al2023.auto.pkrvars.hcl; then
         al2023_updated="true"
     fi
 }
