@@ -157,7 +157,7 @@ if [[ $platform == al2023* ]]; then
         # so it can't detect updates within a pinned major. Instead, query the installed
         # version and all available within the pinned major, then intersect with GRID bucket locally.
         gpu_cmd_installed="dnf repoquery --installed --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda"
-        gpu_cmd_all="dnf repoquery --disableplugin=versionlock --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda | grep '^${pinned_major}[.]' | sort -V"
+        gpu_cmd_all="dnf repoquery --releasever=latest --disableplugin=versionlock --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda | grep '^${pinned_major}[.]' | sort -V"
         command_params="commands=[\"echo INSTALLED=\$(${gpu_cmd_installed})\",\"echo REPO_VERSIONS=\$(${gpu_cmd_all} | paste -sd,)\"]"
     else
         command_params="commands=[\"dnf --refresh check-upgrade --releasever=latest --disableplugin=versionlock $check_upgrade_options -q\"]"
