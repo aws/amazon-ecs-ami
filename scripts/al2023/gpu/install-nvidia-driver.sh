@@ -233,6 +233,14 @@ sudo systemctl enable nvidia-fabricmanager
 # to maintain persistent software state in the NVIDIA driver.
 sudo systemctl enable nvidia-persistenced
 
+### Install DCGM (Data Center GPU Manager) ###
+# DCGM provides GPU telemetry and health monitoring APIs used by the ECS Agent
+# for emitting GPU metrics. Installed from the NVIDIA CUDA repository.
+sudo dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo
+sudo dnf install -y datacenter-gpu-manager
+sudo systemctl enable nvidia-dcgm
+
 ### Cleanup Build-Time Configuration ###
 # Remove the hardcoded DKMS configuration to prevent it from being baked into the AMI
 sudo rm -f /etc/dkms/nvidia.conf
+
