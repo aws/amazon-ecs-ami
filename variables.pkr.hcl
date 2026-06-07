@@ -95,7 +95,7 @@ variable "runc_version_al2023" {
 
 variable "exec_ssm_version" {
   type        = string
-  default     = "3.3.4108.0"
+  default     = "3.3.4624.0"
   description = "SSM binary version to build ECS exec support with."
 }
 
