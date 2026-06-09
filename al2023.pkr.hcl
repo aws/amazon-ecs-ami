@@ -169,6 +169,16 @@ build {
     ]
   }
 
+  ### Reboot barrier: wait until the rebooted instance is reachable before
+  ### running any provisioner below, so none of them reuse the dying pre-reboot session.
+  provisioner "shell" {
+    pause_before        = "30s"
+    start_retry_timeout = "5m"
+    inline = [
+      "echo 'instance back up after reboot:' && uptime"
+    ]
+  }
+
   provisioner "file" {
     sources = [
       "scripts/al2023/neuron/neuron-inf1-downgrade.sh",
