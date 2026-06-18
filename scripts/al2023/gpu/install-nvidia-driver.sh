@@ -189,7 +189,7 @@ sudo dnf install -y \
 
 # Lock NVIDIA packages to prevent automatic updates
 # Updates can break compatibility between driver and kernel modules
-sudo dnf versionlock 'nvidia*' 'kmod*' 'libnvidia*'
+sudo dnf versionlock 'nvidia*' 'kmod*' 'libnvidia*' 'xorg*'
 
 # Ensure gridd.conf exists for the nvidia-gridd service when it starts up
 sudo mkdir -p /etc/nvidia
