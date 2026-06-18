@@ -79,6 +79,7 @@ Certain packages are critical for correct, performant behavior of GPU functional
 - Kernel modules (`kmod*`) 
 - NVIDIA libraries (`libnvidia*`) 
 - Kernel packages (`kernel*`)
+- Xorg server packages (`xorg*`)
 - DCGM library (`datacenter-gpu-manager-*`)
 
 > [!NOTE]
