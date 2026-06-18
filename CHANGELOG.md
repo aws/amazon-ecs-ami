@@ -4,6 +4,11 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
+## 20260618
+- al2, al2023 ami version: 20260618
+- ecs version: 1.105.0
+- enhancement - Update ECS Agent version to 1.105.0 [#719](https://github.com/aws/amazon-ecs-ami/pull/719)
+
 ## 20260615
 - al2, al2023 ami version: 20260615
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20260615.0-x86_64-ebs
