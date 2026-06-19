@@ -1,4 +1,4 @@
-ami_version_al2023        = "20260609"
+ami_version_al2023        = "20260619"
 ecs_agent_version         = "1.104.0"
 ecs_init_rev              = "1"
 docker_version_al2023     = "25.0.14"
@@ -9,3 +9,4 @@ source_ami_al2023         = "al2023-ami-minimal-2023.12.20260608.0-kernel-6.1-x8
 source_ami_al2023arm      = "al2023-ami-minimal-2023.12.20260608.0-kernel-6.1-arm64"
 kernel_version_al2023     = "-kernel-6.1"
 kernel_version_al2023arm  = "-kernel-6.1"
+ecs_init_local_override   = "ecs-init-1.103.2-1.amzn2023int.x86_64.rpm"
