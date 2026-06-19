@@ -73,7 +73,13 @@ packer docs: https://www.packer.io/docs/builders/amazon#iam-task-or-instance-rol
 
 ## Version-locked packages in AL2023 ECS GPU AMIs
 
-Certain packages are critical for correct, performant behavior of GPU functionality in AL2023 ECS GPU AMIs. These include: - NVIDIA drivers (`nvidia*`) - Kernel modules (`kmod*`) - NVIDIA libraries (`libnvidia*`) - Kernel packages (`kernel*`)
+Certain packages are critical for correct, performant behavior of GPU functionality in AL2023 ECS GPU AMIs. These include: 
+
+- NVIDIA drivers (`nvidia*`) 
+- Kernel modules (`kmod*`) 
+- NVIDIA libraries (`libnvidia*`) 
+- Kernel packages (`kernel*`)
+- DCGM library (`datacenter-gpu-manager-*`)
 
 > [!NOTE]
 > This is not an exhaustive list. The complete list of locked packages are available with `dnf versionlock list`
