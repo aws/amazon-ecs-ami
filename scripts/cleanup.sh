@@ -74,8 +74,11 @@ echo "Cleaning up ssh files"
 cleanup "${SSH_FILES[@]}"
 USERS=$(ls /home/)
 for user in $USERS; do
-    echo Deleting /home/"$user"/.ssh/authorized_keys
-    sudo find /home/"$user"/.ssh/authorized_keys -type f -exec shred -zuf {} \;
+    authorized_keys_file=/home/"$user"/.ssh/authorized_keys
+    echo Deleting "$authorized_keys_file"
+    if sudo test -f "$authorized_keys_file"; then
+        sudo find "$authorized_keys_file" -type f -exec shred -zuf {} \;
+    fi
 done
 for user in $USERS; do
     if sudo test -f /home/"$user"/.ssh/authorized_keys; then
