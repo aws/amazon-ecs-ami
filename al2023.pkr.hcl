@@ -230,6 +230,15 @@ build {
   }
 
   provisioner "shell" {
+    environment_vars = [
+      "DCGM_VERSION=${var.dcgm_version_al2023}",
+      "AIR_GAPPED=${var.air_gapped}"
+    ]
+    script = "scripts/al2023/gpu/install-dcgm.sh"
+    only   = ["amazon-ebs.al2023gpu"]
+  }
+
+  provisioner "shell" {
     inline_shebang = "/bin/sh -ex"
     inline = [
       "sudo usermod -a -G docker ec2-user"
