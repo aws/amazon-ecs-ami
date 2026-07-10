@@ -4,6 +4,11 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
+## 20260710
+- al2, al2023 ami version: 20260710
+- Enhancement - Update containerd to 2.1.9 and runc to 1.3.5 for AL2 ECS AMIs [#738](https://github.com/aws/amazon-ecs-ami/pull/738)
+- enhancement - Bump containerd version to 2.2.5 [#737](https://github.com/aws/amazon-ecs-ami/pull/737)
+
 ## 20260708
 - al2, al2023 ami version: 20260708
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20260707.0-x86_64-ebs
