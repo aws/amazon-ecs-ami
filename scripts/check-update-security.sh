@@ -81,7 +81,9 @@ case "$platform" in
     ;;
 "al2023_gpu")
     ami_path=$AL2023_GPU_PATH
-    instance_type="g5.xlarge"
+    # Keep the default non-GPU instance type. The update check only runs dnf
+    # repoquery against the NVIDIA repo (baked into the GPU AMI and enabled by
+    # default) and the local RPM DB, so no GPU hardware is required.
     ;;
 *)
     error_msg "Incorrect platform selection"
