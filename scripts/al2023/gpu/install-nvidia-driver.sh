@@ -220,9 +220,15 @@ sudo chmod +x /tmp/set-nvidia-clocks
 sudo mv /tmp/set-nvidia-clocks /usr/bin/set-nvidia-clocks
 sudo mv /tmp/set-nvidia-clocks.service /etc/systemd/system/set-nvidia-clocks.service
 
+### NVIDIA MPS Control Daemon Setup ###
+# Start the NVIDIA MPS control daemon at boot so containers can 
+# utilize MPS for GPU sharing
+sudo mv /tmp/nvidia-mps.service /etc/systemd/system/nvidia-mps.service
+
 sudo systemctl daemon-reload
 sudo systemctl enable nvidia-kmod-load.service
 sudo systemctl enable set-nvidia-clocks.service
+sudo systemctl enable nvidia-mps.service
 
 ### NVIDIA Service Configuration ###
 # The Fabric Manager service needs to be started and enabled on EC2 P4d instances

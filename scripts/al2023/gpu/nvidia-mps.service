@@ -1,0 +1,16 @@
+[Unit]
+Description=NVIDIA MPS Control Daemon
+Documentation=https://docs.nvidia.com/deploy/mps/
+Wants=nvidia-kmod-load.service
+After=nvidia-kmod-load.service
+Before=ecs.service
+ConditionPathExists=/usr/bin/nvidia-cuda-mps-control
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/nvidia-cuda-mps-control -f -multiuser-server
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

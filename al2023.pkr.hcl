@@ -204,7 +204,8 @@ build {
       "scripts/al2023/gpu/nvidia-kmod-load.service",
       "scripts/al2023/gpu/nvidia-kmod-load.sh",
       "scripts/al2023/gpu/set-nvidia-clocks",
-      "scripts/al2023/gpu/set-nvidia-clocks.service"
+      "scripts/al2023/gpu/set-nvidia-clocks.service",
+      "scripts/al2023/gpu/nvidia-mps.service"
     ]
     destination = "/tmp/"
     only        = ["amazon-ebs.al2023gpu"]
