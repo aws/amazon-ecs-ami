@@ -38,6 +38,17 @@ RuntimeDirectoryMode=0755
 EOF
 sudo systemctl daemon-reload
 
+### Configure log rotation for DCGM logs
+sudo tee /etc/logrotate.d/nv-hostengine <<'EOF'
+/var/log/nv-hostengine.log {
+    size 5M
+    rotate 1
+    missingok
+    notifempty
+    copytruncate
+}
+EOF
+
 ### Enable DCGM and dcgm-init services
 sudo systemctl enable nvidia-dcgm
 sudo systemctl enable dcgm-init
