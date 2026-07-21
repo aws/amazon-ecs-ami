@@ -31,8 +31,9 @@ After=nvidia-persistenced.service
 Wants=nvidia-persistenced.service
 
 [Service]
+ExecStartPre=/usr/bin/mkdir -p /var/log/ecs
 ExecStart=
-ExecStart=/usr/bin/nv-hostengine -n --service-account nvidia-dcgm --domain-socket /run/nvidia-dcgm/nv-hostengine
+ExecStart=/usr/bin/nv-hostengine -n --service-account nvidia-dcgm --domain-socket /run/nvidia-dcgm/nv-hostengine -f /var/log/ecs/nv-hostengine.log
 RuntimeDirectory=nvidia-dcgm
 RuntimeDirectoryMode=0755
 EOF
@@ -40,7 +41,7 @@ sudo systemctl daemon-reload
 
 ### Configure log rotation for DCGM logs
 sudo tee /etc/logrotate.d/nv-hostengine <<'EOF'
-/var/log/nv-hostengine.log {
+/var/log/ecs/nv-hostengine.log {
     size 5M
     rotate 1
     missingok
