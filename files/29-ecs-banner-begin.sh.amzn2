@@ -20,11 +20,12 @@ echo -e "
    _|  (   \__ \   Amazon Linux 2 (ECS Optimized)
  ____|\___|____/
 
-AL2 End of Life is 2026-06-30.
+AL2 End of Life was 2026-06-30.
 
 A newer version of Amazon Linux is available!
 
-Amazon Linux 2023, GA and supported until 2028-03-15.
+Amazon Linux 2023, GA and supported until 2029-06-30.
+  https://docs.aws.amazon.com/linux/al2023/release-notes/support-info-by-support-statement.html#support-info-by-support-statement-eol
   https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI"
 
 # Disable system-release banner during update-motd, reverted with

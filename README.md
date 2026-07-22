@@ -1,8 +1,8 @@
 # ECS-optimized AMI Build Recipes
 > [!IMPORTANT]
 > The ECS-optimized Amazon Linux 1 AMI (AL1) has reached its end-of-life (EOL) on September 15, 2025.
-> The ECS-optimized Amazon Linux 2 AMI (AL2) will reach its EOL on June 30, 2026, mirroring the same EOL date of the upstream [Amazon Linux 2 Operating System](https://aws.amazon.com/amazon-linux-2/faqs).
-> We encourage customers to upgrade their applications to use Amazon Linux 2023, which includes long term support through 2028.
+> The ECS-optimized Amazon Linux 2 AMI (AL2) has reached its EOL on June 30, 2026, mirroring the same EOL date of the upstream [Amazon Linux 2 Operating System](https://aws.amazon.com/amazon-linux-2/faqs).
+> We encourage customers to upgrade their applications to use Amazon Linux 2023, which includes long term support [through 2029](https://docs.aws.amazon.com/linux/al2023/release-notes/support-info-by-support-statement.html#support-info-by-support-statement-eol).
 
 This is a [packer](https://packer.io) recipe for creating an ECS-optimized AMI.
 It will create a private AMI in whatever account you are running it in.
@@ -73,11 +73,11 @@ packer docs: https://www.packer.io/docs/builders/amazon#iam-task-or-instance-rol
 
 ## Version-locked packages in AL2023 ECS GPU AMIs
 
-Certain packages are critical for correct, performant behavior of GPU functionality in AL2023 ECS GPU AMIs. These include: 
+Certain packages are critical for correct, performant behavior of GPU functionality in AL2023 ECS GPU AMIs. These include:
 
-- NVIDIA drivers (`nvidia*`) 
-- Kernel modules (`kmod*`) 
-- NVIDIA libraries (`libnvidia*`) 
+- NVIDIA drivers (`nvidia*`)
+- Kernel modules (`kmod*`)
+- NVIDIA libraries (`libnvidia*`)
 - Kernel packages (`kernel*`)
 - Xorg server packages (`xorg*`)
 - DCGM library (`datacenter-gpu-manager-*`)
@@ -92,8 +92,8 @@ To prevent unintended modifications, the `dnf versionlock` plugin is used on the
 If you wish to modify a locked package, you can:
 ```
 # unlock a single package
-sudo dnf versionlock delete $PACKAGE_NAME 
-# unlock all packages 
+sudo dnf versionlock delete $PACKAGE_NAME
+# unlock all packages
 sudo dnf versionlock clear
 ```
 > [!IMPORTANT]
