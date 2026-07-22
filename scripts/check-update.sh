@@ -94,26 +94,36 @@ set -e
 # Initialize update flag
 Update="false"
 
-# Check for NVIDIA driver version updates
-gpu_update=$(./scripts/check-update-security.sh "${ami_type}_gpu")
-handle_nvidia_version "$ami_type" "$gpu_update"
-# Only trigger update if GPU update detected AND NVIDIA_DRIVER_VERSION file actually changed
-if [[ $gpu_update == true* ]] && ! git diff --quiet NVIDIA_DRIVER_VERSION; then
-    Update="true"
-fi
-
-# Check for security updates if no dependency changes
-if [ -z "$diff_val" ]; then
-    # Check security updates for each architecture type
-    amd_update=$(./scripts/check-update-security.sh $ami_type)
-    arm_update=$(./scripts/check-update-security.sh "${ami_type}_arm")
-
-    # Combine results
-    if [[ $amd_update == true* ]] || [[ $arm_update == true* ]]; then
+if [ "$ami_type" = "al2" ]; then
+    # AL2 reached EOL on 2026-06-30. The ECS agent version is pinned and new ECS
+    # features are no longer supported on AL2. Per the EOL plan, AL2 AMIs are
+    # rebuilt only when a new base AMI is available from Amazon Linux. A new base
+    # AMI shows up as a source_ami_* change in diff_val, so gate the AL2 rebuild on that alone.
+    if [ -n "$diff_val" ]; then
         Update="true"
     fi
 else
-    Update="true"
+    # Check for NVIDIA driver version updates
+    gpu_update=$(./scripts/check-update-security.sh "${ami_type}_gpu")
+    handle_nvidia_version "$ami_type" "$gpu_update"
+    # Only trigger update if GPU update detected AND NVIDIA_DRIVER_VERSION file actually changed
+    if [[ $gpu_update == true* ]] && ! git diff --quiet NVIDIA_DRIVER_VERSION; then
+        Update="true"
+    fi
+
+    # Check for security updates if no dependency changes
+    if [ -z "$diff_val" ]; then
+        # Check security updates for each architecture type
+        amd_update=$(./scripts/check-update-security.sh $ami_type)
+        arm_update=$(./scripts/check-update-security.sh "${ami_type}_arm")
+
+        # Combine results
+        if [[ $amd_update == true* ]] || [[ $arm_update == true* ]]; then
+            Update="true"
+        fi
+    else
+        Update="true"
+    fi
 fi
 
 # Clean up temporary file

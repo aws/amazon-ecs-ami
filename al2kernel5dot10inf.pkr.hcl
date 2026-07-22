@@ -4,7 +4,7 @@ locals {
     os_version          = "Amazon Linux 2"
     source_image_name   = "{{ .SourceAMIName }}"
     ecs_runtime_version = "Docker version ${var.docker_version}"
-    ecs_agent_version   = "${var.ecs_agent_version}"
+    ecs_agent_version   = "${var.ecs_agent_version_al2}"
     ami_type            = "al2kernel5dot10inf"
     ami_version         = "2.0.${var.ami_version_al2}"
   }
