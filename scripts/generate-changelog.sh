@@ -99,11 +99,13 @@ build_changelog_entry() {
         add_line "- al2023 ami version: ${DATE}"
     fi
 
-    # ECS version (only if changed)
-    local new_ecs="${new_ecs_version_al2:-$new_ecs_version_al2023}"
-    local old_ecs="${old_ecs_version_al2:-$old_ecs_version_al2023}"
-    if [ -n "$new_ecs" ] && [ "$new_ecs" != "$old_ecs" ]; then
-        add_line "- ecs version: ${new_ecs}"
+    # ECS version (only if changed). AL2 and AL2023 track independent agent
+    # versions (AL2 is pinned/EOL), so report each separately when it changes.
+    if [ -n "$new_ecs_version_al2" ] && [ "$new_ecs_version_al2" != "$old_ecs_version_al2" ]; then
+        add_line "- al2 ecs version: ${new_ecs_version_al2}"
+    fi
+    if [ -n "$new_ecs_version_al2023" ] && [ "$new_ecs_version_al2023" != "$old_ecs_version_al2023" ]; then
+        add_line "- al2023 ecs version: ${new_ecs_version_al2023}"
     fi
 
     # AL2 source AMIs (only changed ones)

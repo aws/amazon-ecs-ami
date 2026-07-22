@@ -10,7 +10,7 @@ locals {
     os_version          = "Amazon Linux 2"
     source_image_name   = "{{ .SourceAMIName }}"
     ecs_runtime_version = "Docker version ${var.docker_version}"
-    ecs_agent_version   = "${var.ecs_agent_version}"
+    ecs_agent_version   = "${var.ecs_agent_version_al2}"
     ami_type            = "al2"
     ami_version         = "2.0.${var.ami_version_al2}"
   }
@@ -155,8 +155,8 @@ build {
     script = "scripts/install-ecs-init.sh"
     environment_vars = [
       "REGION=${var.region}",
-      "AGENT_VERSION=${var.ecs_agent_version}",
-      "INIT_REV=${var.ecs_init_rev}",
+      "AGENT_VERSION=${var.ecs_agent_version_al2}",
+      "INIT_REV=${var.ecs_init_rev_al2}",
       "AL_NAME=amzn2",
       "AIR_GAPPED=${var.air_gapped}",
       "ECS_INIT_URL=${var.ecs_init_url_al2}",

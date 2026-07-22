@@ -47,13 +47,28 @@ variable "block_device_size_gb" {
 
 variable "ecs_agent_version" {
   type        = string
-  description = "ECS agent version to build AMI with."
+  description = "ECS agent version to build AL2023 AMI with."
   default     = "1.105.1"
 }
 
 variable "ecs_init_rev" {
   type        = string
-  description = "ecs-init package version rev"
+  description = "ecs-init package version rev for AL2023"
+  default     = "1"
+}
+
+# AL2 reached EOL on 2026-06-30. The ECS agent version is pinned on AL2 AMIs and
+# no longer tracks the AL2023 agent version. Do not bump these unless a new AL2
+# AMI is being built intentionally.
+variable "ecs_agent_version_al2" {
+  type        = string
+  description = "Pinned ECS agent version to build AL2 AMIs with (AL2 is EOL)."
+  default     = "1.105.1"
+}
+
+variable "ecs_init_rev_al2" {
+  type        = string
+  description = "Pinned ecs-init package version rev for AL2 (AL2 is EOL)."
   default     = "1"
 }
 

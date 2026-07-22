@@ -43,8 +43,10 @@ case "$ami_type" in
 
     readonly ami_name_al2_kernel5dot10arm ami_name_al2_kernel5dot10 ami_name_al2_arm ami_name_al2_x86
 
-    readonly ecs_agent_version=$(sed -n '/variable "ecs_agent_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
-    readonly ecs_init_rev=$(sed -n '/variable "ecs_init_rev" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    # AL2 is EOL. Its ECS agent version is pinned and read from the al2-specific
+    # variables so it no longer tracks the AL2023 agent version.
+    readonly ecs_agent_version=$(sed -n '/variable "ecs_agent_version_al2" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    readonly ecs_init_rev=$(sed -n '/variable "ecs_init_rev_al2" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly docker_version=$(sed -n '/variable "docker_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly containerd_version=$(sed -n '/variable "containerd_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
     readonly runc_version=$(sed -n '/variable "runc_version" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
