@@ -4,6 +4,14 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
+## 20260727
+- al2, al2023 ami version: 20260727
+- ecs version: 1.106.0
+- source al2023 ami: al2023-ami-minimal-2023.12.20260727.0-kernel-6.1-x86_64
+- source al2023 arm ami: al2023-ami-minimal-2023.12.20260727.0-kernel-6.1-arm64
+- enhancement - Update ECS Agent version to 1.106.0  [#750](https://github.com/aws/amazon-ecs-ami/pull/750)
+- Enhancement - Rotate nv-hostengine logs for AL2023 GPU AMIs [#747](https://github.com/aws/amazon-ecs-ami/pull/747)
+
 ## 20260721
 - al2, al2023 ami version: 20260721
 - source al2 ami: amzn2-ami-minimal-hvm-2.0.20260720.0-x86_64-ebs
