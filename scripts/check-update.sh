@@ -45,7 +45,7 @@ handle_nvidia_version() {
         # Untagged tokens are ignored, so a bare "true" yields no versions (unlike
         # the old positional parser, which mis-read "true" as an nvidia version).
         local -a fields=()
-        read -ra fields <<< "${gpu_update#true}"
+       read -ra fields <<< "${gpu_update#true}"
         local field
         for field in "${fields[@]}"; do
             case "$field" in
