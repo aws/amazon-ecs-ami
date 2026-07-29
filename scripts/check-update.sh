@@ -32,20 +32,31 @@ handle_nvidia_version() {
     local cuda_version_key="cuda_version_${ami_variant}"
 
     if [[ $gpu_update == true* ]]; then
-        # Parse the output format: "true <nvidia_version> <cuda_version>" or "true <nvidia_version>" or "true cuda:<cuda_version>"
-        local update_info=$(echo "$gpu_update" | cut -d' ' -f2-)
-
-        # Check for both nvidia and cuda versions (space-separated)
-        if [[ $update_info == *" "* ]]; then
-            nvidia_version=$(echo "$update_info" | cut -d' ' -f1)
-            cuda_version=$(echo "$update_info" | cut -d' ' -f2)
-        # Check for cuda-only update
-        elif [[ $update_info == cuda:* ]]; then
-            cuda_version=$(echo "$update_info" | cut -d':' -f2)
-        # else nvidia version
-        else
-            nvidia_version="$update_info"
-        fi
+        # $gpu_update is check-update-security.sh's stdout, a single line. When a
+        # version is detected it is emitted as a tagged token; the producer only
+        # tags versions it actually found, so a bare "true" (no tokens) is valid
+        # and means "an update exists but no specific version was resolved". The
+        # possible shapes, in any token order:
+        #   "true"                                    (update exists, no version)
+        #   "true nvidia:<nvidia_version>"            (driver only)
+        #   "true nvidia:<...> cuda:<cuda_version>"   (al2_gpu, driver + cuda)
+        #   "true cuda:<cuda_version>"                (al2_gpu, cuda only)
+        # Read the fields after "true" and classify each strictly by its prefix.
+        # Untagged tokens are ignored, so a bare "true" yields no versions (unlike
+        # the old positional parser, which mis-read "true" as an nvidia version).
+        local -a fields=()
+        read -ra fields <<<"${gpu_update#true}"
+        local field
+        for field in "${fields[@]}"; do
+            case "$field" in
+            nvidia:*)
+                nvidia_version="${field#nvidia:}"
+                ;;
+            cuda:*)
+                cuda_version="${field#cuda:}"
+                ;;
+            esac
+        done
     fi
 
     # Update NVIDIA driver version entry if available

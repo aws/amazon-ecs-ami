@@ -290,7 +290,7 @@ if [ "$platform" = "al2023_gpu" ]; then
         exit 0
     fi
 
-    echo "true $effective_version"
+    echo "true nvidia:$effective_version"
     exit 0
 fi
 
@@ -300,29 +300,13 @@ if [ "$cmd_response_code" -eq "$UPDATE_EXISTS_CODE" ]; then
         nvidia_driver_version=$(echo "$std_output" | grep "nvidia-driver-latest-dkms" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://' || true)
         cuda_version=$(echo "$std_output" | grep "^cuda" | awk '{print $2}' | cut -d'-' -f1 | sed 's/^[0-9]://' || true)
 
-        # Determine output format based on available version combinations
-        version_pattern=""
-        [ -n "$nvidia_driver_version" ] && version_pattern="${version_pattern}nvidia"
-        [ -n "$cuda_version" ] && version_pattern="${version_pattern}_cuda"
-
-        case "$version_pattern" in
-        "nvidia_cuda")
-            # Both NVIDIA and CUDA updates available
-            echo "true $nvidia_driver_version $cuda_version"
-            ;;
-        "nvidia")
-            # Only NVIDIA driver update available
-            echo "true $nvidia_driver_version"
-            ;;
-        "_cuda")
-            # Only CUDA package update available
-            echo "true cuda:$cuda_version"
-            ;;
-        *)
-            # No specific versions detected, but updates exist
-            echo "true"
-            ;;
-        esac
+        # Emit each detected version as a tagged token (nvidia:/cuda:) so the
+        # caller can classify it by prefix regardless of order. If neither
+        # version is detected, emit a bare "true" to signal an update exists.
+        output="true"
+        [ -n "$nvidia_driver_version" ] && output="$output nvidia:$nvidia_driver_version"
+        [ -n "$cuda_version" ] && output="$output cuda:$cuda_version"
+        echo "$output"
     elif [ "$platform" = "al2023_gpu" ]; then
         # This path should not be reached; al2023_gpu is handled above via repoquery
         echo "ERROR: Unexpected al2023_gpu in check-upgrade result path"
