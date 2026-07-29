@@ -142,10 +142,10 @@ instance_id=$(aws ec2 run-instances \
     jq -r '.Instances[0].InstanceId')
 
 # Read pinned major version for AL2023 GPU filtering
-pinned_major=""
+nvidia_driver_pinned_major=""
 if [ "$platform" = "al2023_gpu" ]; then
-    pinned_major=$(sed -n '/variable "nvidia_driver_major_al2023" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
-    if [ -z "$pinned_major" ]; then
+    nvidia_driver_pinned_major=$(sed -n '/variable "nvidia_driver_major_al2023" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    if [ -z "$nvidia_driver_pinned_major" ]; then
         echo "ERROR: Could not read nvidia_driver_major_al2023 from variables.pkr.hcl"
         exit 1
     fi
@@ -159,7 +159,7 @@ if [[ $platform == al2023* ]]; then
         # so it can't detect updates within a pinned major. Instead, query the installed
         # version and all available within the pinned major, then intersect with GRID bucket locally.
         gpu_cmd_installed="dnf repoquery --installed --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda"
-        gpu_cmd_all="dnf repoquery --releasever=latest --disableplugin=versionlock --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda | grep '^${pinned_major}[.]' | sort -V"
+        gpu_cmd_all="dnf repoquery --releasever=latest --disableplugin=versionlock --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda | grep '^${nvidia_driver_pinned_major}[.]' | sort -V"
         command_params="commands=[\"echo INSTALLED=\$(${gpu_cmd_installed})\",\"echo REPO_VERSIONS=\$(${gpu_cmd_all} | paste -sd,)\"]"
     else
         command_params="commands=[\"dnf --refresh check-upgrade --releasever=latest --disableplugin=versionlock $check_upgrade_options -q\"]"
@@ -254,10 +254,10 @@ if [ "$platform" = "al2023_gpu" ]; then
         exit 1
     fi
 
-    installed_version=$(echo "$std_output" | grep "^INSTALLED=" | cut -d'=' -f2)
-    repo_versions_csv=$(echo "$std_output" | grep "^REPO_VERSIONS=" | cut -d'=' -f2)
+    nvidia_driver_installed_version=$(echo "$std_output" | grep "^INSTALLED=" | cut -d'=' -f2)
+    nvidia_driver_repo_versions_csv=$(echo "$std_output" | grep "^REPO_VERSIONS=" | cut -d'=' -f2)
 
-    if [ -z "$installed_version" ] || [ -z "$repo_versions_csv" ]; then
+    if [ -z "$nvidia_driver_installed_version" ] || [ -z "$nvidia_driver_repo_versions_csv" ]; then
         echo "ERROR: Could not determine installed or available NVIDIA driver versions"
         exit 1
     fi
@@ -266,31 +266,31 @@ if [ "$platform" = "al2023_gpu" ]; then
     grid_versions=$(aws s3 ls --recursive s3://ec2-linux-nvidia-drivers/ --no-sign-request |
         grep -Eo "(NVIDIA-Linux-x86_64-)[0-9]+\.[0-9]+\.[0-9]+(-grid-aws\.run)" |
         cut -d'-' -f4 |
-        grep "^${pinned_major}\.")
+        grep "^${nvidia_driver_pinned_major}\.")
     if [ -z "$grid_versions" ]; then
-        echo "ERROR: Could not determine NVIDIA GRID driver versions from S3 for major ${pinned_major}"
+        echo "ERROR: Could not determine NVIDIA GRID driver versions from S3 for major ${nvidia_driver_pinned_major}"
         exit 1
     fi
 
     # Find intersection: keep only repo versions that also exist in the GRID bucket,
     # then pick the latest version as the effective version
-    effective_version=$(echo "$repo_versions_csv" | tr ',' '\n' | grep -v '^$' |
+    nvidia_driver_effective_version=$(echo "$nvidia_driver_repo_versions_csv" | tr ',' '\n' | grep -v '^$' |
         grep -xF -f <(echo "$grid_versions") |
         sort -V | tail -1)
 
-    if [ -z "$effective_version" ]; then
-        echo "ERROR: No common NVIDIA driver version found between repo and GRID bucket for major ${pinned_major}"
+    if [ -z "$nvidia_driver_effective_version" ]; then
+        echo "ERROR: No common NVIDIA driver version found between repo and GRID bucket for major ${nvidia_driver_pinned_major}"
         exit 1
     fi
 
     # Only trigger a release if the effective version is newer than installed
-    newer=$(printf '%s\n%s' "$installed_version" "$effective_version" | sort -V | tail -1)
-    if [ "$newer" = "$installed_version" ]; then
+    nvidia_driver_newer=$(printf '%s\n%s' "$nvidia_driver_installed_version" "$nvidia_driver_effective_version" | sort -V | tail -1)
+    if [ "$nvidia_driver_newer" = "$nvidia_driver_installed_version" ]; then
         echo "false"
         exit 0
     fi
 
-    echo "true nvidia:$effective_version"
+    echo "true nvidia:$nvidia_driver_effective_version"
     exit 0
 fi
 
