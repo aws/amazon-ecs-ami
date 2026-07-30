@@ -21,7 +21,6 @@ if [[ -z $DCGM_FULL_VERSION ]]; then
     exit 1
 fi
 
-# The package name embeds the major (datacenter-gpu-manager-4-core)
 DCGM_MAJOR="${DCGM_FULL_VERSION%%.*}"
 echo "Using DCGM version: ${DCGM_FULL_VERSION}"
 
