@@ -5,12 +5,14 @@
 #
 # Format: nvidia_driver_version_<ami_type> = "<version>"
 #         cuda_version_<ami_type> = "<version>" (AL2 only)
+#         dcgm_version_<ami_type> = "<version>"
 #
-# This file tracks the latest NVIDIA driver and CUDA versions detected for
-# different Amazon Linux AMIs. For AL2023 GPU, the version in this file is
-# used by the install script during AMI builds (sourced via Packer file
-# provisioner). The pinned major version is defined in variables.pkr.hcl.
+# This file tracks the latest NVIDIA driver, CUDA, and DCGM versions detected
+# for different Amazon Linux AMIs. For AL2023 GPU, the versions in this file
+# are used by install scripts during AMI builds (sourced via Packer file
+# provisioner). The pinned major versions are defined in variables.pkr.hcl.
 
 nvidia_driver_version_al2 = "550.163.01"
 nvidia_driver_version_al2023 = "580.159.03"
 cuda_version_al2 = "12.4.1"
+dcgm_version_al2023 = "4.6.0"
