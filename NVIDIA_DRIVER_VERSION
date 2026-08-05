@@ -15,4 +15,4 @@
 nvidia_driver_version_al2 = "550.163.01"
 nvidia_driver_version_al2023 = "580.159.03"
 cuda_version_al2 = "12.4.1"
-dcgm_version_al2023 = "4.6.0"
+dcgm_version_al2023 = "4.6.1"
