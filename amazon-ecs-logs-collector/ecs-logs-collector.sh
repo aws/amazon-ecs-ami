@@ -890,6 +890,10 @@ get_gpu_info() {
     modinfo nvidia > "$info_system"/gpu/gpu-installed-kmod.txt
   fi
 
+  if [ -e /var/log/nv-hostengine.log ]; then
+    cp -f /var/log/nv-hostengine.log "$info_system"/gpu/
+  fi
+
   ok
 }
 # --------------------------------------------------------------------------------------------
