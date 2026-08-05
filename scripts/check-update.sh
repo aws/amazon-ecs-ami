@@ -28,10 +28,8 @@ handle_nvidia_version() {
 
     local nvidia_version=""
     local cuda_version=""
-    local dcgm_version=""
     local nvidia_version_key="nvidia_driver_version_${ami_variant}"
     local cuda_version_key="cuda_version_${ami_variant}"
-    local dcgm_version_key="dcgm_version_${ami_variant}"
 
     if [[ $gpu_update == true* ]]; then
         # $gpu_update is check-update-security.sh's stdout, a single line. When a
@@ -43,9 +41,6 @@ handle_nvidia_version() {
         #   "true nvidia:<nvidia_version>"            (driver only)
         #   "true nvidia:<...> cuda:<cuda_version>"   (al2_gpu, driver + cuda)
         #   "true cuda:<cuda_version>"                (al2_gpu, cuda only)
-        #   "true nvidia:<...> dcgm:<dcgm_version>"   (al2023_gpu, driver + dcgm)
-        # cuda: (al2_gpu) and dcgm: (al2023_gpu) come from different platforms and
-        # never appear together in one output.
         # Read the fields after "true" and classify each strictly by its prefix.
         # Untagged tokens are ignored, so a bare "true" yields no versions (unlike
         # the old positional parser, which mis-read "true" as an nvidia version).
@@ -59,9 +54,6 @@ handle_nvidia_version() {
                 ;;
             cuda:*)
                 cuda_version="${field#cuda:}"
-                ;;
-            dcgm:*)
-                dcgm_version="${field#dcgm:}"
                 ;;
             esac
         done
@@ -81,15 +73,6 @@ handle_nvidia_version() {
         if grep -q "^${cuda_version_key} = " NVIDIA_DRIVER_VERSION; then
             if ! sed -i "s/^${cuda_version_key} = .*/${cuda_version_key} = \"${cuda_version}\"/" NVIDIA_DRIVER_VERSION; then
                 echo "Failed to update CUDA version in NVIDIA_DRIVER_VERSION file"
-            fi
-        fi
-    fi
-
-    # Update DCGM version entry if available (AL2023 only)
-    if [ -n "$dcgm_version" ] && [ "$ami_variant" = "al2023" ]; then
-        if grep -q "^${dcgm_version_key} = " NVIDIA_DRIVER_VERSION; then
-            if ! sed -i "s/^${dcgm_version_key} = .*/${dcgm_version_key} = \"${dcgm_version}\"/" NVIDIA_DRIVER_VERSION; then
-                echo "Failed to update DCGM version in NVIDIA_DRIVER_VERSION file"
             fi
         fi
     fi
