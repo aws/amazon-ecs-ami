@@ -7,29 +7,20 @@ if [ -n "$AIR_GAPPED" ]; then
     exit 0
 fi
 
-# dcgm-init ships in the amazon-ecs-init RPM; skip until it's present. Checks the
-# path directly since /usr/libexec is not on $PATH.
+# The dcgm-init binary (and its systemd unit) ships in the amazon-ecs-init RPM,
+# which is installed earlier in the build. Older RPMs don't include it yet, so
+# skip DCGM setup entirely until the binary is present (mirrors AIR_GAPPED).
+# Note: the binary lives in /usr/libexec, which is not on $PATH, so this checks
+# the install path directly rather than using `command -v`/`which`.
 if [ ! -f /usr/libexec/dcgm-init ]; then
     echo "dcgm-init binary not found, skipping DCGM installation"
     exit 0
 fi
 
-### Determine DCGM version, as selected by check-update-security.sh
-DCGM_FULL_VERSION=$(grep "^dcgm_version_al2023" /tmp/NVIDIA_DRIVER_VERSION | awk -F'"' '{print $2}')
-if [[ -z $DCGM_FULL_VERSION ]]; then
-    echo "ERROR: Could not read dcgm_version_al2023 from /tmp/NVIDIA_DRIVER_VERSION"
-    exit 1
-fi
-
-DCGM_MAJOR="${DCGM_FULL_VERSION%%.*}"
-echo "Using DCGM version: ${DCGM_FULL_VERSION}"
-
 ### Install DCGM core package (provides nv-hostengine and libdcgm.so)
-# Pinned to the exact version so the AMI matches what NVIDIA_DRIVER_VERSION
-# records.
-sudo dnf install -y "datacenter-gpu-manager-${DCGM_MAJOR}-core-${DCGM_FULL_VERSION}"
+sudo dnf install -y "datacenter-gpu-manager-${DCGM_VERSION}-core"
 
-### Lock DCGM packages to prevent automatic updates
+### Lock DCGM packages to prevent updates that could break the libdcgm.so ABI
 sudo dnf versionlock 'datacenter-gpu-manager*'
 
 ### Override nvidia-dcgm to use Unix domain socket instead of TCP
