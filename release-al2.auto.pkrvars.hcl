@@ -1,5 +1,5 @@
-ami_version_al2               = "20260805"
-ecs_agent_version             = "1.106.0"
+ami_version_al2               = "20260813"
+ecs_agent_version             = "1.106.1"
 ecs_init_rev                  = "1"
 docker_version                = "25.0.16"
 containerd_version            = "2.1.9"
