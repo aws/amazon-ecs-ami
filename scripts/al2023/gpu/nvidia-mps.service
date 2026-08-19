@@ -8,6 +8,7 @@ ConditionPathExists=/usr/bin/nvidia-cuda-mps-control
 
 [Service]
 Type=exec
+Environment=CUDA_MPS_PIPE_DIRECTORY=/run/mps-ecs
 ExecStart=/usr/bin/nvidia-cuda-mps-control -f -multiuser-server
 Restart=always
 RestartSec=1
