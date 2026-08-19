@@ -262,13 +262,32 @@ if [ "$platform" = "al2023_gpu" ]; then
         exit 1
     fi
 
-    # Get all GRID bucket versions within pinned major
-    grid_versions=$(aws s3 ls --recursive s3://ec2-linux-nvidia-drivers/ --no-sign-request |
-        grep -Eo "(NVIDIA-Linux-x86_64-)[0-9]+\.[0-9]+\.[0-9]+(-grid-aws\.run)" |
-        cut -d'-' -f4 |
-        grep "^${nvidia_driver_pinned_major}\.")
+    # A driver version present in one region's GRID bucket is not guaranteed to
+    # be present in another, so intersect the listing across regions and keep
+    # only versions available in all of them. This avoids selecting a version
+    # that would fail the GPU AMI build in a region whose bucket lacks it. Reads
+    # are unsigned and only need network access to each region's S3 endpoint;
+    # regions not reachable from the build environment are out of scope.
+    grid_partition_regions="us-east-1 us-gov-east-1 cn-north-1"
+    grid_versions=""
+    for grid_region in $grid_partition_regions; do
+        region_grid_versions=$(aws s3 ls --recursive s3://ec2-linux-nvidia-drivers/ --no-sign-request --region "$grid_region" |
+            grep -Eo "(NVIDIA-Linux-x86_64-)[0-9]+\.[0-9]+\.[0-9]+(-grid-aws\.run)" |
+            cut -d'-' -f4 |
+            grep "^${nvidia_driver_pinned_major}\." | sort -u || true)
+        if [ -z "$region_grid_versions" ]; then
+            echo "ERROR: Could not determine NVIDIA GRID driver versions from S3 in ${grid_region} for major ${nvidia_driver_pinned_major}"
+            exit 1
+        fi
+        if [ -z "$grid_versions" ]; then
+            grid_versions="$region_grid_versions"
+        else
+            # Keep only versions also present in this region
+            grid_versions=$(grep -xF -f <(echo "$region_grid_versions") <(echo "$grid_versions") || true)
+        fi
+    done
     if [ -z "$grid_versions" ]; then
-        echo "ERROR: Could not determine NVIDIA GRID driver versions from S3 for major ${nvidia_driver_pinned_major}"
+        echo "ERROR: No NVIDIA GRID driver version for major ${nvidia_driver_pinned_major} is available across all GPU-building regions (${grid_partition_regions})"
         exit 1
     fi
 
