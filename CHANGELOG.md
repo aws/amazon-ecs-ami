@@ -12,7 +12,6 @@
 - source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20260817.0-arm64-ebs
 - source al2023 ami: al2023-ami-minimal-2023.12.20260817.0-kernel-6.1-x86_64
 - source al2023 arm ami: al2023-ami-minimal-2023.12.20260817.0-kernel-6.1-arm64
-- enhancement - update InitiateRelease github action to check for GRID driver across commercial, us-gov, and china partitions  [#768](https://github.com/aws/amazon-ecs-ami/pull/768)
 
 ## 20260813
 - al2, al2023 ami version: 20260813
