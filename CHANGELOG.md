@@ -4,6 +4,13 @@
 - [Amazon Linux 2023 release notes](https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html)
 - [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html)
 
+## 20260924
+- al2 ami version: 20260924
+- source al2 ami: amzn2-ami-minimal-hvm-2.0.20260923.0-x86_64-ebs
+- source al2 arm ami: amzn2-ami-minimal-hvm-2.0.20260923.0-arm64-ebs
+- source al2 kernel 5.10 ami: amzn2-ami-minimal-hvm-2.0.20260923.0-x86_64-ebs
+- source al2 kernel 5.10 arm ami: amzn2-ami-minimal-hvm-2.0.20260923.0-arm64-ebs
+
 ## 20260922
 - al2, al2023 ami version: 20260922
 - ecs version: 1.107.0
