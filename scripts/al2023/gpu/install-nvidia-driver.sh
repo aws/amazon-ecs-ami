@@ -33,6 +33,11 @@ sudo dnf versionlock 'kernel*'
 # Enable DKMS service
 sudo systemctl enable --now dkms
 
+# Skip DKMS's initramfs rebuild after each transaction. The initramfs carries no NVIDIA modules, so the rebuild
+# only costs time: about 65 s across this build, and a synchronous dracut run in every instance's first boot.
+sudo mkdir -p /etc/dkms/framework.conf.d
+echo 'post_transaction=""' | sudo tee /etc/dkms/framework.conf.d/10-no-initramfs-rebuild.conf
+
 # nvidia-release creates an nvidia repo file at /etc/yum.repos.d/amazonlinux-nvidia.repo
 sudo dnf install -y nvidia-release
 
@@ -190,6 +195,17 @@ sudo dnf install -y \
 # Lock NVIDIA packages to prevent automatic updates
 # Updates can break compatibility between driver and kernel modules
 sudo dnf versionlock 'nvidia*' 'kmod*' 'libnvidia*' 'xorg*'
+
+# The glob above locks only installed packages. These aren't installed but must follow the driver version,
+# otherwise a customer's `dnf install nvidia-imex` pulls the newest driver branch's version.
+for pkg in nvidia-imex libnvidia-nscq; do
+  lock=$(dnf repoquery -q --qf '%{name}-%{epoch}:%{version}-%{release}.*' "${pkg}-${NVIDIA_DRIVER_FULL_VERSION}" | sed -n 1p)
+  if [ -z "${lock}" ]; then
+    echo "${pkg} ${NVIDIA_DRIVER_FULL_VERSION} not found in the repo; not locking it"
+    continue
+  fi
+  echo "${lock}" | sudo tee -a /etc/dnf/plugins/versionlock.list
+done
 
 # Ensure gridd.conf exists for the nvidia-gridd service when it starts up
 sudo mkdir -p /etc/nvidia
