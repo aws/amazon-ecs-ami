@@ -25,6 +25,9 @@ DKMS_ARCHIVE_DIR=/var/lib/dkms-archive
 
 LOCK_FILE=/var/lock/kmod-util.lock
 
+# The NVIDIA kernel module flavors. They all install nvidia.ko, so only one may be registered with DKMS at a time.
+NVIDIA_FLAVORS=(nvidia nvidia-proprietary nvidia-grid)
+
 function log() {
   echo >&2 "$(date '+%Y-%m-%dT%H:%M:%S%z')" "[kmod-util]" "$@"
 }
@@ -65,7 +68,8 @@ function has-nvidia-device() {
 function module-version() {
   local MODULE_NAME="${1}"
   local status_output
-  status_output=$(${DKMS} status -m "${MODULE_NAME}" 2>/dev/null | head -n 1)
+  # sed rather than head: head exits early, and under pipefail the SIGPIPE to dkms fails the pipeline
+  status_output=$(${DKMS} status -m "${MODULE_NAME}" 2>/dev/null | sed -n 1p)
   
   if [ -z "$status_output" ]; then
     log "ERROR: No DKMS status found for module: ${MODULE_NAME}"
@@ -76,27 +80,77 @@ function module-version() {
   echo "$status_output" | cut -d',' -f1 | cut -d'/' -f2 | cut -d':' -f1 | xargs
 }
 
-# load a kernel module from the archives
+# udev loads nvidia.ko at boot, before nvidia-kmod-load runs. After a flavor change that is the previous flavor's
+# module, so replace it with the module just installed.
+function reload-if-stale() {
+  [ -e /sys/module/nvidia ] || return 0
+  local loaded installed m reload=()
+  loaded=$(cat /sys/module/nvidia/srcversion 2>/dev/null || true)
+  installed=$(modinfo -F srcversion nvidia 2>/dev/null || true)
+  if [ -z "${loaded}" ] || [ -z "${installed}" ] || [ "${loaded}" = "${installed}" ]; then
+    return 0
+  fi
+  log "loaded nvidia module (srcversion ${loaded}) is not the installed one (${installed}); reloading"
+  for m in nvidia_drm nvidia_peermem nvidia_uvm nvidia_modeset nvidia; do
+    [ -e "/sys/module/${m}" ] || continue
+    reload=("${m}" "${reload[@]}")
+    if ! rmmod "${m}"; then
+      log "ERROR: cannot unload ${m}; the previous flavor stays loaded until the next boot." \
+        "refcnt=$(cat "/sys/module/${m}/refcnt" 2>/dev/null) holders=[$(ls "/sys/module/${m}/holders" 2>/dev/null | tr '\n' ' ')]" \
+        "users=[$(fuser /dev/nvidia* 2>/dev/null | tr -s ' ')]"
+      return 1
+    fi
+  done
+  for m in "${reload[@]}"; do
+    modprobe "${m}"
+  done
+  log "reloaded: ${reload[*]}"
+}
+
+# load a kernel module from the archives. Safe to run on every boot: a module that is already installed for the
+# running kernel isn't unpacked or installed again.
 function load() {
   local MODULE_NAME="${1}"
   acquire_lock || return 1
-  
-  log "unpacking: ${MODULE_NAME}"
-  local MODULE_ARCHIVE="${DKMS_ARCHIVE_DIR}/${MODULE_NAME}/*.tar.gz"
-  local archives=($MODULE_ARCHIVE)
-  
+
+  local archives=("${DKMS_ARCHIVE_DIR}/${MODULE_NAME}"/*.tar.gz)
   if [ ${#archives[@]} -eq 0 ]; then
     log "ERROR: No archive found for ${MODULE_NAME}"
     return 1
   fi
-  
-  ${DKMS} ldtarball "${archives[0]}"
-  log "unpacked: ${MODULE_NAME}"
-  log "installing: ${MODULE_NAME}"
+  # Archive names are <module>-<version>-kernel<kernel>-<arch>.dkms.tar.gz
   local MODULE_VERSION
-  MODULE_VERSION=$(module-version "${MODULE_NAME}")
-  ${DKMS} install -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
-  log "installed: ${MODULE_NAME}"
+  MODULE_VERSION=$(basename "${archives[0]}")
+  MODULE_VERSION=${MODULE_VERSION#"${MODULE_NAME}"-}
+  MODULE_VERSION=${MODULE_VERSION%%-kernel*}
+
+  # Remove the other flavors first. Otherwise each install overwrites the other's nvidia.ko, and dkms autoinstall
+  # can bring the previous flavor back.
+  local flavor version
+  for flavor in "${NVIDIA_FLAVORS[@]}"; do
+    [ "${flavor}" = "${MODULE_NAME}" ] && continue
+    for version in $(${DKMS} status -m "${flavor}" 2>/dev/null | cut -d',' -f1 | cut -d'/' -f2 | cut -d':' -f1 | sort -u); do
+      log "removing other flavor: ${flavor}/${version}"
+      ${DKMS} remove -m "${flavor}" -v "${version}" --all
+    done
+  done
+
+  local state
+  state=$(${DKMS} status -m "${MODULE_NAME}" -v "${MODULE_VERSION}" -k "$(uname -r)" 2>/dev/null || true)
+  if [ -z "${state}" ]; then
+    log "unpacking: ${MODULE_NAME}"
+    ${DKMS} ldtarball "${archives[0]}"
+    log "unpacked: ${MODULE_NAME}"
+  fi
+  if [[ "${state}" == *": installed"* ]]; then
+    log "already installed: ${MODULE_NAME}/${MODULE_VERSION}"
+  else
+    log "installing: ${MODULE_NAME}"
+    ${DKMS} install -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
+    log "installed: ${MODULE_NAME}"
+  fi
+
+  reload-if-stale
 }
 
 # remove a kernel module
