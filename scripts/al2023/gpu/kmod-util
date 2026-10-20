@@ -114,7 +114,8 @@ function load() {
   acquire_lock || return 1
 
   local archives=("${DKMS_ARCHIVE_DIR}/${MODULE_NAME}"/*.tar.gz)
-  if [ ${#archives[@]} -eq 0 ]; then
+  # Without nullglob an unmatched glob stays as the literal pattern, so check that the file exists
+  if [ ! -e "${archives[0]}" ]; then
     log "ERROR: No archive found for ${MODULE_NAME}"
     return 1
   fi
