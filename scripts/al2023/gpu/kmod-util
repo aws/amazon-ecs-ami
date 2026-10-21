@@ -68,7 +68,6 @@ function has-nvidia-device() {
 function module-version() {
   local MODULE_NAME="${1}"
   local status_output
-  # sed rather than head: head exits early, and under pipefail the SIGPIPE to dkms fails the pipeline
   status_output=$(${DKMS} status -m "${MODULE_NAME}" 2>/dev/null | sed -n 1p)
   
   if [ -z "$status_output" ]; then
