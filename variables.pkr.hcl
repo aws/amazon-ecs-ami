@@ -271,6 +271,20 @@ variable "nvidia_driver_major_al2023" {
   default     = "580"
 }
 
+variable "nvidia_driver_trees" {
+  type        = bool
+  description = "Build a per-version NVIDIA driver tree for each branch in scripts/al2023/gpu/nvidia-branches into the AL2023 GPU AMI. Off by default: the AMI is built as before."
+  default     = false
+}
+
+variable "nvidia_driver_tree_versions_al2023" {
+  type        = map(string)
+  description = "Full NVIDIA driver version of each non-default branch in scripts/al2023/gpu/nvidia-branches, by branch name. The default branch uses nvidia_driver_version_al2023."
+  default = {
+    pb = "595.91.07"
+  }
+}
+
 variable "dcgm_version_al2023" {
   type        = string
   description = "DCGM major version for AL2023 GPU AMIs. Used to install the datacenter-gpu-manager-4-core package."
