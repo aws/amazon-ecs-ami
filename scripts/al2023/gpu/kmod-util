@@ -124,8 +124,12 @@ function load() {
   MODULE_VERSION=${MODULE_VERSION#"${MODULE_NAME}"-}
   MODULE_VERSION=${MODULE_VERSION%%-kernel*}
 
-  # Remove the other flavors first. Otherwise each install overwrites the other's nvidia.ko, and dkms autoinstall
-  # can bring the previous flavor back.
+  # Remove the other flavors first. Every flavor installs the same module files (nvidia.ko, nvidia-uvm.ko and so on)
+  # to the same path, so otherwise each install overwrites the other's, and dkms autoinstall can bring the previous
+  # flavor back. The flavor changes when the same root volume boots on a GPU that needs a different one: a stop/start
+  # onto another instance type (g4dn uses open, g6f GRID, P3 proprietary), or a custom AMI baked on one family and
+  # launched on another. Only the DKMS registrations and installed modules are removed; the archives in
+  # /var/lib/dkms-archive stay, so a removed flavor can be loaded again later.
   local flavor version
   for flavor in "${NVIDIA_FLAVORS[@]}"; do
     [ "${flavor}" = "${MODULE_NAME}" ] && continue
