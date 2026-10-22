@@ -273,7 +273,7 @@ variable "nvidia_driver_major_al2023" {
 
 variable "nvidia_driver_trees" {
   type        = bool
-  description = "Build a per-version NVIDIA driver tree for each branch in scripts/al2023/gpu/nvidia-branches into the AL2023 GPU AMI. Off by default: the AMI is built as before."
+  description = "Build a per-version NVIDIA driver tree for each branch in scripts/al2023/gpu/nvidia-branches into the AL2023 GPU AMI. Off by default: the AMI is built as before. On, it adds about 2.3 GB to the AMI and the time to build the trees; nothing uses them at boot yet."
   default     = false
 }
 
