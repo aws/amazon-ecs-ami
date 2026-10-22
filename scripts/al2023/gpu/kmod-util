@@ -90,13 +90,33 @@ function reload-if-stale() {
     return 0
   fi
   log "loaded nvidia module (srcversion ${loaded}) is not the installed one (${installed}); reloading"
-  for m in nvidia_drm nvidia_peermem nvidia_uvm nvidia_modeset nvidia; do
+  local modules=(nvidia_drm nvidia_peermem nvidia_uvm nvidia_modeset nvidia) h p users=""
+  # Check everything that would stop the unload before unloading anything: a failure part-way through would leave
+  # the previous flavor's nvidia core loaded without the modules that depend on it.
+  for p in /proc/[0-9]*; do
+    if [[ $(ls -l "${p}/fd" 2>/dev/null || true) == *" /dev/nvidia"* ]]; then
+      users+=" ${p#/proc/}"
+    fi
+  done
+  if [ -n "${users}" ]; then
+    log "ERROR: /dev/nvidia* is open (pids:${users}); not reloading, the previous flavor stays loaded until the next boot"
+    return 1
+  fi
+  for m in "${modules[@]}"; do
+    for h in "/sys/module/${m}/holders"/*; do
+      h=$(basename "${h}")
+      if [[ " ${modules[*]} " != *" ${h} "* ]]; then
+        log "ERROR: ${m} is used by ${h}; not reloading, the previous flavor stays loaded until the next boot"
+        return 1
+      fi
+    done
+  done
+  for m in "${modules[@]}"; do
     [ -e "/sys/module/${m}" ] || continue
     reload=("${m}" "${reload[@]}")
     if ! rmmod "${m}"; then
-      log "ERROR: cannot unload ${m}; the previous flavor stays loaded until the next boot." \
-        "refcnt=$(cat "/sys/module/${m}/refcnt" 2>/dev/null) holders=[$(ls "/sys/module/${m}/holders" 2>/dev/null | tr '\n' ' ')]" \
-        "users=[$(fuser /dev/nvidia* 2>/dev/null | tr -s ' ')]"
+      log "ERROR: cannot unload ${m} after unloading ${reload[*]:1}; reboot to load the installed flavor." \
+        "refcnt=$(cat "/sys/module/${m}/refcnt" 2>/dev/null) holders=[$(ls "/sys/module/${m}/holders" 2>/dev/null | tr '\n' ' ')]"
       return 1
     fi
   done
@@ -113,8 +133,8 @@ function load() {
   acquire_lock || return 1
 
   local archives=("${DKMS_ARCHIVE_DIR}/${MODULE_NAME}"/*.tar.gz)
-  # Without nullglob an unmatched glob stays as the literal pattern, so check that the file exists
-  if [ ! -e "${archives[0]}" ]; then
+  # nullglob is set at the top of this script, so an unmatched glob leaves the array empty
+  if [ ${#archives[@]} -eq 0 ]; then
     log "ERROR: No archive found for ${MODULE_NAME}"
     return 1
   fi
