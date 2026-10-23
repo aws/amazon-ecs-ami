@@ -36,7 +36,8 @@ while read -r name flavors; do
     FLAVORS[$name]=$flavors
 done <"$BRANCHES_FILE"
 [[ ${#NAMES[@]} -gt 0 ]] || die "no branches in $BRANCHES_FILE"
-VERSION[${NAMES[0]}]=$(grep "^nvidia_driver_version_al2023" "$NVIDIA_DRIVER_VERSION_FILE" | awk -F'"' '{print $2}')
+VERSION[${NAMES[0]}]=$(grep "^nvidia_driver_version_al2023" "$NVIDIA_DRIVER_VERSION_FILE" | awk -F'"' '{print $2}') || true
+[[ -n ${VERSION[${NAMES[0]}]} ]] || die "no nvidia_driver_version_al2023 in $NVIDIA_DRIVER_VERSION_FILE"
 for pair in ${NVIDIA_DRIVER_TREE_VERSIONS:-}; do
     VERSION[${pair%%=*}]=${pair#*=}
 done
@@ -73,12 +74,11 @@ is_vs_name() {
     for n in "${VS_NAMES[@]}"; do [[ $n == "$1" ]] && return 0; done
     return 1
 }
-is_nvidia_pkg() { case "$1" in nvidia-* | libnvidia-* | xorg-x11-nvidia-* | kmod-nvidia-* | egl-wayland* | nvidia_*) return 0 ;; *) return 1 ;; esac }
 
 # -------- 1. download each branch's packages --------
-# dnf download --resolve fetches the named packages plus the dependencies that aren't installed yet. It satisfies the
-# unversioned requirements between NVIDIA packages with the newest provider, so another branch's copies of some
-# version-specific packages get pulled in; drop those. The DKMS source packages are build inputs: they conflict with
+# dnf download --resolve fetches the named packages plus the dependencies that aren't installed yet, such as 595's
+# egl-wayland2; those go into the tree with the rest. It satisfies the unversioned requirements between NVIDIA packages
+# with the newest provider, so another branch's copies of some version-specific packages get pulled in; drop those. The DKMS source packages are build inputs: they conflict with
 # each other, so they're downloaded separately, without dependency resolution. The versionlock plugin is off for the
 # downloads only: it holds the NVIDIA packages at the native install's version, and the other branches need theirs.
 download_branch() { # download_branch NAME
@@ -86,7 +86,7 @@ download_branch() { # download_branch NAME
     sudo mkdir -p "$dest" "$B/kmod/$name"
     local specs=()
     for n in "${VS_NAMES[@]}"; do specs+=("$n-$v"); done
-    sudo dnf -y download --resolve --disableplugin=versionlock --destdir="$dest" "${specs[@]}" egl-wayland egl-wayland2
+    sudo dnf -y download --resolve --disableplugin=versionlock --destdir="$dest" "${specs[@]}"
     shopt -s nullglob
     for rpm in "$dest"/*.rpm; do
         nv=$(rpm -qp --nosignature --qf '%{NAME} %{VERSION}' "$rpm") || die "cannot read $rpm"
@@ -127,34 +127,13 @@ if grep -qv ': digests signatures OK$' <<<"$sigs"; then
 fi
 echo "GUARD signatures: OK (${#ALL_RPMS[@]} packages)"
 
-# -------- 2. shared packages: installed natively --------
-# A package is shared if every branch downloaded the same file (same name, version and release). None of them may be
-# an NVIDIA package.
-step "install the packages every branch shares"
-SHARED=$B/shared
-sudo mkdir -p "$SHARED"
-shopt -s nullglob
-for rpm in "$B/dl/${NAMES[0]}"/*.rpm; do
-    base=$(basename "$rpm")
-    in_all=1
-    for name in "${NAMES[@]:1}"; do [[ -e "$B/dl/$name/$base" ]] || in_all=0; done
-    [[ $in_all == 1 ]] || continue
-    is_nvidia_pkg "$base" && continue
-    sudo cp "$rpm" "$SHARED/"
-done
-shared=("$SHARED"/*.rpm)
-shopt -u nullglob
-echo "shared packages: ${#shared[@]}"
-if [[ ${#shared[@]} -gt 0 ]]; then
-    sudo dnf -y install --setopt=install_weak_deps=False "${shared[@]}"
-fi
-
-# -------- 3. kernel modules --------
+# -------- 2. kernel modules --------
 # Built in a separate DKMS tree ($B/dkms) from sources unpacked under $B/root, so the native install isn't touched.
 dkms_build() { # dkms_build MODULE VERSION SRCROOT EXTRA
     local m=$1 v=$2 src=$3 extra=$4 ko
     sudo dkms add -m "$m" -v "$v" --sourcetree "$src" --dkmstree "$B/dkms"
     sudo dkms build -m "$m" -v "$v" -k "$K" --sourcetree "$src" --dkmstree "$B/dkms"
+    compgen -G "$B/dkms/$m/$v/$K/$(uname -m)/module/*.ko*" >/dev/null || die "dkms built no $m $v modules for $K"
     for ko in "$B/dkms/$m/$v/$K/$(uname -m)/module"/*.ko*; do sudo cp "$ko" "$extra/"; done
 }
 build_open() { # build_open NAME TREE
@@ -173,12 +152,13 @@ build_proprietary() { # build_proprietary NAME TREE
     dkms_build nvidia-proprietary "$v" "$root/usr/src" "$extra"
 }
 build_grid() { # build_grid NAME TREE
-    local v=${VERSION[$1]} tree=$2 extra=$2/flavors/grid/lib/modules/$K/extra tmp key runfile
+    local v=${VERSION[$1]} tree=$2 extra=$2/flavors/grid/lib/modules/$K/extra tmp listing key runfile
     sudo mkdir -p "$extra"
     tmp=$(mktemp -d)
     # Anchored to grid-*/ so it can't match the runfile under latest/.
-    key=$(aws s3 ls --recursive "s3://${EC2_GRID_DRIVER_S3_BUCKET}/" --no-sign-request |
-        grep "grid-.*NVIDIA-Linux-x86_64-${v}-grid" | sort -k1,2 | awk 'END {print $4}')
+    listing=$(aws s3 ls --recursive "s3://${EC2_GRID_DRIVER_S3_BUCKET}/" --no-sign-request) ||
+        die "cannot list s3://${EC2_GRID_DRIVER_S3_BUCKET}"
+    key=$(grep "grid-.*NVIDIA-Linux-x86_64-${v}-grid" <<<"$listing" | sort -k1,2 | awk 'END {print $4}') || true
     [[ -n $key ]] || die "no GRID runfile for $v in s3://${EC2_GRID_DRIVER_S3_BUCKET}"
     runfile=$(basename "$key")
     aws s3 cp "s3://${EC2_GRID_DRIVER_S3_BUCKET}/${key}" "$tmp/$runfile" --no-sign-request
@@ -194,7 +174,7 @@ build_grid() { # build_grid NAME TREE
     sudo rm -rf "$tmp"
 }
 
-# -------- 4. one tree per branch --------
+# -------- 3. one tree per branch --------
 # <tree>/.rpms keeps only each package's lead, signature header and main header: recording a package in the database
 # (rpm --justdb) reads the header and never the payload.
 rpm_header_only() { # rpm_header_only SRC DST
@@ -214,14 +194,13 @@ open(dst, "wb").write(data[:off])
 ' "$1" "$2"
 }
 build_tree() { # build_tree NAME
-    local name=$1 v=${VERSION[$1]} tree=$NV/$1 rpm base flavor
+    local name=$1 v=${VERSION[$1]} tree=$NV/$1 rpm base flavor count
     step "tree $name ($v): unpack the version-specific packages"
     sudo rm -rf "$tree"
     sudo mkdir -p "$tree/.rpms"
     shopt -s nullglob
     for rpm in "$B/dl/$name"/*.rpm; do
         base=$(basename "$rpm")
-        [[ -e "$SHARED/$base" ]] && continue
         sudo bash -c "rpm2cpio '$rpm' | (cd '$tree' && cpio -idmu --quiet)"
         rpm_header_only "$rpm" "$tree/.rpms/$base"
     done
@@ -276,12 +255,14 @@ build_tree() { # build_tree NAME
         *) die "branch $name: unknown flavor '$flavor'" ;;
         esac
         sudo find "$tree/flavors/$flavor/lib/modules/$K/extra" -name '*.ko' -exec strip -g --strip-unneeded {} +
-        echo "tree $name: $flavor: $(find "$tree/flavors/$flavor/lib/modules/$K/extra" -name '*.ko*' | wc -l) modules"
+        count=$(find "$tree/flavors/$flavor/lib/modules/$K/extra" -name '*.ko*' | wc -l)
+        [[ $count -gt 0 ]] || die "tree $name: no $flavor modules were built"
+        echo "tree $name: $flavor: $count modules"
     done
 }
 for name in "${NAMES[@]}"; do build_tree "$name"; done
 
-# -------- 5. build-time effects of the packages' install scripts --------
+# -------- 4. build-time effects of the packages' install scripts --------
 # The unpacked packages' scripts never run. nvidia-persistenced's creates its user and group; this is a no-op while the
 # native install includes nvidia-persistenced, and keeps the trees from depending on it.
 sudo getent group nvidia-persistenced >/dev/null || sudo groupadd -r nvidia-persistenced
