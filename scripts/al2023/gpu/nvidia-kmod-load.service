@@ -3,7 +3,7 @@ Description=NVIDIA kernel module loader
 # dkms.service runs dkms autoinstall at boot and takes no lock
 After=dkms.service
 Before=nvidia-fabricmanager.service nvidia-persistenced.service ecs.service
-Before=nvidia-gridd.service nvidia-mps.service set-nvidia-clocks.service
+Before=nvidia-gridd.service nvidia-mps.service set-nvidia-clocks.service nvidia-cdi-refresh.service
 
 [Service]
 Type=oneshot
