@@ -203,10 +203,10 @@ sudo dnf versionlock 'nvidia*' 'kmod*' 'libnvidia*' 'xorg*'
 mapfile -t NVIDIA_DRIVER_LOCKS < <(dnf repoquery -q --repo amazonlinux-nvidia --available \
   --qf '%{name}-%{epoch}:%{version}-%{release}.%{arch}' | grep -E -- "-[0-9]+:${NVIDIA_DRIVER_FULL_VERSION}-")
 if [ ${#NVIDIA_DRIVER_LOCKS[@]} -eq 0 ]; then
-  echo "No packages at ${NVIDIA_DRIVER_FULL_VERSION} found in the NVIDIA repo" >&2
-  exit 1
+  echo "WARNING: no packages at ${NVIDIA_DRIVER_FULL_VERSION} found in the NVIDIA repo; not adding the extra versionlock" >&2
+else
+  sudo dnf versionlock add "${NVIDIA_DRIVER_LOCKS[@]}"
 fi
-sudo dnf versionlock add "${NVIDIA_DRIVER_LOCKS[@]}"
 
 # Ensure gridd.conf exists for the nvidia-gridd service when it starts up
 sudo mkdir -p /etc/nvidia
