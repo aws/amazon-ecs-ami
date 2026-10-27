@@ -1,5 +1,7 @@
 [Unit]
 Description=NVIDIA kernel module loader
+# dkms.service runs dkms autoinstall at boot and takes no lock; after a kernel update both would build the module at once
+After=dkms.service
 Before=nvidia-fabricmanager.service nvidia-persistenced.service ecs.service
 
 [Service]

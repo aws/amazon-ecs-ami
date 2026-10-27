@@ -65,7 +65,7 @@ function has-nvidia-device() {
 function module-version() {
   local MODULE_NAME="${1}"
   local status_output
-  status_output=$(${DKMS} status -m "${MODULE_NAME}" 2>/dev/null | head -n 1)
+  status_output=$(${DKMS} status -m "${MODULE_NAME}" 2>/dev/null | sed -n 1p)
   
   if [ -z "$status_output" ]; then
     log "ERROR: No DKMS status found for module: ${MODULE_NAME}"
@@ -80,21 +80,28 @@ function module-version() {
 function load() {
   local MODULE_NAME="${1}"
   acquire_lock || return 1
-  
-  log "unpacking: ${MODULE_NAME}"
-  local MODULE_ARCHIVE="${DKMS_ARCHIVE_DIR}/${MODULE_NAME}/*.tar.gz"
-  local archives=($MODULE_ARCHIVE)
-  
+
+  local archives=("${DKMS_ARCHIVE_DIR}/${MODULE_NAME}"/*.tar.gz)
   if [ ${#archives[@]} -eq 0 ]; then
     log "ERROR: No archive found for ${MODULE_NAME}"
     return 1
   fi
-  
-  ${DKMS} ldtarball "${archives[0]}"
-  log "unpacked: ${MODULE_NAME}"
-  log "installing: ${MODULE_NAME}"
+
+  # After the first boot the module is already unpacked and installed, and dkms ldtarball would fail ("already added")
+  if [ -z "$(${DKMS} status -m "${MODULE_NAME}" 2>/dev/null || true)" ]; then
+    log "unpacking: ${MODULE_NAME}"
+    ${DKMS} ldtarball "${archives[0]}"
+    log "unpacked: ${MODULE_NAME}"
+  fi
   local MODULE_VERSION
   MODULE_VERSION=$(module-version "${MODULE_NAME}")
+  local state
+  state=$(${DKMS} status -m "${MODULE_NAME}" -v "${MODULE_VERSION}" -k "$(uname -r)" 2>/dev/null || true)
+  if [[ "${state}" == *": installed"* ]]; then
+    log "already installed: ${MODULE_NAME}/${MODULE_VERSION}"
+    return 0
+  fi
+  log "installing: ${MODULE_NAME}"
   ${DKMS} install -m "${MODULE_NAME}" -v "${MODULE_VERSION}"
   log "installed: ${MODULE_NAME}"
 }
