@@ -1,0 +1,8 @@
+# NVIDIA driver branches built into the AL2023 GPU AMI as per-version driver trees, when nvidia_driver_trees is on.
+#
+# One line per branch: <name> <flavors...>. The first line is the default branch, pinned by nvidia_driver_version_al2023
+# like the natively installed driver; every other branch is pinned in nvidia_driver_tree_versions_al2023. Each branch
+# becomes a tree under /opt/nvidia/<name> with kernel modules for the flavors listed. Build only the flavors the GPUs
+# that use the branch need: Blackwell and newer GPUs are open-only.
+lts open proprietary grid
+pb open
