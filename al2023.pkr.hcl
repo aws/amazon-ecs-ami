@@ -236,7 +236,7 @@ build {
   provisioner "shell" {
     environment_vars = [
       "AMI_TYPE=${source.name}",
-      "NVIDIA_DRIVER_TREES=${var.nvidia_driver_trees}",
+      "NVIDIA_DRIVER_TREES=${var.nvidia_driver_trees_al2023}",
       "NVIDIA_DRIVER_TREE_VERSIONS=${local.nvidia_driver_tree_versions}"
     ]
     script = "scripts/al2023/gpu/build-nvidia-trees.sh"

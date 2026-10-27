@@ -1,4 +1,4 @@
-# NVIDIA driver branches built into the AL2023 GPU AMI as per-version driver trees, when nvidia_driver_trees is on.
+# NVIDIA driver branches built into the AL2023 GPU AMI as per-version driver trees when nvidia_driver_trees_al2023 is on.
 #
 # One line per branch: <name> <flavors...>. The first line is the default branch, pinned by nvidia_driver_version_al2023
 # like the natively installed driver; every other branch is pinned in nvidia_driver_tree_versions_al2023. Each branch

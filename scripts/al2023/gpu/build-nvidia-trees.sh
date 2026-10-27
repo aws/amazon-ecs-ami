@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Build a per-version NVIDIA driver tree for each branch in nvidia-branches, under /opt/nvidia/<branch>.
 #
-# Runs at build time only when nvidia_driver_trees is on (off by default). So far it reads and checks the branches and
-# their versions. Nothing reads the trees yet: the natively installed driver still runs the AMI.
+# Runs at build time only when nvidia_driver_trees_al2023 is on (off by default). So far it reads and checks the
+# branches and their versions. Nothing reads the trees yet: the natively installed driver still runs the AMI.
 set -Eeuo pipefail
 
 if [[ ${AMI_TYPE:-} != "al2023gpu" || ${NVIDIA_DRIVER_TREES:-false} != "true" ]]; then
@@ -21,7 +21,7 @@ BRANCHES_FILE=${NVIDIA_BRANCHES_FILE:-/tmp/nvidia-branches}
 NVIDIA_DRIVER_VERSION_FILE=${NVIDIA_DRIVER_VERSION_FILE:-/tmp/NVIDIA_DRIVER_VERSION}
 declare -A VERSION=() FLAVORS=()
 NAMES=()
-while read -r name flavors; do
+while read -r name flavors || [[ -n $name ]]; do
     [[ -z $name || $name == \#* ]] && continue
     NAMES+=("$name")
     FLAVORS[$name]=$flavors
@@ -30,6 +30,7 @@ done <"$BRANCHES_FILE"
 VERSION[${NAMES[0]}]=$(grep "^nvidia_driver_version_al2023" "$NVIDIA_DRIVER_VERSION_FILE" | awk -F'"' '{print $2}') || true
 [[ -n ${VERSION[${NAMES[0]}]} ]] || die "no nvidia_driver_version_al2023 in $NVIDIA_DRIVER_VERSION_FILE"
 for pair in ${NVIDIA_DRIVER_TREE_VERSIONS:-}; do
+    [[ ${pair%%=*} != "${NAMES[0]}" ]] || die "nvidia_driver_tree_versions_al2023 can't pin the default branch ${NAMES[0]}"
     VERSION[${pair%%=*}]=${pair#*=}
 done
 for name in "${NAMES[@]}"; do
