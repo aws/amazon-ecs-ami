@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Build a per-version NVIDIA driver tree for each branch in nvidia-branches, under /opt/nvidia/<branch>.
 #
-# Runs at build time only when nvidia_driver_trees_al2023 is on (off by default). So far it downloads each branch's
-# packages and removes them again. Nothing reads the trees yet: the natively installed driver still runs the AMI.
+# Runs at build time only when nvidia_driver_trees_al2023 is on (off by default). So far it downloads and checks each
+# branch's packages and removes them again. Nothing reads the trees yet: the native driver still runs the AMI.
 set -Eeuo pipefail
 
 if [[ ${AMI_TYPE:-} != "al2023gpu" || ${NVIDIA_DRIVER_TREES:-false} != "true" ]]; then
@@ -47,11 +47,6 @@ for name in "${NAMES[@]}"; do
     echo "branch $name: ${VERSION[$name]} (flavors: ${FLAVORS[$name]})"
 done
 
-step "build prerequisites"
-# Removed again at the end if they weren't on the AMI before, so the AMI's package set doesn't change.
-PREREQS=()
-rpm -q dnf-plugins-core >/dev/null || PREREQS+=(dnf-plugins-core)
-[[ ${#PREREQS[@]} -eq 0 ]] || sudo dnf install -y "${PREREQS[@]}"
 sudo rm -rf "$B"
 
 # The version-specific packages are the NVIDIA packages the native install put on the AMI at the default branch's
@@ -75,8 +70,12 @@ is_vs_name() {
 # The DKMS source packages conflict with each other, so they're downloaded separately, without dependency resolution,
 # and only for the flavors the branch lists. The versionlock plugin is off for the downloads only: it holds the NVIDIA
 # packages at the native install's version, and the other branches need theirs.
+#
+# dnf download checks the packages only against the repo metadata, which isn't signed (repo_gpgcheck=0), and the
+# packages are unpacked rather than installed, so no install transaction checks their signatures either. Each one must
+# be signed by a key the native install imported. rpmkeys exits 0 for an unsigned package, so the output is matched.
 download_branch() { # download_branch NAME
-    local name=$1 v=${VERSION[$1]} dest=$B/dl/$1 n rpm nv ver flavor
+    local name=$1 v=${VERSION[$1]} dest=$B/dl/$1 n rpm nv ver flavor list out
     sudo mkdir -p "$dest" "$B/kmod/$name"
     local specs=() kmods=()
     for n in "${VS_NAMES[@]}"; do specs+=("$n-$v"); done
@@ -93,6 +92,15 @@ download_branch() { # download_branch NAME
     done
     shopt -u nullglob
     sudo rm -f "$dest"/kmod-nvidia-*-dkms-*.rpm
+
+    # Each package must be in the branch once: --resolve resolves each named package separately, so two of them can
+    # pull in different versions of the same dependency.
+    list=$(rpm -qp --nosignature --qf '  %{NAME} %{VERSION}\n' "$dest"/*.rpm | sort)
+    echo "branch $name: packages:"
+    echo "$list"
+    n=$(awk '{print $1}' <<<"$list" | uniq -d | paste -sd' ')
+    [[ -z $n ]] || die "branch $name: more than one version of $n"
+
     for flavor in ${FLAVORS[$name]}; do
         case $flavor in
         open) kmods+=("kmod-nvidia-open-dkms-$v") ;;
@@ -100,6 +108,13 @@ download_branch() { # download_branch NAME
         esac # grid comes from the GRID runfile, not a package
     done
     [[ ${#kmods[@]} -eq 0 ]] || sudo dnf -y download --disableplugin=versionlock --destdir="$B/kmod/$name" "${kmods[@]}"
+
+    shopt -s nullglob
+    for rpm in "$dest"/*.rpm "$B/kmod/$name"/*.rpm; do
+        out=$(rpmkeys --checksig "$rpm") || die "branch $name: $out"
+        [[ $out == *"signatures OK" ]] || die "branch $name: not signed by an imported key: $out"
+    done
+    shopt -u nullglob
 }
 for name in "${NAMES[@]}"; do
     step "download branch $name (${VERSION[$name]})"
@@ -107,5 +122,4 @@ for name in "${NAMES[@]}"; do
 done
 
 sudo rm -rf "$B"
-[[ ${#PREREQS[@]} -eq 0 ]] || sudo dnf -y remove "${PREREQS[@]}"
 echo "build-nvidia-trees: done"
