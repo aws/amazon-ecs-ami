@@ -110,11 +110,13 @@ download_branch() { # download_branch NAME
     [[ ${#kmods[@]} -eq 0 ]] || sudo dnf -y download --disableplugin=versionlock --destdir="$B/kmod/$name" "${kmods[@]}"
 
     shopt -s nullglob
-    for rpm in "$dest"/*.rpm "$B/kmod/$name"/*.rpm; do
+    local rpms=("$dest"/*.rpm "$B/kmod/$name"/*.rpm)
+    shopt -u nullglob
+    for rpm in "${rpms[@]}"; do
         out=$(rpmkeys --checksig "$rpm") || die "branch $name: $out"
         [[ $out == *"signatures OK" ]] || die "branch $name: not signed by an imported key: $out"
     done
-    shopt -u nullglob
+    echo "branch $name: ${#rpms[@]} packages signed by an imported key"
 }
 for name in "${NAMES[@]}"; do
     step "download branch $name (${VERSION[$name]})"
