@@ -1,0 +1,5 @@
+# NVIDIA driver branch of each instance family that doesn't use the default branch (the first in nvidia-branches).
+#
+# One line per family: <family> <branch>. List a family only once its GPUs are qualified on the branch, and only for a
+# branch that builds the kernel module flavor they use.
+g7 pb
