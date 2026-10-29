@@ -20,12 +20,12 @@ echo "MAKE[0]=\"'make' -j$(nproc --all) modules\"" | sudo tee /etc/dkms/nvidia.c
 # Install kernel development packages for current running kernel
 RUNNING_KERNEL=$(uname -r)
 sudo dnf install -y \
-  "dnf-command(versionlock)" \
-  "kernel-devel-${RUNNING_KERNEL}" \
-  "kernel-headers-${RUNNING_KERNEL}" \
-  "kernel-modules-extra-${RUNNING_KERNEL}" \
-  "kernel-modules-extra-common-${RUNNING_KERNEL}" \
-  dkms
+    "dnf-command(versionlock)" \
+    "kernel-devel-${RUNNING_KERNEL}" \
+    "kernel-headers-${RUNNING_KERNEL}" \
+    "kernel-modules-extra-${RUNNING_KERNEL}" \
+    "kernel-modules-extra-common-${RUNNING_KERNEL}" \
+    dkms
 
 # Lock kernel version to prevent automatic updates that could break DKMS modules
 sudo dnf versionlock 'kernel*'
@@ -60,17 +60,17 @@ fi
 # and tracked in the NVIDIA_DRIVER_VERSION file uploaded by Packer.
 
 NVIDIA_DRIVER_FULL_VERSION=$(grep "^nvidia_driver_version_al2023" /tmp/NVIDIA_DRIVER_VERSION | awk -F'"' '{print $2}')
-if [[ -z "$NVIDIA_DRIVER_FULL_VERSION" ]]; then
-  echo "ERROR: Could not read nvidia_driver_version_al2023 from /tmp/NVIDIA_DRIVER_VERSION"
-  exit 1
+if [[ -z $NVIDIA_DRIVER_FULL_VERSION ]]; then
+    echo "ERROR: Could not read nvidia_driver_version_al2023 from /tmp/NVIDIA_DRIVER_VERSION"
+    exit 1
 fi
 echo "Using NVIDIA driver version: ${NVIDIA_DRIVER_FULL_VERSION}"
 
 # Some regions do not have access to the GRID driver S3 bucket, skip GRID driver
 skip_grid_driver=""
-if [[ -n "$SKIP_GRID_DRIVER_REGIONS" ]] && echo "$SKIP_GRID_DRIVER_REGIONS" | grep -q -w "$REGION"; then
-  skip_grid_driver="true"
-  echo "Region ${REGION} is in list, skipping GRID driver"
+if [[ -n $SKIP_GRID_DRIVER_REGIONS ]] && echo "$SKIP_GRID_DRIVER_REGIONS" | grep -q -w "$REGION"; then
+    skip_grid_driver="true"
+    echo "Region ${REGION} is in list, skipping GRID driver"
 fi
 
 EC2_GRID_DRIVER_S3_BUCKET="ec2-linux-nvidia-drivers"
@@ -82,98 +82,98 @@ EC2_GRID_DRIVER_S3_BUCKET="ec2-linux-nvidia-drivers"
 
 # Build and archive proprietary NVIDIA driver
 function archive-proprietary-kmod() {
-  sudo dnf -y install "kmod-nvidia-latest-dkms-${NVIDIA_DRIVER_FULL_VERSION}"
+    sudo dnf -y install "kmod-nvidia-latest-dkms-${NVIDIA_DRIVER_FULL_VERSION}"
 
-  NVIDIA_PROPRIETARY_VERSION=$(kmod-util module-version nvidia)
-  sudo dkms remove "nvidia/$NVIDIA_PROPRIETARY_VERSION" --all
+    NVIDIA_PROPRIETARY_VERSION=$(kmod-util module-version nvidia)
+    sudo dkms remove "nvidia/$NVIDIA_PROPRIETARY_VERSION" --all
 
-  # Rename to avoid conflicts with other driver variants
-  sudo sed -i 's/PACKAGE_NAME="nvidia"/PACKAGE_NAME="nvidia-proprietary"/' /usr/src/nvidia-$NVIDIA_PROPRIETARY_VERSION/dkms.conf
-  sudo mv /usr/src/nvidia-$NVIDIA_PROPRIETARY_VERSION /usr/src/nvidia-proprietary-$NVIDIA_PROPRIETARY_VERSION
+    # Rename to avoid conflicts with other driver variants
+    sudo sed -i 's/PACKAGE_NAME="nvidia"/PACKAGE_NAME="nvidia-proprietary"/' /usr/src/nvidia-$NVIDIA_PROPRIETARY_VERSION/dkms.conf
+    sudo mv /usr/src/nvidia-$NVIDIA_PROPRIETARY_VERSION /usr/src/nvidia-proprietary-$NVIDIA_PROPRIETARY_VERSION
 
-  # Build and install the renamed module
-  sudo dkms add -m nvidia-proprietary -v $NVIDIA_PROPRIETARY_VERSION
-  sudo dkms build -m nvidia-proprietary -v $NVIDIA_PROPRIETARY_VERSION
-  sudo dkms install -m nvidia-proprietary -v $NVIDIA_PROPRIETARY_VERSION
+    # Build and install the renamed module
+    sudo dkms add -m nvidia-proprietary -v $NVIDIA_PROPRIETARY_VERSION
+    sudo dkms build -m nvidia-proprietary -v $NVIDIA_PROPRIETARY_VERSION
+    sudo dkms install -m nvidia-proprietary -v $NVIDIA_PROPRIETARY_VERSION
 
-  # Archive for later use and clean up
-  sudo kmod-util archive nvidia-proprietary
-  sudo kmod-util remove nvidia-proprietary
-  sudo rm -rf /usr/src/nvidia-proprietary*
-  sudo dnf -y remove --all "kmod-nvidia-latest-dkms*"
+    # Archive for later use and clean up
+    sudo kmod-util archive nvidia-proprietary
+    sudo kmod-util remove nvidia-proprietary
+    sudo rm -rf /usr/src/nvidia-proprietary*
+    sudo dnf -y remove --all "kmod-nvidia-latest-dkms*"
 }
 
 # Build and archive open-source NVIDIA driver
 function archive-open-kmod() {
-  sudo dnf -y install "kmod-nvidia-open-dkms-${NVIDIA_DRIVER_FULL_VERSION}"
+    sudo dnf -y install "kmod-nvidia-open-dkms-${NVIDIA_DRIVER_FULL_VERSION}"
 
-  NVIDIA_OPEN_VERSION=$(kmod-util module-version nvidia)
-  sudo kmod-util archive nvidia
-  sudo kmod-util remove nvidia
-  sudo rm -rf /usr/src/nvidia*
+    NVIDIA_OPEN_VERSION=$(kmod-util module-version nvidia)
+    sudo kmod-util archive nvidia
+    sudo kmod-util remove nvidia
+    sudo rm -rf /usr/src/nvidia*
 }
 
 # Build and archive GRID driver from EC2 .run file
 function archive-grid-kmod() {
-  local GRID_INSTALLATION_TEMP_DIR
-  local EXTRACT_DIR
-  local NVIDIA_GRID_RUNFILE_KEY
-  local GRID_RUNFILE_NAME
+    local GRID_INSTALLATION_TEMP_DIR
+    local EXTRACT_DIR
+    local NVIDIA_GRID_RUNFILE_KEY
+    local GRID_RUNFILE_NAME
 
-  GRID_INSTALLATION_TEMP_DIR=$(mktemp -d)
-  EXTRACT_DIR="${GRID_INSTALLATION_TEMP_DIR}/NVIDIA-GRID-extract"
+    GRID_INSTALLATION_TEMP_DIR=$(mktemp -d)
+    EXTRACT_DIR="${GRID_INSTALLATION_TEMP_DIR}/NVIDIA-GRID-extract"
 
-  echo "Archiving NVIDIA GRID kernel modules (version ${NVIDIA_DRIVER_FULL_VERSION})"
+    echo "Archiving NVIDIA GRID kernel modules (version ${NVIDIA_DRIVER_FULL_VERSION})"
 
-  NVIDIA_GRID_RUNFILE_KEY=$(aws s3 ls --recursive s3://${EC2_GRID_DRIVER_S3_BUCKET}/ --no-sign-request \
-    | grep "NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_FULL_VERSION}" \
-    | sort -k1,2 \
-    | tail -1 \
-    | awk '{print $4}')
+    NVIDIA_GRID_RUNFILE_KEY=$(aws s3 ls --recursive s3://${EC2_GRID_DRIVER_S3_BUCKET}/ --no-sign-request |
+        grep "NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_FULL_VERSION}" |
+        sort -k1,2 |
+        tail -1 |
+        awk '{print $4}')
 
-  if [[ -z "$NVIDIA_GRID_RUNFILE_KEY" ]]; then
-    echo "ERROR: No GRID driver found for version ${NVIDIA_DRIVER_FULL_VERSION} in S3"
-    exit 1
-  fi
+    if [[ -z $NVIDIA_GRID_RUNFILE_KEY ]]; then
+        echo "ERROR: No GRID driver found for version ${NVIDIA_DRIVER_FULL_VERSION} in S3"
+        exit 1
+    fi
 
-  echo "Found GRID runfile: ${NVIDIA_GRID_RUNFILE_KEY}"
-  GRID_RUNFILE_NAME=$(basename "${NVIDIA_GRID_RUNFILE_KEY}")
+    echo "Found GRID runfile: ${NVIDIA_GRID_RUNFILE_KEY}"
+    GRID_RUNFILE_NAME=$(basename "${NVIDIA_GRID_RUNFILE_KEY}")
 
-  echo "Downloading GRID driver runfile..."
-  aws s3 cp "s3://${EC2_GRID_DRIVER_S3_BUCKET}/${NVIDIA_GRID_RUNFILE_KEY}" "${GRID_INSTALLATION_TEMP_DIR}/${GRID_RUNFILE_NAME}" --no-sign-request
-  chmod +x "${GRID_INSTALLATION_TEMP_DIR}/${GRID_RUNFILE_NAME}"
+    echo "Downloading GRID driver runfile..."
+    aws s3 cp "s3://${EC2_GRID_DRIVER_S3_BUCKET}/${NVIDIA_GRID_RUNFILE_KEY}" "${GRID_INSTALLATION_TEMP_DIR}/${GRID_RUNFILE_NAME}" --no-sign-request
+    chmod +x "${GRID_INSTALLATION_TEMP_DIR}/${GRID_RUNFILE_NAME}"
 
-  echo "Extracting NVIDIA GRID driver runfile..."
-  sudo "${GRID_INSTALLATION_TEMP_DIR}/${GRID_RUNFILE_NAME}" --extract-only --target "${EXTRACT_DIR}"
+    echo "Extracting NVIDIA GRID driver runfile..."
+    sudo "${GRID_INSTALLATION_TEMP_DIR}/${GRID_RUNFILE_NAME}" --extract-only --target "${EXTRACT_DIR}"
 
-  pushd "${EXTRACT_DIR}"
+    pushd "${EXTRACT_DIR}"
 
-  # Install GRID kernel modules via nvidia-installer
-  echo "Installing NVIDIA GRID kernel modules..."
-  sudo ./nvidia-installer \
-    --dkms \
-    --kernel-module-type open \
-    --silent
+    # Install GRID kernel modules via nvidia-installer
+    echo "Installing NVIDIA GRID kernel modules..."
+    sudo ./nvidia-installer \
+        --dkms \
+        --kernel-module-type open \
+        --silent
 
-  # Rename DKMS package to nvidia-grid to avoid conflicts with other variants
-  sudo dkms remove "nvidia/$NVIDIA_DRIVER_FULL_VERSION" --all
-  sudo sed -i 's/PACKAGE_NAME="nvidia"/PACKAGE_NAME="nvidia-grid"/' /usr/src/nvidia-$NVIDIA_DRIVER_FULL_VERSION/dkms.conf
-  sudo mv /usr/src/nvidia-$NVIDIA_DRIVER_FULL_VERSION /usr/src/nvidia-grid-$NVIDIA_DRIVER_FULL_VERSION
-  sudo dkms add -m nvidia-grid -v $NVIDIA_DRIVER_FULL_VERSION
-  sudo dkms build -m nvidia-grid -v $NVIDIA_DRIVER_FULL_VERSION
-  sudo dkms install -m nvidia-grid -v $NVIDIA_DRIVER_FULL_VERSION
+    # Rename DKMS package to nvidia-grid to avoid conflicts with other variants
+    sudo dkms remove "nvidia/$NVIDIA_DRIVER_FULL_VERSION" --all
+    sudo sed -i 's/PACKAGE_NAME="nvidia"/PACKAGE_NAME="nvidia-grid"/' /usr/src/nvidia-$NVIDIA_DRIVER_FULL_VERSION/dkms.conf
+    sudo mv /usr/src/nvidia-$NVIDIA_DRIVER_FULL_VERSION /usr/src/nvidia-grid-$NVIDIA_DRIVER_FULL_VERSION
+    sudo dkms add -m nvidia-grid -v $NVIDIA_DRIVER_FULL_VERSION
+    sudo dkms build -m nvidia-grid -v $NVIDIA_DRIVER_FULL_VERSION
+    sudo dkms install -m nvidia-grid -v $NVIDIA_DRIVER_FULL_VERSION
 
-  sudo kmod-util archive nvidia-grid
-  sudo kmod-util remove nvidia-grid
-  sudo rm -rf /usr/src/nvidia-grid*
+    sudo kmod-util archive nvidia-grid
+    sudo kmod-util remove nvidia-grid
+    sudo rm -rf /usr/src/nvidia-grid*
 
-  popd
-  sudo rm -rf "${GRID_INSTALLATION_TEMP_DIR}"
+    popd
+    sudo rm -rf "${GRID_INSTALLATION_TEMP_DIR}"
 }
 
 ### Build All Driver Variants ###
-if [[ -z "$skip_grid_driver" ]]; then
-  archive-grid-kmod
+if [[ -z $skip_grid_driver ]]; then
+    archive-grid-kmod
 fi
 archive-proprietary-kmod
 archive-open-kmod
@@ -201,11 +201,11 @@ sudo dnf versionlock 'nvidia*' 'kmod*' 'libnvidia*' 'xorg*'
 # the newest driver branch's version. Lock every package in the NVIDIA repo at the pinned driver version, installed
 # or not, so any package that follows the driver version is covered.
 mapfile -t NVIDIA_DRIVER_LOCKS < <(dnf repoquery -q --repo amazonlinux-nvidia --available \
-  --qf '%{name}-%{epoch}:%{version}-%{release}.%{arch}' | grep -E -- "-[0-9]+:${NVIDIA_DRIVER_FULL_VERSION}-")
+    --qf '%{name}-%{epoch}:%{version}-%{release}.%{arch}' | grep -E -- "-[0-9]+:${NVIDIA_DRIVER_FULL_VERSION}-")
 if [ ${#NVIDIA_DRIVER_LOCKS[@]} -eq 0 ]; then
-  echo "WARNING: no packages at ${NVIDIA_DRIVER_FULL_VERSION} found in the NVIDIA repo; not adding the extra versionlock" >&2
+    echo "WARNING: no packages at ${NVIDIA_DRIVER_FULL_VERSION} found in the NVIDIA repo; not adding the extra versionlock" >&2
 else
-  sudo dnf versionlock add "${NVIDIA_DRIVER_LOCKS[@]}"
+    sudo dnf versionlock add "${NVIDIA_DRIVER_LOCKS[@]}"
 fi
 
 # Ensure gridd.conf exists for the nvidia-gridd service when it starts up
@@ -222,7 +222,6 @@ sudo modprobe ib_umad
 # Ensure the ib_umad module is loaded at boot
 echo ib_umad | sudo tee /etc/modules-load.d/ib_umad.conf
 
-
 ### Dynamic Driver Loading Setup ###
 # Install boot-time service that detects GPU hardware and loads the right driver
 # This service runs early in boot to ensure the correct driver is loaded before applications start
@@ -238,7 +237,7 @@ sudo mv /tmp/set-nvidia-clocks /usr/bin/set-nvidia-clocks
 sudo mv /tmp/set-nvidia-clocks.service /etc/systemd/system/set-nvidia-clocks.service
 
 ### NVIDIA MPS Control Daemon Setup ###
-# Start the NVIDIA MPS control daemon at boot so containers can 
+# Start the NVIDIA MPS control daemon at boot so containers can
 # utilize MPS for GPU sharing
 sudo mv /tmp/nvidia-mps.service /etc/systemd/system/nvidia-mps.service
 

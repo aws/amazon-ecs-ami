@@ -41,11 +41,11 @@ downgrade_neuron_packages() {
     # installation command as an override.
     local no_op_dir
     no_op_dir=$(mktemp -d)
-    if [[ -z "$no_op_dir" ]]; then
+    if [[ -z $no_op_dir ]]; then
         log "ERROR: Failed to create temporary directory"
         return 1
     fi
-    cat > "$no_op_dir/update-pciids" << 'EOF'
+    cat >"$no_op_dir/update-pciids" <<'EOF'
 #!/bin/bash
 echo "update-pciids: skipped (AMI already has current PCI database)" >&2
 exit 0
@@ -59,7 +59,7 @@ EOF
     local cached_rpms
     cached_rpms=$(find "$CACHE_DIR" -name "*.rpm" 2>/dev/null)
 
-    if [[ -z "$cached_rpms" ]]; then
+    if [[ -z $cached_rpms ]]; then
         log "ERROR: No cached inf1-compatible packages found in $CACHE_DIR"
         return 1
     fi
@@ -71,13 +71,13 @@ EOF
 
     # Process each cached RPM
     while IFS= read -r rpm_file; do
-        [[ -n "$rpm_file" ]] || continue
+        [[ -n $rpm_file ]] || continue
 
         # Extract package name from RPM filename
         local package_name
         package_name=$(rpm -qp --queryformat '%{NAME}' "$rpm_file" 2>/dev/null)
 
-        if [[ -z "$package_name" ]]; then
+        if [[ -z $package_name ]]; then
             log "WARNING: Could not determine package name for $rpm_file, skipping"
             continue
         fi
@@ -89,7 +89,7 @@ EOF
         current_version=$(rpm -q "$package_name" --queryformat '%{VERSION}' 2>/dev/null || echo "none")
         target_version=$(rpm -qp --queryformat '%{VERSION}' "$rpm_file" 2>/dev/null)
 
-        if [[ -z "$target_version" ]]; then
+        if [[ -z $target_version ]]; then
             log "ERROR: Could not determine target version for $rpm_file"
             return 1
         fi
@@ -98,7 +98,7 @@ EOF
         log "Target $package_name version: $target_version"
 
         # Skip if already at target version
-        if [[ "$current_version" == "$target_version" ]]; then
+        if [[ $current_version == "$target_version" ]]; then
             log "$package_name already at target version, skipping"
             continue
         fi
@@ -117,7 +117,7 @@ EOF
             log "ERROR: Failed to install inf1-compatible $package_name"
             return 1
         fi
-    done <<< "$cached_rpms"
+    done <<<"$cached_rpms"
 
     # Lock all known neuron packages to prevent partial updates
     local all_neuron_packages=("aws-neuronx-dkms" "aws-neuronx-tools" "aws-neuronx-oci-hook")
