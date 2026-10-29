@@ -19,8 +19,9 @@ die() {
 default=$(awk '$1 !~ /^#/ && NF {print $1; exit}' "$CONF/nvidia-branches")
 [[ -n $default ]] || die "no branches in $CONF/nvidia-branches"
 
-# On Nitro instances the DMI product name is the instance type, e.g. g7.2xlarge. On Xen instances (P3) it isn't, and
-# they get the default branch.
+# On Nitro instances the DMI product name is the instance type, e.g. g7.2xlarge. EC2 doesn't document this (its
+# docs cover board_asset_tag, the instance ID), but it matched IMDS on g7.2xlarge and g4dn.xlarge. On Xen instances
+# (P3) it isn't the instance type, and they get the default branch.
 itype=$(tr -d '[:space:]' <"$PRODUCT_NAME") || true
 branch=$(awk -v f="${itype%%.*}" '$1 !~ /^#/ && $1 == f {print $2; exit}' "$CONF/nvidia-branch-families")
 branch=${branch:-$default}
