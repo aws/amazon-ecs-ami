@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Pick the NVIDIA driver branch for this instance and write its name to /run/nvidia-driver-trees/branch.
 #
-# The branch is the one nvidia-branch-families lists for the instance family, or the default branch (the first in
-# nvidia-branches) for every other family. The instance type comes from DMI, which needs no network, so this can run
-# early in boot. Nothing runs this yet: the AMI doesn't install it, and nvidia_driver_trees_al2023 is off by default.
+# The branch is the one nvidia_driver_branch_families_al2023 lists for the instance family, or the default branch for
+# every other family. The build writes both to /etc/nvidia-driver-trees: nvidia-branch-families has one
+# "<family> <branch>" line per family, and nvidia-branches lists the branches, the default first. The instance type
+# comes from DMI, which needs no network, so this can run early in boot. Nothing runs this yet: the AMI doesn't install
+# it, and nvidia_driver_trees_al2023 is off by default.
 set -Eeuo pipefail
 
 CONF=${NVIDIA_TREES_CONF:-/etc/nvidia-driver-trees}
