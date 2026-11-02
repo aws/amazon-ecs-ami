@@ -59,8 +59,12 @@ handle_nvidia_version() {
         done
     fi
 
-    # Update NVIDIA driver version entry if available
-    if [ -n "$nvidia_version" ]; then
+    # Update NVIDIA driver version entry if available. AL2023's is the lts entry of nvidia_driver_versions_al2023.
+    if [ -n "$nvidia_version" ] && [ "$ami_variant" = "al2023" ]; then
+        if ! sed -i "/^variable \"nvidia_driver_versions_al2023\" {/,/^}/ s/^\( *lts *= *\)\"[^\"]*\"/\1\"${nvidia_version}\"/" variables.pkr.hcl; then
+            echo "Failed to update the lts NVIDIA driver version in variables.pkr.hcl"
+        fi
+    elif [ -n "$nvidia_version" ]; then
         if grep -q "^${nvidia_version_key} = " NVIDIA_DRIVER_VERSION; then
             if ! sed -i "s/^${nvidia_version_key} = .*/${nvidia_version_key} = \"${nvidia_version}\"/" NVIDIA_DRIVER_VERSION; then
                 echo "Failed to update NVIDIA driver version in NVIDIA_DRIVER_VERSION file"
@@ -108,8 +112,8 @@ Update="false"
 # Check for NVIDIA driver version updates
 gpu_update=$(./scripts/check-update-security.sh "${ami_type}_gpu")
 handle_nvidia_version "$ami_type" "$gpu_update"
-# Only trigger update if GPU update detected AND NVIDIA_DRIVER_VERSION file actually changed
-if [[ $gpu_update == true* ]] && ! git diff --quiet NVIDIA_DRIVER_VERSION; then
+# Only trigger update if GPU update detected AND a driver version actually changed
+if [[ $gpu_update == true* ]] && ! git diff --quiet NVIDIA_DRIVER_VERSION variables.pkr.hcl; then
     Update="true"
 fi
 
@@ -135,10 +139,10 @@ if [ "$Update" = "true" ]; then
     echo "Update exists for $ami_type"
     git add release-$ami_type.auto.pkrvars.hcl
 
-    # Add NVIDIA_DRIVER_VERSION if it has changes
-    if ! git diff --quiet NVIDIA_DRIVER_VERSION; then
+    # Add the NVIDIA driver versions if they have changes
+    if ! git diff --quiet NVIDIA_DRIVER_VERSION variables.pkr.hcl; then
         echo "NVIDIA driver version changes detected"
-        git add NVIDIA_DRIVER_VERSION
+        git add NVIDIA_DRIVER_VERSION variables.pkr.hcl
     fi
 else
     echo "Update does not exist for $ami_type"

@@ -271,9 +271,27 @@ variable "nvidia_driver_major_al2023" {
   default     = "580"
 }
 
+variable "nvidia_driver_versions_al2023" {
+  type        = map(string)
+  description = "Full NVIDIA driver version of each driver branch for AL2023 GPU AMIs. lts is the natively installed driver, kept current within nvidia_driver_major_al2023 by scripts/check-update.sh; every other branch is built as a driver tree when nvidia_driver_trees_al2023 is on."
+  default = {
+    lts = "580.178.04"
+    pb  = "595.91.07"
+  }
+}
+
+variable "nvidia_driver_flavors_al2023" {
+  type        = map(list(string))
+  description = "Kernel module flavors (open, proprietary, grid) built for each driver branch in nvidia_driver_versions_al2023. The native install builds lts's; every other branch's are built into its driver tree."
+  default = {
+    lts = ["open", "proprietary", "grid"]
+    pb  = ["open", "grid"]
+  }
+}
+
 variable "nvidia_driver_trees_al2023" {
   type        = bool
-  description = "Build a per-version NVIDIA driver tree for each branch in scripts/al2023/gpu/nvidia-branches into the AL2023 GPU AMI. Off by default: the AMI is built as before. Nothing uses the trees at boot yet."
+  description = "Build a per-version NVIDIA driver tree for each branch in nvidia_driver_versions_al2023 into the AL2023 GPU AMI. Off by default: the AMI is built as before. Nothing uses the trees at boot yet."
   default     = false
 }
 

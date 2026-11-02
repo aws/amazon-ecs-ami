@@ -51,11 +51,10 @@ fi
 # The exact driver version is determined by the security check script
 # (check-update-security.sh) as the highest version available in BOTH the
 # AL2023 nvidia repo AND the S3 GRID bucket within the pinned major,
-# and tracked in the NVIDIA_DRIVER_VERSION file uploaded by Packer.
+# and tracked as lts in nvidia_driver_versions_al2023, which Packer passes in.
 
-NVIDIA_DRIVER_FULL_VERSION=$(grep "^nvidia_driver_version_al2023 = " /tmp/NVIDIA_DRIVER_VERSION | awk -F'"' '{print $2}')
-if [[ -z "$NVIDIA_DRIVER_FULL_VERSION" ]]; then
-  echo "ERROR: Could not read nvidia_driver_version_al2023 from /tmp/NVIDIA_DRIVER_VERSION"
+if [[ -z "${NVIDIA_DRIVER_FULL_VERSION:-}" ]]; then
+  echo "ERROR: NVIDIA_DRIVER_FULL_VERSION is not set (lts in nvidia_driver_versions_al2023)"
   exit 1
 fi
 echo "Using NVIDIA driver version: ${NVIDIA_DRIVER_FULL_VERSION}"
@@ -166,11 +165,17 @@ function archive-grid-kmod() {
 }
 
 ### Build All Driver Variants ###
-if [[ -z "$skip_grid_driver" ]]; then
+# The flavors are lts's in nvidia_driver_flavors_al2023; they're built in this order whichever way they're listed.
+flavor-listed() { [[ " ${NVIDIA_DRIVER_FLAVORS:-} " == *" $1 "* ]]; }
+if flavor-listed grid && [[ -z "$skip_grid_driver" ]]; then
   archive-grid-kmod
 fi
-archive-proprietary-kmod
-archive-open-kmod
+if flavor-listed proprietary; then
+  archive-proprietary-kmod
+fi
+if flavor-listed open; then
+  archive-open-kmod
+fi
 
 ### Install GPU Drivers and Required Packages ###
 # NVIDIA installation doc: https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/amazon-linux.html
