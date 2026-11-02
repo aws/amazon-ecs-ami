@@ -265,15 +265,9 @@ variable "custom_endpoint_ec2" {
   default     = ""
 }
 
-variable "nvidia_driver_major_al2023" {
-  type        = string
-  description = "Pinned NVIDIA driver major version for AL2023 GPU AMIs. Only driver versions within this major will be installed."
-  default     = "580"
-}
-
 variable "nvidia_driver_versions_al2023" {
   type        = map(string)
-  description = "Full NVIDIA driver version of each driver branch for AL2023 GPU AMIs. lts is the natively installed driver, kept current within nvidia_driver_major_al2023 by scripts/check-update.sh; every other branch is built as a driver tree when nvidia_driver_trees_al2023 is on."
+  description = "Full NVIDIA driver version of each driver branch for AL2023 GPU AMIs. lts is the natively installed driver, kept current within its major by scripts/check-update.sh (to move to another major, set a version from it); every other branch is built as a driver tree when nvidia_driver_trees_al2023 is on."
   default = {
     lts = "580.178.04"
     pb  = "595.91.07"
