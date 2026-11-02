@@ -11,8 +11,6 @@ locals {
   merged_tags = merge("${local.default_tags}", "${var.tags}")
   # Regions where the GRID driver S3 bucket is unavailable
   skip_grid_driver_regions = "eusc-de-east-1,eu-isoe-west-1"
-  # Driver versions of the non-default branches in scripts/al2023/gpu/nvidia-branches, as "name=version" pairs
-  nvidia_driver_tree_versions = join(" ", [for name, version in var.nvidia_driver_tree_versions_al2023 : "${name}=${version}"])
 }
 
 source "amazon-ebs" "al2023" {
@@ -236,8 +234,7 @@ build {
   provisioner "shell" {
     environment_vars = [
       "AMI_TYPE=${source.name}",
-      "NVIDIA_DRIVER_TREES=${var.nvidia_driver_trees_al2023}",
-      "NVIDIA_DRIVER_TREE_VERSIONS=${local.nvidia_driver_tree_versions}"
+      "NVIDIA_DRIVER_TREES=${var.nvidia_driver_trees_al2023}"
     ]
     script = "scripts/al2023/gpu/build-nvidia-trees.sh"
     only   = ["amazon-ebs.al2023gpu"]

@@ -16,7 +16,8 @@ die() {
 }
 
 # -------- branches and versions --------
-# The default branch's version is the pin the native install uses; the others come from nvidia_driver_tree_versions_al2023.
+# Each branch's version is pinned in NVIDIA_DRIVER_VERSION: the default branch's by nvidia_driver_version_al2023, the
+# pin the native install uses, and every other branch's by nvidia_driver_version_al2023_<branch>.
 BRANCHES_FILE=${NVIDIA_BRANCHES_FILE:-/tmp/nvidia-branches}
 NVIDIA_DRIVER_VERSION_FILE=${NVIDIA_DRIVER_VERSION_FILE:-/tmp/NVIDIA_DRIVER_VERSION}
 declare -A VERSION=() FLAVORS=()
@@ -27,14 +28,15 @@ while read -r name flavors || [[ -n $name ]]; do
     FLAVORS[$name]=$flavors
 done <"$BRANCHES_FILE"
 [[ ${#NAMES[@]} -gt 0 ]] || die "no branches in $BRANCHES_FILE"
-VERSION[${NAMES[0]}]=$(grep "^nvidia_driver_version_al2023" "$NVIDIA_DRIVER_VERSION_FILE" | awk -F'"' '{print $2}') || true
-[[ -n ${VERSION[${NAMES[0]}]} ]] || die "no nvidia_driver_version_al2023 in $NVIDIA_DRIVER_VERSION_FILE"
-for pair in ${NVIDIA_DRIVER_TREE_VERSIONS:-}; do
-    [[ ${pair%%=*} != "${NAMES[0]}" ]] || die "nvidia_driver_tree_versions_al2023 can't pin the default branch ${NAMES[0]}"
-    VERSION[${pair%%=*}]=${pair#*=}
+pin() { # pin KEY: the version NVIDIA_DRIVER_VERSION pins for KEY
+    awk -F'"' -v k="$1" '$1 ~ "^" k " *= *$" {print $2}' "$NVIDIA_DRIVER_VERSION_FILE"
+}
+VERSION[${NAMES[0]}]=$(pin nvidia_driver_version_al2023)
+for name in "${NAMES[@]:1}"; do
+    VERSION[$name]=$(pin "nvidia_driver_version_al2023_$name")
 done
 for name in "${NAMES[@]}"; do
-    [[ -n ${VERSION[$name]:-} ]] || die "no driver version for branch '$name'"
+    [[ -n ${VERSION[$name]:-} ]] || die "no driver version for branch '$name' in $NVIDIA_DRIVER_VERSION_FILE"
     for flavor in ${FLAVORS[$name]}; do
         [[ $flavor == open || $flavor == proprietary || $flavor == grid ]] || die "branch $name: unknown flavor '$flavor'"
     done

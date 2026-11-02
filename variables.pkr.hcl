@@ -277,13 +277,6 @@ variable "nvidia_driver_trees_al2023" {
   default     = false
 }
 
-variable "nvidia_driver_tree_versions_al2023" {
-  type        = map(string)
-  description = "Full NVIDIA driver version of each non-default branch in scripts/al2023/gpu/nvidia-branches, by branch name. The default branch uses nvidia_driver_version_al2023."
-  default = {
-    pb = "595.91.07"
-  }
-}
 
 variable "dcgm_version_al2023" {
   type        = string

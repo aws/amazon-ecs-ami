@@ -4,6 +4,8 @@
 # by the check-update.sh script. Manual changes will be overwritten.
 #
 # Format: nvidia_driver_version_<ami_type> = "<version>"
+#         nvidia_driver_version_al2023_<branch> = "<version>" (each non-default branch in
+#         scripts/al2023/gpu/nvidia-branches)
 #         cuda_version_<ami_type> = "<version>" (AL2 only)
 #
 # This file tracks the latest NVIDIA driver and CUDA versions detected for
@@ -13,4 +15,5 @@
 
 nvidia_driver_version_al2 = "550.163.01"
 nvidia_driver_version_al2023 = "580.178.04"
+nvidia_driver_version_al2023_pb = "595.91.07"
 cuda_version_al2 = "12.4.1"
