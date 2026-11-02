@@ -165,7 +165,7 @@ function archive-grid-kmod() {
 }
 
 ### Build All Driver Variants ###
-# The flavors are lts's in nvidia_driver_flavors_al2023; they're built in this order whichever way they're listed.
+# The flavors are the default branch's in nvidia_driver_branches_al2023; they're built in this order whichever way they're listed.
 flavor-listed() { [[ " ${NVIDIA_DRIVER_FLAVORS:-} " == *" $1 "* ]]; }
 if flavor-listed grid && [[ -z "$skip_grid_driver" ]]; then
   archive-grid-kmod
