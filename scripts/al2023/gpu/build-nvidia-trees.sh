@@ -21,9 +21,11 @@ die() {
 # Packer passes nvidia_driver_branches_al2023 in order as "name=flavor,flavor" pairs, and nvidia_driver_versions_al2023
 # as "name=version" pairs. The first branch is the default: the natively installed driver.
 
-NAMES=()
-declare -A FLAVORS=() VERSION=()
+NAMES=()                         # branch names, in order; NAMES[0] is the default branch
+declare -A FLAVORS=() VERSION=() # flavors and version of each branch, by name
 
+# Read the branches: each "lts=open,proprietary,grid" pair adds "lts" to NAMES and "open proprietary grid" to
+# FLAVORS[lts], keeping packer's order so the default branch comes first.
 for pair in ${NVIDIA_DRIVER_BRANCHES:-}; do
     name=${pair%%=*}
     flavors=${pair#*=}
@@ -32,11 +34,13 @@ for pair in ${NVIDIA_DRIVER_BRANCHES:-}; do
 done
 [[ ${#NAMES[@]} -gt 0 ]] || die "no branches in NVIDIA_DRIVER_BRANCHES"
 
+# Read the versions: each "lts=580.178.04" pair sets VERSION[lts]=580.178.04.
 for pair in ${NVIDIA_DRIVER_VERSIONS:-}; do
     VERSION[${pair%%=*}]=${pair#*=}
 done
 
-# Every branch needs a version and known flavors.
+# Check each branch: it needs a version and at least one flavor, every flavor must be open, proprietary or grid, and
+# the branch is logged with what it builds.
 for name in "${NAMES[@]}"; do
     [[ -n ${VERSION[$name]:-} ]] || die "no driver version for branch '$name' in nvidia_driver_versions_al2023"
     [[ -n ${FLAVORS[$name]} ]] || die "no kernel module flavors for branch '$name'"
@@ -49,8 +53,8 @@ for name in "${NAMES[@]}"; do
     echo "branch $name: ${VERSION[$name]} (flavors: ${FLAVORS[$name]})"
 done
 
-# The default branch is the native install, which builds every flavor, and it serves every instance family that isn't
-# in nvidia_driver_branch_families_al2023, so it has to list all three.
+# Check the default branch lists all three flavors. It's the native install, which builds every flavor, and it serves
+# every instance family that isn't in nvidia_driver_branch_families_al2023.
 for flavor in open proprietary grid; do
     [[ " ${FLAVORS[${NAMES[0]}]} " == *" $flavor "* ]] || die "the default branch '${NAMES[0]}' must list the $flavor flavor"
 done
