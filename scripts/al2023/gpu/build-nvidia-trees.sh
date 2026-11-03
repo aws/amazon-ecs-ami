@@ -69,17 +69,17 @@ done
 # ==================================================================================================================
 # The packages each tree gets
 # ==================================================================================================================
-# The version-specific packages are the NVIDIA packages the native install put on the AMI at the default branch's
-# version, so each tree has the same packages as the native install. They're unpacked into each tree instead of
-# installed natively, because one host can't install two versions of the same package.
+# The version-specific packages: the NVIDIA driver packages that exist at each driver version. Each branch's tree gets
+# all of them at its version, unpacked rather than installed, because one host can't install two versions of the same
+# package. The kernel modules are built from the DKMS source packages, downloaded per flavor below.
 
-DEFAULT=${NAMES[0]}
-sudo rm -rf "$B"
-
-mapfile -t VS_NAMES < <(rpm -qa --qf '%{NAME} %{VERSION}\n' |
-    awk -v v="${VERSION[$DEFAULT]}" '$2 == v && $1 !~ /^kmod-nvidia-/ {print $1}' | sort -u)
-[[ ${#VS_NAMES[@]} -gt 0 ]] || die "no NVIDIA packages installed at ${VERSION[$DEFAULT]}"
+VS_NAMES=(
+    libnvidia-cfg libnvidia-fbc libnvidia-gpucomp libnvidia-ml nvidia-driver nvidia-driver-cuda nvidia-driver-cuda-libs
+    nvidia-driver-libs nvidia-fabricmanager nvidia-kmod-common nvidia-libXNVCtrl nvidia-modprobe nvidia-persistenced
+    nvidia-settings xorg-x11-nvidia
+)
 echo "version-specific packages: ${#VS_NAMES[@]} (${VS_NAMES[*]})"
+sudo rm -rf "$B"
 
 is_vs_name() {
     local n
@@ -127,17 +127,15 @@ download_branch() { # download_branch NAME
     n=$(awk '{print $1}' <<<"$list" | uniq -d | paste -sd' ')
     [[ -z $n ]] || die "branch $name: more than one version of $n"
 
-    # The DKMS source packages: only the non-default branches build kernel modules (the default branch's are the
-    # native install's). They conflict with each other, so they're downloaded without dependency resolution. The GRID
-    # flavor comes from the GRID runfile, not a package.
-    if [[ $name != "$DEFAULT" ]]; then
-        for flavor in ${FLAVORS[$name]}; do
-            case $flavor in
-            open) kmods+=("kmod-nvidia-open-dkms-$v") ;;
-            proprietary) kmods+=("kmod-nvidia-latest-dkms-$v") ;;
-            esac
-        done
-    fi
+    # The DKMS source packages each branch builds its prebuilt kernel modules from, one per flavor it lists. They
+    # conflict with each other, so they're downloaded without dependency resolution. The GRID flavor comes from the GRID
+    # runfile, not a package.
+    for flavor in ${FLAVORS[$name]}; do
+        case $flavor in
+        open) kmods+=("kmod-nvidia-open-dkms-$v") ;;
+        proprietary) kmods+=("kmod-nvidia-latest-dkms-$v") ;;
+        esac
+    done
     [[ ${#kmods[@]} -eq 0 ]] || sudo dnf -y download --disableplugin=versionlock --destdir="$B/kmod/$name" "${kmods[@]}"
 
     # dnf download checks the packages only against the repo metadata, which isn't signed (repo_gpgcheck=0), and the
