@@ -165,17 +165,11 @@ function archive-grid-kmod() {
 }
 
 ### Build All Driver Variants ###
-# The flavors are the default branch's in nvidia_driver_branches_al2023; they're built in this order whichever way they're listed.
-flavor-listed() { [[ " ${NVIDIA_DRIVER_FLAVORS:-} " == *" $1 "* ]]; }
-if flavor-listed grid && [[ -z "$skip_grid_driver" ]]; then
+if [[ -z "$skip_grid_driver" ]]; then
   archive-grid-kmod
 fi
-if flavor-listed proprietary; then
-  archive-proprietary-kmod
-fi
-if flavor-listed open; then
-  archive-open-kmod
-fi
+archive-proprietary-kmod
+archive-open-kmod
 
 ### Install GPU Drivers and Required Packages ###
 # NVIDIA installation doc: https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/amazon-linux.html

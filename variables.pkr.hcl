@@ -276,7 +276,7 @@ variable "nvidia_driver_versions_al2023" {
 
 variable "nvidia_driver_branches_al2023" {
   type        = map(object({ flavors = list(string) }))
-  description = "NVIDIA driver branches for AL2023 GPU AMIs, by name, and the kernel module flavors (open, proprietary, grid) each builds. lts is the default branch, the natively installed driver; every other branch is built as a driver tree when nvidia_driver_trees_al2023 is on. Each branch's version is in nvidia_driver_versions_al2023."
+  description = "NVIDIA driver branches for AL2023 GPU AMIs, by name, and the kernel module flavors (open, proprietary, grid) each builds. lts is the default branch, the natively installed driver, and must list all three; every other branch is built as a driver tree when nvidia_driver_trees_al2023 is on. Each branch's version is in nvidia_driver_versions_al2023."
   default = {
     lts = { flavors = ["open", "proprietary", "grid"] }
     pb  = { flavors = ["open", "grid"] }

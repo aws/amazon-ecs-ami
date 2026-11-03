@@ -49,4 +49,10 @@ for name in "${NAMES[@]}"; do
     echo "branch $name: ${VERSION[$name]} (flavors: ${FLAVORS[$name]})"
 done
 
+# The default branch is the native install, which builds every flavor, and it serves every instance family that isn't
+# in nvidia_driver_branch_families_al2023, so it has to list all three.
+for flavor in open proprietary grid; do
+    [[ " ${FLAVORS[${NAMES[0]}]} " == *" $flavor "* ]] || die "the default branch '${NAMES[0]}' must list the $flavor flavor"
+done
+
 echo "build-nvidia-trees: done"

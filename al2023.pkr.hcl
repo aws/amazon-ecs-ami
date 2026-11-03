@@ -225,8 +225,7 @@ build {
       "AIR_GAPPED=${var.air_gapped}",
       "REGION=${var.region}",
       "SKIP_GRID_DRIVER_REGIONS=${local.skip_grid_driver_regions}",
-      "NVIDIA_DRIVER_FULL_VERSION=${var.nvidia_driver_versions_al2023[local.nvidia_driver_default_branch]}",
-      "NVIDIA_DRIVER_FLAVORS=${join(" ", var.nvidia_driver_branches_al2023[local.nvidia_driver_default_branch].flavors)}"
+      "NVIDIA_DRIVER_FULL_VERSION=${var.nvidia_driver_versions_al2023[local.nvidia_driver_default_branch]}"
     ]
     scripts = [
       "scripts/al2023/gpu/install-nvidia-driver.sh",
