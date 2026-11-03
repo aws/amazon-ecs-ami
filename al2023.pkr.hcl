@@ -11,10 +11,14 @@ locals {
   merged_tags = merge("${local.default_tags}", "${var.tags}")
   # Regions where the GRID driver S3 bucket is unavailable
   skip_grid_driver_regions = "eusc-de-east-1,eu-isoe-west-1"
-  # NVIDIA driver branches for the shell scripts. The first branch is the native install's; the others are driver trees.
-  nvidia_driver_default_branch = var.nvidia_driver_branches_al2023[0]
-  nvidia_driver_branches       = join(" ", [for branch in var.nvidia_driver_branches_al2023 : "${branch.name}=${join(",", branch.flavors)}"])
-  nvidia_driver_versions       = join(" ", [for name, version in var.nvidia_driver_versions_al2023 : "${name}=${version}"])
+  # NVIDIA driver branches: lts is the native install's, the others are driver trees. The shell scripts get them as
+  # "name=flavor,flavor" pairs, the default branch first.
+  nvidia_driver_default_branch = "lts"
+  nvidia_driver_branches = join(" ", concat(
+    ["${local.nvidia_driver_default_branch}=${join(",", var.nvidia_driver_branches_al2023[local.nvidia_driver_default_branch].flavors)}"],
+    [for name, branch in var.nvidia_driver_branches_al2023 : "${name}=${join(",", branch.flavors)}" if name != local.nvidia_driver_default_branch]
+  ))
+  nvidia_driver_versions = join(" ", [for name, version in var.nvidia_driver_versions_al2023 : "${name}=${version}"])
 }
 
 source "amazon-ebs" "al2023" {
@@ -221,8 +225,8 @@ build {
       "AIR_GAPPED=${var.air_gapped}",
       "REGION=${var.region}",
       "SKIP_GRID_DRIVER_REGIONS=${local.skip_grid_driver_regions}",
-      "NVIDIA_DRIVER_FULL_VERSION=${var.nvidia_driver_versions_al2023[local.nvidia_driver_default_branch.name]}",
-      "NVIDIA_DRIVER_FLAVORS=${join(" ", local.nvidia_driver_default_branch.flavors)}"
+      "NVIDIA_DRIVER_FULL_VERSION=${var.nvidia_driver_versions_al2023[local.nvidia_driver_default_branch]}",
+      "NVIDIA_DRIVER_FLAVORS=${join(" ", var.nvidia_driver_branches_al2023[local.nvidia_driver_default_branch].flavors)}"
     ]
     scripts = [
       "scripts/al2023/gpu/install-nvidia-driver.sh",
