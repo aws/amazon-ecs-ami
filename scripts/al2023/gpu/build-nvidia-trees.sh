@@ -5,8 +5,8 @@
 # branches and their versions. Nothing reads the trees yet: the natively installed driver still runs the AMI.
 set -Eeuo pipefail
 
-if [[ ${AMI_TYPE:-} != "al2023gpu" || ${NVIDIA_DRIVER_TREES:-false} != "true" ]]; then
-    echo "build-nvidia-trees: skipping (AMI_TYPE=${AMI_TYPE:-}, NVIDIA_DRIVER_TREES=${NVIDIA_DRIVER_TREES:-false})"
+if [[ ${NVIDIA_DRIVER_TREES:-false} != "true" ]]; then
+    echo "build-nvidia-trees: skipping (NVIDIA_DRIVER_TREES=${NVIDIA_DRIVER_TREES:-false})"
     exit 0
 fi
 

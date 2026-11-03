@@ -239,7 +239,6 @@ build {
 
   provisioner "shell" {
     environment_vars = [
-      "AMI_TYPE=${source.name}",
       "NVIDIA_DRIVER_TREES=${var.nvidia_driver_trees_al2023}",
       "NVIDIA_DRIVER_BRANCHES=${local.nvidia_driver_branches}"
     ]
