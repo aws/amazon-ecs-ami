@@ -51,10 +51,11 @@ fi
 # The exact driver version is determined by the security check script
 # (check-update-security.sh) as the highest version available in BOTH the
 # AL2023 nvidia repo AND the S3 GRID bucket within the pinned major,
-# and tracked as lts in nvidia_driver_versions_al2023, which Packer passes in.
+# and tracked in the NVIDIA_DRIVER_VERSION file uploaded by Packer.
 
-if [[ -z "${NVIDIA_DRIVER_FULL_VERSION:-}" ]]; then
-  echo "ERROR: NVIDIA_DRIVER_FULL_VERSION is not set (lts in nvidia_driver_versions_al2023)"
+NVIDIA_DRIVER_FULL_VERSION=$(grep "^nvidia_driver_version_al2023 = " /tmp/NVIDIA_DRIVER_VERSION | awk -F'"' '{print $2}')
+if [[ -z "$NVIDIA_DRIVER_FULL_VERSION" ]]; then
+  echo "ERROR: Could not read nvidia_driver_version_al2023 from /tmp/NVIDIA_DRIVER_VERSION"
   exit 1
 fi
 echo "Using NVIDIA driver version: ${NVIDIA_DRIVER_FULL_VERSION}"

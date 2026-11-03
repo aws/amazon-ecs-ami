@@ -4,11 +4,17 @@
 # by the check-update.sh script. Manual changes will be overwritten.
 #
 # Format: nvidia_driver_version_<ami_type> = "<version>"
+#         nvidia_driver_version_al2023_<branch> = "<version>" (each non-default branch in
+#         nvidia_driver_branches_al2023)
 #         cuda_version_<ami_type> = "<version>" (AL2 only)
 #
 # This file tracks the latest NVIDIA driver and CUDA versions detected for
-# AL2 AMIs. AL2023 GPU's driver versions are nvidia_driver_versions_al2023 in
-# variables.pkr.hcl, where check-update.sh updates the lts entry.
+# different Amazon Linux AMIs. For AL2023 GPU, the version in this file is
+# used by the install script during AMI builds (sourced via Packer file
+# provisioner). The pinned major of each branch is in nvidia_driver_majors_al2023 in
+# variables.pkr.hcl.
 
 nvidia_driver_version_al2 = "550.163.01"
+nvidia_driver_version_al2023 = "580.178.04"
+nvidia_driver_version_al2023_pb = "595.91.07"
 cuda_version_al2 = "12.4.1"

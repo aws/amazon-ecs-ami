@@ -18,7 +18,6 @@ locals {
     ["${local.nvidia_driver_default_branch}=${join(",", var.nvidia_driver_branches_al2023[local.nvidia_driver_default_branch].flavors)}"],
     [for name, branch in var.nvidia_driver_branches_al2023 : "${name}=${join(",", branch.flavors)}" if name != local.nvidia_driver_default_branch]
   ))
-  nvidia_driver_versions = join(" ", [for name, version in var.nvidia_driver_versions_al2023 : "${name}=${version}"])
 }
 
 source "amazon-ebs" "al2023" {
@@ -219,13 +218,18 @@ build {
     only        = ["amazon-ebs.al2023gpu"]
   }
 
+  provisioner "file" {
+    source      = "NVIDIA_DRIVER_VERSION"
+    destination = "/tmp/NVIDIA_DRIVER_VERSION"
+    only        = ["amazon-ebs.al2023gpu"]
+  }
+
   provisioner "shell" {
     environment_vars = [
       "AMI_TYPE=${source.name}",
       "AIR_GAPPED=${var.air_gapped}",
       "REGION=${var.region}",
-      "SKIP_GRID_DRIVER_REGIONS=${local.skip_grid_driver_regions}",
-      "NVIDIA_DRIVER_FULL_VERSION=${var.nvidia_driver_versions_al2023[local.nvidia_driver_default_branch]}"
+      "SKIP_GRID_DRIVER_REGIONS=${local.skip_grid_driver_regions}"
     ]
     scripts = [
       "scripts/al2023/gpu/install-nvidia-driver.sh",
@@ -237,8 +241,7 @@ build {
     environment_vars = [
       "AMI_TYPE=${source.name}",
       "NVIDIA_DRIVER_TREES=${var.nvidia_driver_trees_al2023}",
-      "NVIDIA_DRIVER_BRANCHES=${local.nvidia_driver_branches}",
-      "NVIDIA_DRIVER_VERSIONS=${local.nvidia_driver_versions}"
+      "NVIDIA_DRIVER_BRANCHES=${local.nvidia_driver_branches}"
     ]
     script = "scripts/al2023/gpu/build-nvidia-trees.sh"
     only   = ["amazon-ebs.al2023gpu"]

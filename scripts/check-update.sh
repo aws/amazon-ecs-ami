@@ -27,6 +27,7 @@ handle_nvidia_version() {
     fi
 
     local nvidia_version=""
+    local nvidia_pb_version=""
     local cuda_version=""
     local nvidia_version_key="nvidia_driver_version_${ami_variant}"
     local cuda_version_key="cuda_version_${ami_variant}"
@@ -39,6 +40,7 @@ handle_nvidia_version() {
         # possible shapes, in any token order:
         #   "true"                                    (update exists, no version)
         #   "true nvidia:<nvidia_version>"            (driver only)
+        #   "true nvidia_pb:<version>"                (al2023_gpu, the pb driver tree; with or without nvidia:)
         #   "true nvidia:<...> cuda:<cuda_version>"   (al2_gpu, driver + cuda)
         #   "true cuda:<cuda_version>"                (al2_gpu, cuda only)
         # Read the fields after "true" and classify each strictly by its prefix.
@@ -52,6 +54,9 @@ handle_nvidia_version() {
             nvidia:*)
                 nvidia_version="${field#nvidia:}"
                 ;;
+            nvidia_pb:*)
+                nvidia_pb_version="${field#nvidia_pb:}"
+                ;;
             cuda:*)
                 cuda_version="${field#cuda:}"
                 ;;
@@ -59,15 +64,20 @@ handle_nvidia_version() {
         done
     fi
 
-    # Update NVIDIA driver version entry if available. AL2023's is the lts entry of nvidia_driver_versions_al2023.
-    if [ -n "$nvidia_version" ] && [ "$ami_variant" = "al2023" ]; then
-        if ! sed -i "/^variable \"nvidia_driver_versions_al2023\" {/,/^}/ s/^\( *lts *= *\)\"[^\"]*\"/\1\"${nvidia_version}\"/" variables.pkr.hcl; then
-            echo "Failed to update the lts NVIDIA driver version in variables.pkr.hcl"
-        fi
-    elif [ -n "$nvidia_version" ]; then
+    # Update NVIDIA driver version entry if available
+    if [ -n "$nvidia_version" ]; then
         if grep -q "^${nvidia_version_key} = " NVIDIA_DRIVER_VERSION; then
             if ! sed -i "s/^${nvidia_version_key} = .*/${nvidia_version_key} = \"${nvidia_version}\"/" NVIDIA_DRIVER_VERSION; then
                 echo "Failed to update NVIDIA driver version in NVIDIA_DRIVER_VERSION file"
+            fi
+        fi
+    fi
+
+    # Update the pb driver tree's version entry if available (AL2023 only)
+    if [ -n "$nvidia_pb_version" ] && [ "$ami_variant" = "al2023" ]; then
+        if grep -q "^${nvidia_version_key}_pb = " NVIDIA_DRIVER_VERSION; then
+            if ! sed -i "s/^${nvidia_version_key}_pb = .*/${nvidia_version_key}_pb = \"${nvidia_pb_version}\"/" NVIDIA_DRIVER_VERSION; then
+                echo "Failed to update the pb NVIDIA driver version in NVIDIA_DRIVER_VERSION file"
             fi
         fi
     fi
@@ -112,8 +122,8 @@ Update="false"
 # Check for NVIDIA driver version updates
 gpu_update=$(./scripts/check-update-security.sh "${ami_type}_gpu")
 handle_nvidia_version "$ami_type" "$gpu_update"
-# Only trigger update if GPU update detected AND a driver version actually changed
-if [[ $gpu_update == true* ]] && ! git diff --quiet NVIDIA_DRIVER_VERSION variables.pkr.hcl; then
+# Only trigger update if GPU update detected AND NVIDIA_DRIVER_VERSION file actually changed
+if [[ $gpu_update == true* ]] && ! git diff --quiet NVIDIA_DRIVER_VERSION; then
     Update="true"
 fi
 
@@ -139,10 +149,10 @@ if [ "$Update" = "true" ]; then
     echo "Update exists for $ami_type"
     git add release-$ami_type.auto.pkrvars.hcl
 
-    # Add the NVIDIA driver versions if they have changes
-    if ! git diff --quiet NVIDIA_DRIVER_VERSION variables.pkr.hcl; then
+    # Add NVIDIA_DRIVER_VERSION if it has changes
+    if ! git diff --quiet NVIDIA_DRIVER_VERSION; then
         echo "NVIDIA driver version changes detected"
-        git add NVIDIA_DRIVER_VERSION variables.pkr.hcl
+        git add NVIDIA_DRIVER_VERSION
     fi
 else
     echo "Update does not exist for $ami_type"

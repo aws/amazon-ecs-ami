@@ -265,18 +265,18 @@ variable "custom_endpoint_ec2" {
   default     = ""
 }
 
-variable "nvidia_driver_versions_al2023" {
+variable "nvidia_driver_majors_al2023" {
   type        = map(string)
-  description = "Full NVIDIA driver version of each branch in nvidia_driver_branches_al2023. lts is the natively installed driver, kept current within its major by scripts/check-update.sh (to move to another major, set a version from it); every other branch is built as a driver tree."
+  description = "Pinned NVIDIA driver major version of each branch in nvidia_driver_branches_al2023 for AL2023 GPU AMIs. scripts/check-update.sh keeps each branch's full version in NVIDIA_DRIVER_VERSION current within its major."
   default = {
-    lts = "580.178.04"
-    pb  = "595.91.07"
+    lts = "580"
+    pb  = "595"
   }
 }
 
 variable "nvidia_driver_branches_al2023" {
   type        = map(object({ flavors = list(string) }))
-  description = "NVIDIA driver branches for AL2023 GPU AMIs, by name, and the kernel module flavors (open, proprietary, grid) each builds. lts is the default branch, the natively installed driver, and must list all three; every other branch is built as a driver tree when nvidia_driver_trees_al2023 is on. Each branch's version is in nvidia_driver_versions_al2023."
+  description = "NVIDIA driver branches for AL2023 GPU AMIs, by name, and the kernel module flavors (open, proprietary, grid) each builds. lts is the default branch, the natively installed driver, and must list all three; every other branch is built as a driver tree when nvidia_driver_trees_al2023 is on. Each branch's full version is in NVIDIA_DRIVER_VERSION, within its major in nvidia_driver_majors_al2023."
   default = {
     lts = { flavors = ["open", "proprietary", "grid"] }
     pb  = { flavors = ["open", "grid"] }

@@ -18,8 +18,11 @@ die() {
 # ==================================================================================================================
 # Branches, flavors and versions
 # ==================================================================================================================
-# Packer passes nvidia_driver_branches_al2023 in order as "name=flavor,flavor" pairs, and nvidia_driver_versions_al2023
-# as "name=version" pairs. The first branch is the default: the natively installed driver.
+# Packer passes nvidia_driver_branches_al2023 in order as "name=flavor,flavor" pairs; the first branch is the default,
+# the natively installed driver. Each branch's full version is pinned in NVIDIA_DRIVER_VERSION, which check-update.sh
+# keeps current: nvidia_driver_version_al2023 for the default branch, nvidia_driver_version_al2023_<name> for the others.
+
+NVIDIA_DRIVER_VERSION_FILE=${NVIDIA_DRIVER_VERSION_FILE:-/tmp/NVIDIA_DRIVER_VERSION}
 
 NAMES=()                         # branch names, in order; NAMES[0] is the default branch
 declare -A FLAVORS=() VERSION=() # flavors and version of each branch, by name
@@ -34,15 +37,19 @@ for pair in ${NVIDIA_DRIVER_BRANCHES:-}; do
 done
 [[ ${#NAMES[@]} -gt 0 ]] || die "no branches in NVIDIA_DRIVER_BRANCHES"
 
-# Read the versions: each "lts=580.178.04" pair sets VERSION[lts]=580.178.04.
-for pair in ${NVIDIA_DRIVER_VERSIONS:-}; do
-    VERSION[${pair%%=*}]=${pair#*=}
+# Read the versions: VERSION[lts] from nvidia_driver_version_al2023, VERSION[pb] from nvidia_driver_version_al2023_pb.
+pin() { # pin KEY: the version NVIDIA_DRIVER_VERSION pins for KEY (exact key, so _al2023 doesn't match _al2023_pb)
+    awk -F'"' -v k="$1" '$1 ~ "^" k " *= *$" {print $2}' "$NVIDIA_DRIVER_VERSION_FILE"
+}
+VERSION[${NAMES[0]}]=$(pin nvidia_driver_version_al2023)
+for name in "${NAMES[@]:1}"; do
+    VERSION[$name]=$(pin "nvidia_driver_version_al2023_$name")
 done
 
 # Check each branch: it needs a version and at least one flavor, every flavor must be open, proprietary or grid, and
 # the branch is logged with what it builds.
 for name in "${NAMES[@]}"; do
-    [[ -n ${VERSION[$name]:-} ]] || die "no driver version for branch '$name' in nvidia_driver_versions_al2023"
+    [[ -n ${VERSION[$name]:-} ]] || die "no driver version for branch '$name' in $NVIDIA_DRIVER_VERSION_FILE"
     [[ -n ${FLAVORS[$name]} ]] || die "no kernel module flavors for branch '$name'"
     for flavor in ${FLAVORS[$name]}; do
         case $flavor in
