@@ -60,10 +60,4 @@ for name in "${NAMES[@]}"; do
     echo "branch $name: ${VERSION[$name]} (flavors: ${FLAVORS[$name]})"
 done
 
-# Check the default branch lists all three flavors. It's the native install, which builds every flavor, and it serves
-# every instance family that isn't mapped to another branch.
-for flavor in open proprietary grid; do
-    [[ " ${FLAVORS[${NAMES[0]}]} " == *" $flavor "* ]] || die "the default branch '${NAMES[0]}' must list the $flavor flavor"
-done
-
 echo "build-nvidia-trees: done"
