@@ -265,11 +265,30 @@ variable "custom_endpoint_ec2" {
   default     = ""
 }
 
-variable "nvidia_driver_major_al2023" {
-  type        = string
-  description = "Pinned NVIDIA driver major version for AL2023 GPU AMIs. Only driver versions within this major will be installed."
-  default     = "580"
+variable "nvidia_driver_majors_al2023" {
+  type        = map(string)
+  description = "Pinned NVIDIA driver major version of each branch in nvidia_driver_branches_al2023 for AL2023 GPU AMIs. scripts/check-update.sh keeps each branch's full version in NVIDIA_DRIVER_VERSION current within its major."
+  default = {
+    lts = "580"
+    pb  = "595"
+  }
 }
+
+variable "nvidia_driver_branches_al2023" {
+  type        = map(object({ flavors = list(string) }))
+  description = "NVIDIA driver branches for AL2023 GPU AMIs, by name, and the kernel module flavors (open, proprietary, grid) each builds. lts is the default branch, the natively installed driver, which builds all three; every other branch is built as a driver tree when nvidia_driver_trees_al2023 is on. Each branch's full version is in NVIDIA_DRIVER_VERSION, within its major in nvidia_driver_majors_al2023."
+  default = {
+    lts = { flavors = ["open", "proprietary", "grid"] }
+    pb  = { flavors = ["open", "grid"] }
+  }
+}
+
+variable "nvidia_driver_trees_al2023" {
+  type        = bool
+  description = "Build a per-version NVIDIA driver tree for each branch in nvidia_driver_branches_al2023 into the AL2023 GPU AMI. Off by default: the AMI is built as before. Nothing uses the trees at boot yet."
+  default     = false
+}
+
 
 variable "dcgm_version_al2023" {
   type        = string

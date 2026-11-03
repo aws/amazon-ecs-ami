@@ -53,7 +53,7 @@ fi
 # AL2023 nvidia repo AND the S3 GRID bucket within the pinned major,
 # and tracked in the NVIDIA_DRIVER_VERSION file uploaded by Packer.
 
-NVIDIA_DRIVER_FULL_VERSION=$(grep "^nvidia_driver_version_al2023" /tmp/NVIDIA_DRIVER_VERSION | awk -F'"' '{print $2}')
+NVIDIA_DRIVER_FULL_VERSION=$(grep "^nvidia_driver_version_al2023 = " /tmp/NVIDIA_DRIVER_VERSION | awk -F'"' '{print $2}')
 if [[ -z "$NVIDIA_DRIVER_FULL_VERSION" ]]; then
   echo "ERROR: Could not read nvidia_driver_version_al2023 from /tmp/NVIDIA_DRIVER_VERSION"
   exit 1

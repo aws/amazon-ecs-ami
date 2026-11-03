@@ -141,12 +141,12 @@ instance_id=$(aws ec2 run-instances \
     --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value='$platform-check-update-security'}]' |
     jq -r '.Instances[0].InstanceId')
 
-# Read pinned major version for AL2023 GPU filtering
+# Read pinned major version for AL2023 GPU filtering: the lts entry of nvidia_driver_majors_al2023
 nvidia_driver_pinned_major=""
 if [ "$platform" = "al2023_gpu" ]; then
-    nvidia_driver_pinned_major=$(sed -n '/variable "nvidia_driver_major_al2023" {/,/}/p' variables.pkr.hcl | grep "default" | awk -F '"' '{ print $2 }')
+    nvidia_driver_pinned_major=$(sed -n '/^variable "nvidia_driver_majors_al2023" {/,/^}/p' variables.pkr.hcl | awk -F '"' '/^ *lts *=/ { print $2 }')
     if [ -z "$nvidia_driver_pinned_major" ]; then
-        echo "ERROR: Could not read nvidia_driver_major_al2023 from variables.pkr.hcl"
+        echo "ERROR: Could not read the lts major of nvidia_driver_majors_al2023 from variables.pkr.hcl"
         exit 1
     fi
 fi
