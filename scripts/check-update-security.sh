@@ -149,9 +149,13 @@ if [ "$platform" = "al2023_gpu" ]; then
     nvidia_driver_majors=$(sed -n '/^variable "nvidia_driver_majors_al2023" {/,/^}/p' variables.pkr.hcl)
     nvidia_driver_pinned_major=$(awk -F '"' '/^ *lts *=/ { print $2 }' <<<"$nvidia_driver_majors")
     nvidia_driver_pb_major=$(awk -F '"' '/^ *pb *=/ { print $2 }' <<<"$nvidia_driver_majors")
-    if [ -z "$nvidia_driver_pinned_major" ] || [ -z "$nvidia_driver_pb_major" ]; then
-        echo "ERROR: Could not read the lts and pb majors of nvidia_driver_majors_al2023 from variables.pkr.hcl"
+    if [ -z "$nvidia_driver_pinned_major" ]; then
+        echo "ERROR: Could not read the lts major of nvidia_driver_majors_al2023 from variables.pkr.hcl"
         exit 1
+    fi
+    # pb is checked best-effort: a pb problem prints a warning and skips pb, so it never holds back lts updates
+    if [ -z "$nvidia_driver_pb_major" ]; then
+        echo "WARNING: Could not read the pb major of nvidia_driver_majors_al2023 from variables.pkr.hcl; not checking pb" >&2
     fi
 fi
 
@@ -265,8 +269,7 @@ if [ "$platform" = "al2023_gpu" ]; then
     # The pb branch isn't installed natively, so its current version is its pin
     nvidia_driver_pb_pinned_version=$(awk -F '"' '$1 ~ /^nvidia_driver_version_al2023_pb *= *$/ { print $2 }' NVIDIA_DRIVER_VERSION)
 
-    if [ -z "$nvidia_driver_installed_version" ] || [ -z "$nvidia_driver_repo_versions_csv" ] ||
-        [ -z "$nvidia_driver_pb_repo_versions_csv" ] || [ -z "$nvidia_driver_pb_pinned_version" ]; then
+    if [ -z "$nvidia_driver_installed_version" ] || [ -z "$nvidia_driver_repo_versions_csv" ]; then
         echo "ERROR: Could not determine installed or available NVIDIA driver versions"
         exit 1
     fi
@@ -309,7 +312,13 @@ if [ "$platform" = "al2023_gpu" ]; then
     newer() { [ "$(printf '%s\n%s' "$1" "$2" | sort -V | tail -1)" != "$1" ]; } # newer CURRENT CANDIDATE
 
     nvidia_driver_effective_version=$(effective_version "$nvidia_driver_pinned_major" "$nvidia_driver_repo_versions_csv") || exit 1
-    nvidia_driver_pb_effective_version=$(effective_version "$nvidia_driver_pb_major" "$nvidia_driver_pb_repo_versions_csv") || exit 1
+    nvidia_driver_pb_effective_version=""
+    if [ -n "$nvidia_driver_pb_major" ] && [ -n "$nvidia_driver_pb_repo_versions_csv" ] && [ -n "$nvidia_driver_pb_pinned_version" ]; then
+        nvidia_driver_pb_effective_version=$(effective_version "$nvidia_driver_pb_major" "$nvidia_driver_pb_repo_versions_csv") ||
+            echo "WARNING: No pb NVIDIA driver version in both the repo and the GRID bucket; not checking pb" >&2
+    elif [ -n "$nvidia_driver_pb_major" ]; then
+        echo "WARNING: Could not determine the pb NVIDIA driver's pin or repo versions; not checking pb" >&2
+    fi
 
     # Only trigger a release if a branch's effective version is newer than what it has: lts's installed version on
     # the published AMI, pb's pin
@@ -317,7 +326,7 @@ if [ "$platform" = "al2023_gpu" ]; then
     if newer "$nvidia_driver_installed_version" "$nvidia_driver_effective_version"; then
         output="$output nvidia:$nvidia_driver_effective_version"
     fi
-    if newer "$nvidia_driver_pb_pinned_version" "$nvidia_driver_pb_effective_version"; then
+    if [ -n "$nvidia_driver_pb_effective_version" ] && newer "$nvidia_driver_pb_pinned_version" "$nvidia_driver_pb_effective_version"; then
         output="$output nvidia_pb:$nvidia_driver_pb_effective_version"
     fi
     if [ "$output" = "true" ]; then
