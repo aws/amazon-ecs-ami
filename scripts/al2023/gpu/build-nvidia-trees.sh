@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Functions that build a per-version NVIDIA driver tree for each branch in nvidia_driver_branches_al2023, under
 # /opt/nvidia/<branch>. install-nvidia-driver.sh sources this file and calls them after the native install, only when
-# nvidia_driver_trees_al2023 is on (off by default). So far they download and check each branch's packages and remove
-# them again. Nothing reads the trees yet: the native driver still runs the AMI.
+# nvidia_driver_trees_al2023 is on (off by default). So far they download and check each branch's packages and unpack
+# them into the branch's tree. Nothing reads the trees yet: the native driver still runs the AMI.
 
 TREES_BUILD_DIR=/opt/nvidia-build # scratch space for the build, removed at the end
+TREES_DIR=/opt/nvidia             # the trees, one per branch
 NVIDIA_DRIVER_VERSION_FILE=${NVIDIA_DRIVER_VERSION_FILE:-/tmp/NVIDIA_DRIVER_VERSION}
 
 die() {
@@ -105,4 +106,17 @@ download_branch_packages() {
         [[ $result == *"signatures OK" ]] || die "branch $name: not signed by an imported key: $result"
     done
     echo "branch $name: ${#rpm_files[@]} packages signed by an imported key"
+}
+
+# unpack_branch NAME: unpack branch NAME's downloaded packages into its tree. They're unpacked, not installed, because
+# one host can't install two versions of the same package.
+unpack_branch() {
+    local name=$1 tree=$TREES_DIR/$1 rpm_file
+    local - # pipefail for this function only, so a failed rpm2cpio fails the unpack too
+    set -o pipefail
+    sudo mkdir -p "$tree"
+    for rpm_file in "$TREES_BUILD_DIR/download/$name"/*.rpm; do
+        rpm2cpio "$rpm_file" | (cd "$tree" && sudo cpio -idmu --quiet) || die "branch $name: cannot unpack $rpm_file"
+    done
+    echo "branch $name: tree is $(sudo du -sh "$tree" | cut -f1)"
 }
