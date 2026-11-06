@@ -193,7 +193,9 @@ if [[ ${NVIDIA_DRIVER_TREES:-false} == "true" ]]; then
   # The version-specific packages: every package the install above put on at the driver version. The 7 NVIDIA packages
   # it names pull in 8 more at the same version (libnvidia-cfg, libnvidia-gpucomp, libnvidia-ml, nvidia-driver-cuda-
   # libs, nvidia-driver-libs, nvidia-kmod-common, nvidia-modprobe and xorg-x11-nvidia), and each driver tree needs all
-  # 15 at its own version, since it replaces this install on the instances that use it.
+  # The version-specific packages: every package the install above put on at the driver version, both the NVIDIA
+  # packages it names and the ones they pull in. Each driver tree needs all of them at its own version, since it
+  # replaces this install on the instances that use it.
   mapfile -t VERSION_SPECIFIC_PACKAGES < <(rpm -qa --qf '%{NAME} %{VERSION}\n' |
     awk -v version="$NVIDIA_DRIVER_FULL_VERSION" '$2 == version && $1 !~ /^kmod-nvidia-/ {print $1}' | sort -u)
   echo "version-specific packages: ${#VERSION_SPECIFIC_PACKAGES[@]} (${VERSION_SPECIFIC_PACKAGES[*]})"
