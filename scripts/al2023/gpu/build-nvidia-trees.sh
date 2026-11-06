@@ -7,10 +7,6 @@
 TREES_BUILD_DIR=/opt/nvidia-build # scratch space for the build, removed at the end
 NVIDIA_DRIVER_VERSION_FILE=${NVIDIA_DRIVER_VERSION_FILE:-/tmp/NVIDIA_DRIVER_VERSION}
 
-step() {
-    echo
-    echo "=== $*"
-}
 die() {
     echo "ERROR: $*" >&2
     exit 1

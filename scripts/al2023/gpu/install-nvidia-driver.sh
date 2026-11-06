@@ -200,7 +200,6 @@ if [[ ${NVIDIA_DRIVER_TREES:-false} == "true" ]]; then
   source /tmp/build-nvidia-trees.sh
   read_driver_branches
   for branch in "${NAMES[@]}"; do
-    step "download branch $branch (${VERSION[$branch]})"
     download_branch_packages "$branch" "${VERSION_SPECIFIC_PACKAGES[@]}"
   done
   sudo rm -rf "$TREES_BUILD_DIR"
