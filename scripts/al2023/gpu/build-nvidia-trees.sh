@@ -61,8 +61,7 @@ pinned_version() {
 #
 # Each branch's packages are downloaded in one dnf transaction, so dnf resolves them together and every dependency comes
 # out at the branch's version, plus the other dependencies the host doesn't have yet (such as 595's egl-wayland2). The
-# default branch's packages are the native install's, already installed, so they're downloaded with reinstall. The
-# versionlock plugin is off for the downloads only: it holds the NVIDIA packages at the native install's version.
+# default branch's packages are the native install's, already installed, so they're downloaded with reinstall.
 download_branch_packages() {
     local name=$1 version=${VERSION[$1]} download_dir=$TREES_BUILD_DIR/download/$1 dkms_dir=$TREES_BUILD_DIR/dkms/$1
     shift
@@ -74,7 +73,7 @@ download_branch_packages() {
     if [[ $name == "${NAMES[0]}" ]]; then
         action=reinstall
     fi
-    sudo dnf -y "$action" --downloadonly --downloaddir="$download_dir" --disableplugin=versionlock "${package_specs[@]}"
+    sudo dnf -y "$action" --downloadonly --downloaddir="$download_dir" "${package_specs[@]}"
 
     # dnf has to resolve a kmod-nvidia-*-dkms package, since nvidia-kmod-common requires nvidia-kmod at the same version
     # and only those provide it, so they can't be excluded from the transaction. They're build inputs, downloaded per
@@ -93,7 +92,7 @@ download_branch_packages() {
         esac
     done
     [[ ${#dkms_packages[@]} -eq 0 ]] ||
-        sudo dnf -y download --disableplugin=versionlock --destdir="$dkms_dir" "${dkms_packages[@]}"
+        sudo dnf -y download --destdir="$dkms_dir" "${dkms_packages[@]}"
 
     # dnf checks the packages only against the repo metadata, which isn't signed (repo_gpgcheck=0), and the packages are
     # unpacked rather than installed, so no install transaction checks their signatures either. Each one must be signed
