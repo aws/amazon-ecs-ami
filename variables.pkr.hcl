@@ -287,9 +287,7 @@ variable "nvidia_driver_branch_families_al2023" {
   type        = map(string)
   description = "Driver branch of each instance family that doesn't use the default NVIDIA driver branch. List a family only once its GPUs are qualified on the branch, and only for a branch that builds the kernel module flavor they use."
   default = {
-    g7   = "pb"
-    g6f  = "pb"
-    gr6f = "pb"
+    g7 = "pb"
   }
 }
 

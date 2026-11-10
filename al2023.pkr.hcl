@@ -18,6 +18,8 @@ locals {
     ["${local.nvidia_driver_default_branch}=${join(",", var.nvidia_driver_branches_al2023[local.nvidia_driver_default_branch].flavors)}"],
     [for name, branch in var.nvidia_driver_branches_al2023 : "${name}=${join(",", branch.flavors)}" if name != local.nvidia_driver_default_branch]
   ))
+  # Instance families that don't use the default branch, as "family=branch" pairs.
+  nvidia_driver_branch_families = join(" ", [for family, branch in var.nvidia_driver_branch_families_al2023 : "${family}=${branch}"])
 }
 
 source "amazon-ebs" "al2023" {
@@ -240,7 +242,8 @@ build {
   provisioner "shell" {
     environment_vars = [
       "NVIDIA_DRIVER_TREES=${var.nvidia_driver_trees_al2023}",
-      "NVIDIA_DRIVER_BRANCHES=${local.nvidia_driver_branches}"
+      "NVIDIA_DRIVER_BRANCHES=${local.nvidia_driver_branches}",
+      "NVIDIA_DRIVER_BRANCH_FAMILIES=${local.nvidia_driver_branch_families}"
     ]
     script = "scripts/al2023/gpu/build-nvidia-trees.sh"
     only   = ["amazon-ebs.al2023gpu"]

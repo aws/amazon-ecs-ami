@@ -2,7 +2,8 @@
 # Build a per-version NVIDIA driver tree for each branch in nvidia_driver_branches_al2023, under /opt/nvidia/<branch>.
 #
 # Runs at build time only when nvidia_driver_trees_al2023 is on (off by default). So far it reads and checks the
-# branches and their versions. Nothing reads the trees yet: the natively installed driver still runs the AMI.
+# branches and their versions, and writes the branch selection files nvidia-branch-resolve.sh reads. Nothing reads the
+# trees yet: the natively installed driver still runs the AMI.
 set -Eeuo pipefail
 
 if [[ ${NVIDIA_DRIVER_TREES:-false} != "true" ]]; then
@@ -59,5 +60,34 @@ for name in "${NAMES[@]}"; do
     done
     echo "branch $name: ${VERSION[$name]} (flavors: ${FLAVORS[$name]})"
 done
+
+# ==================================================================================================================
+# Branch selection files
+# ==================================================================================================================
+# nvidia-branch-resolve.sh picks the instance's branch at boot from two files in /etc/nvidia-driver-trees:
+#   nvidia-branches         one branch name per line, the default branch first, e.g. "lts" then "pb"
+#   nvidia-branch-families  one "<family> <branch>" line per family in nvidia_driver_branch_families_al2023, e.g. "g7 pb"
+# Packer passes the families as "family=branch" pairs. Each must name a branch above, so a typo in the map fails the
+# build instead of failing every boot of that family.
+
+CONF=${NVIDIA_TREES_CONF:-/etc/nvidia-driver-trees}
+
+FAMILY_LINES=()
+for pair in ${NVIDIA_DRIVER_BRANCH_FAMILIES:-}; do
+    [[ $pair =~ ^[a-z0-9-]+=[a-z0-9-]+$ ]] || die "bad family '$pair' in NVIDIA_DRIVER_BRANCH_FAMILIES (want family=branch, lowercase)"
+    family=${pair%%=*}
+    branch=${pair#*=}
+    [[ -n ${FLAVORS[$branch]:-} ]] || die "family $family: branch '$branch' isn't in nvidia_driver_branches_al2023"
+    FAMILY_LINES+=("$family $branch")
+done
+
+sudo mkdir -p "$CONF"
+printf '%s\n' "${NAMES[@]}" | sudo tee "$CONF/nvidia-branches" >/dev/null
+if [[ ${#FAMILY_LINES[@]} -gt 0 ]]; then
+    printf '%s\n' "${FAMILY_LINES[@]}" | sudo tee "$CONF/nvidia-branch-families" >/dev/null
+else
+    sudo truncate -s 0 "$CONF/nvidia-branch-families"
+fi
+echo "branches: ${NAMES[*]}; families: ${FAMILY_LINES[*]:-none} (written to $CONF)"
 
 echo "build-nvidia-trees: done"
