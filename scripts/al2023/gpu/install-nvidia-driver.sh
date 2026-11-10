@@ -187,6 +187,23 @@ sudo dnf install -y \
     xorg-x11-server-Xorg \
     nvidia-container-toolkit
 
+### Per-version Driver Trees ###
+# Off by default (nvidia_driver_trees_al2023): a tree for each driver branch, built from the same packages
+if [[ ${NVIDIA_DRIVER_TREES:-false} == "true" ]]; then
+  # The version-specific packages: every package the install above put on at the driver version, both the NVIDIA
+  # packages it names and the ones they pull in. Each driver tree needs all of them at its own version, since it
+  # replaces this install on the instances that use it.
+  mapfile -t VERSION_SPECIFIC_PACKAGES < <(rpm -qa --qf '%{NAME} %{VERSION}\n' |
+    awk -v version="$NVIDIA_DRIVER_FULL_VERSION" '$2 == version && $1 !~ /^kmod-nvidia-/ {print $1}' | sort -u)
+  echo "version-specific packages: ${#VERSION_SPECIFIC_PACKAGES[@]} (${VERSION_SPECIFIC_PACKAGES[*]})"
+  source /tmp/build-nvidia-trees.sh
+  read_driver_branches
+  for branch in "${NAMES[@]}"; do
+    download_branch_packages "$branch" "${VERSION_SPECIFIC_PACKAGES[@]}"
+  done
+  sudo rm -rf "$TREES_BUILD_DIR"
+fi
+
 # Lock NVIDIA packages to prevent automatic updates
 # Updates can break compatibility between driver and kernel modules
 sudo dnf versionlock 'nvidia*' 'kmod*' 'libnvidia*' 'xorg*'

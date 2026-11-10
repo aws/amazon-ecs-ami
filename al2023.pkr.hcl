@@ -212,7 +212,8 @@ build {
       "scripts/al2023/gpu/nvidia-kmod-load.sh",
       "scripts/al2023/gpu/set-nvidia-clocks",
       "scripts/al2023/gpu/set-nvidia-clocks.service",
-      "scripts/al2023/gpu/nvidia-mps.service"
+      "scripts/al2023/gpu/nvidia-mps.service",
+      "scripts/al2023/gpu/build-nvidia-trees.sh"
     ]
     destination = "/tmp/"
     only        = ["amazon-ebs.al2023gpu"]
@@ -229,21 +230,14 @@ build {
       "AMI_TYPE=${source.name}",
       "AIR_GAPPED=${var.air_gapped}",
       "REGION=${var.region}",
-      "SKIP_GRID_DRIVER_REGIONS=${local.skip_grid_driver_regions}"
+      "SKIP_GRID_DRIVER_REGIONS=${local.skip_grid_driver_regions}",
+      "NVIDIA_DRIVER_TREES=${var.nvidia_driver_trees_al2023}",
+      "NVIDIA_DRIVER_BRANCHES=${local.nvidia_driver_branches}"
     ]
     scripts = [
       "scripts/al2023/gpu/install-nvidia-driver.sh",
       "scripts/al2023/gpu/enable-ecs-agent-gpu-support-al2023.sh"
     ]
-  }
-
-  provisioner "shell" {
-    environment_vars = [
-      "NVIDIA_DRIVER_TREES=${var.nvidia_driver_trees_al2023}",
-      "NVIDIA_DRIVER_BRANCHES=${local.nvidia_driver_branches}"
-    ]
-    script = "scripts/al2023/gpu/build-nvidia-trees.sh"
-    only   = ["amazon-ebs.al2023gpu"]
   }
 
   provisioner "shell" {
