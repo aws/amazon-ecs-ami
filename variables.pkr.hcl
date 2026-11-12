@@ -102,7 +102,7 @@ variable "exec_ssm_version" {
 variable "efs_utils_version" {
   type        = string
   description = "amazon-efs-utils version to build AMI with. Pinned so the AMI does not pick up efs-utils 4.0.0."
-  default     = "3.3.2"
+  default     = "3.3.5"
 }
 
 variable "source_ami_al2" {
