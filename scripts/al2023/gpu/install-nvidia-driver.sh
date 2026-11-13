@@ -198,6 +198,7 @@ if [[ ${NVIDIA_DRIVER_TREES:-false} == "true" ]]; then
   echo "version-specific packages: ${#VERSION_SPECIFIC_PACKAGES[@]} (${VERSION_SPECIFIC_PACKAGES[*]})"
   source /tmp/build-nvidia-trees.sh
   read_driver_branches
+  write_branch_files
   for branch in "${NAMES[@]}"; do
     download_branch_packages "$branch" "${VERSION_SPECIFIC_PACKAGES[@]}"
   done

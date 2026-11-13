@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Functions that build a per-version NVIDIA driver tree for each branch in nvidia_driver_branches_al2023, under
 # /opt/nvidia/<branch>. install-nvidia-driver.sh sources this file and calls them after the native install, only when
-# nvidia_driver_trees_al2023 is on (off by default). So far they download and check each branch's packages and remove
-# them again. Nothing reads the trees yet: the native driver still runs the AMI.
+# nvidia_driver_trees_al2023 is on (off by default). So far they write the branch selection files
+# nvidia-branch-resolve.sh reads, and download and check each branch's packages and remove them again. Nothing reads
+# the trees yet: the native driver still runs the AMI.
 
 TREES_BUILD_DIR=/opt/nvidia-build # scratch space for the build, removed at the end
 NVIDIA_DRIVER_VERSION_FILE=${NVIDIA_DRIVER_VERSION_FILE:-/tmp/NVIDIA_DRIVER_VERSION}
@@ -51,6 +52,33 @@ read_driver_branches() {
         echo "branch $name: ${VERSION[$name]} (flavors: ${FLAVORS[$name]})"
     done
 }
+# write_branch_files: write the two files nvidia-branch-resolve.sh picks the instance's branch from at boot, in
+# /etc/nvidia-driver-trees:
+#   nvidia-branches         one branch name per line, the default branch first, e.g. "lts" then "pb"
+#   nvidia-branch-families  one "<family> <branch>" line per family in nvidia_driver_branch_families_al2023, e.g. "g7 pb"
+#
+# Packer passes the families in NVIDIA_DRIVER_BRANCH_FAMILIES as "family=branch" pairs. Each must name a branch
+# read_driver_branches read, so a typo in the map fails the build instead of failing every boot of that family.
+write_branch_files() {
+    local conf=${NVIDIA_TREES_CONF:-/etc/nvidia-driver-trees} pair family branch family_lines=()
+    for pair in ${NVIDIA_DRIVER_BRANCH_FAMILIES:-}; do
+        [[ $pair =~ ^[a-z0-9-]+=[a-z0-9-]+$ ]] || die "bad family '$pair' in NVIDIA_DRIVER_BRANCH_FAMILIES (want family=branch, lowercase)"
+        family=${pair%%=*}
+        branch=${pair#*=}
+        [[ -n ${FLAVORS[$branch]:-} ]] || die "family $family: branch '$branch' isn't in nvidia_driver_branches_al2023"
+        family_lines+=("$family $branch")
+    done
+
+    sudo mkdir -p "$conf"
+    printf '%s\n' "${NAMES[@]}" | sudo tee "$conf/nvidia-branches" >/dev/null
+    if [[ ${#family_lines[@]} -gt 0 ]]; then
+        printf '%s\n' "${family_lines[@]}" | sudo tee "$conf/nvidia-branch-families" >/dev/null
+    else
+        sudo truncate -s 0 "$conf/nvidia-branch-families"
+    fi
+    echo "branches: ${NAMES[*]}; families: ${family_lines[*]:-none} (written to $conf)"
+}
+
 # pinned_version KEY: the version NVIDIA_DRIVER_VERSION pins for KEY, by exact key, so _al2023 doesn't match _al2023_pb
 pinned_version() {
     awk -F'"' -v key="$1" '$1 ~ "^" key " *= *$" {print $2}' "$NVIDIA_DRIVER_VERSION_FILE"

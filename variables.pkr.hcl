@@ -283,6 +283,14 @@ variable "nvidia_driver_branches_al2023" {
   }
 }
 
+variable "nvidia_driver_branch_families_al2023" {
+  type        = map(string)
+  description = "Driver branch of each instance family that doesn't use the default NVIDIA driver branch. List a family only once its GPUs are qualified on the branch, and only for a branch that builds the kernel module flavor they use."
+  default = {
+    g7 = "pb"
+  }
+}
+
 variable "nvidia_driver_trees_al2023" {
   type        = bool
   description = "Build a per-version NVIDIA driver tree for each branch in nvidia_driver_branches_al2023 into the AL2023 GPU AMI. Off by default: the AMI is built as before. Nothing uses the trees at boot yet."
