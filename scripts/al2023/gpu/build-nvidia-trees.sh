@@ -1,93 +1,136 @@
 #!/usr/bin/env bash
-# Build a per-version NVIDIA driver tree for each branch in nvidia_driver_branches_al2023, under /opt/nvidia/<branch>.
-#
-# Runs at build time only when nvidia_driver_trees_al2023 is on (off by default). So far it reads and checks the
-# branches and their versions, and writes the branch selection files nvidia-branch-resolve.sh reads. Nothing reads the
-# trees yet: the natively installed driver still runs the AMI.
-set -Eeuo pipefail
+# Functions that build a per-version NVIDIA driver tree for each branch in nvidia_driver_branches_al2023, under
+# /opt/nvidia/<branch>. install-nvidia-driver.sh sources this file and calls them after the native install, only when
+# nvidia_driver_trees_al2023 is on (off by default). So far they write the branch selection files
+# nvidia-branch-resolve.sh reads, and download and check each branch's packages and remove them again. Nothing reads
+# the trees yet: the native driver still runs the AMI.
 
-if [[ ${NVIDIA_DRIVER_TREES:-false} != "true" ]]; then
-    echo "build-nvidia-trees: skipping (NVIDIA_DRIVER_TREES=${NVIDIA_DRIVER_TREES:-false})"
-    exit 0
-fi
+TREES_BUILD_DIR=/opt/nvidia-build # scratch space for the build, removed at the end
+NVIDIA_DRIVER_VERSION_FILE=${NVIDIA_DRIVER_VERSION_FILE:-/tmp/NVIDIA_DRIVER_VERSION}
 
 die() {
     echo "ERROR: $*" >&2
     exit 1
 }
 
-# ==================================================================================================================
-# Branches, flavors and versions
-# ==================================================================================================================
+# read_driver_branches: fill NAMES, FLAVORS and VERSION from NVIDIA_DRIVER_BRANCHES and NVIDIA_DRIVER_VERSION.
+#
 # Packer passes nvidia_driver_branches_al2023 in order as "name=flavor,flavor" pairs; the first branch is the default,
 # the natively installed driver. Each branch's full version is pinned in NVIDIA_DRIVER_VERSION, which check-update.sh
-# keeps current: nvidia_driver_version_al2023 for the default branch, nvidia_driver_version_al2023_<name> for the others.
-
-NVIDIA_DRIVER_VERSION_FILE=${NVIDIA_DRIVER_VERSION_FILE:-/tmp/NVIDIA_DRIVER_VERSION}
-
+# keeps current: nvidia_driver_version_al2023 for the default branch, nvidia_driver_version_al2023_<name> for the
+# others.
 NAMES=()                         # branch names, in order; NAMES[0] is the default branch
 declare -A FLAVORS=() VERSION=() # flavors and version of each branch, by name
-
-# Read the branches: each "lts=open,proprietary,grid" pair adds "lts" to NAMES and "open proprietary grid" to
-# FLAVORS[lts], keeping packer's order so the default branch comes first.
-for pair in ${NVIDIA_DRIVER_BRANCHES:-}; do
-    name=${pair%%=*}
-    flavors=${pair#*=}
-    NAMES+=("$name")
-    FLAVORS[$name]=${flavors//,/ }
-done
-[[ ${#NAMES[@]} -gt 0 ]] || die "no branches in NVIDIA_DRIVER_BRANCHES"
-
-# Read the versions: VERSION[lts] from nvidia_driver_version_al2023, VERSION[pb] from nvidia_driver_version_al2023_pb.
-pin() { # pin KEY: the version NVIDIA_DRIVER_VERSION pins for KEY (exact key, so _al2023 doesn't match _al2023_pb)
-    awk -F'"' -v k="$1" '$1 ~ "^" k " *= *$" {print $2}' "$NVIDIA_DRIVER_VERSION_FILE"
-}
-VERSION[${NAMES[0]}]=$(pin nvidia_driver_version_al2023)
-for name in "${NAMES[@]:1}"; do
-    VERSION[$name]=$(pin "nvidia_driver_version_al2023_$name")
-done
-
-# Check each branch: it needs a version and at least one flavor, every flavor must be open, proprietary or grid, and
-# the branch is logged with what it builds.
-for name in "${NAMES[@]}"; do
-    [[ -n ${VERSION[$name]:-} ]] || die "no driver version for branch '$name' in $NVIDIA_DRIVER_VERSION_FILE"
-    [[ -n ${FLAVORS[$name]} ]] || die "no kernel module flavors for branch '$name'"
-    for flavor in ${FLAVORS[$name]}; do
-        case $flavor in
-        open | proprietary | grid) ;;
-        *) die "branch $name: unknown flavor '$flavor'" ;;
-        esac
+read_driver_branches() {
+    local pair name flavor
+    # Each "lts=open,proprietary,grid" pair adds "lts" to NAMES and "open proprietary grid" to FLAVORS[lts], keeping
+    # packer's order so the default branch comes first.
+    for pair in ${NVIDIA_DRIVER_BRANCHES:-}; do
+        name=${pair%%=*}
+        NAMES+=("$name")
+        FLAVORS[$name]=${pair#*=}
+        FLAVORS[$name]=${FLAVORS[$name]//,/ }
     done
-    echo "branch $name: ${VERSION[$name]} (flavors: ${FLAVORS[$name]})"
-done
+    [[ ${#NAMES[@]} -gt 0 ]] || die "no branches in NVIDIA_DRIVER_BRANCHES"
 
-# ==================================================================================================================
-# Branch selection files
-# ==================================================================================================================
-# nvidia-branch-resolve.sh picks the instance's branch at boot from two files in /etc/nvidia-driver-trees:
+    # VERSION[lts] from nvidia_driver_version_al2023, VERSION[pb] from nvidia_driver_version_al2023_pb
+    VERSION[${NAMES[0]}]=$(pinned_version nvidia_driver_version_al2023)
+    for name in "${NAMES[@]:1}"; do
+        VERSION[$name]=$(pinned_version "nvidia_driver_version_al2023_$name")
+    done
+
+    # Each branch needs a version and at least one flavor, and every flavor must be open, proprietary or grid
+    for name in "${NAMES[@]}"; do
+        [[ -n ${VERSION[$name]:-} ]] || die "no driver version for branch '$name' in $NVIDIA_DRIVER_VERSION_FILE"
+        [[ -n ${FLAVORS[$name]} ]] || die "no kernel module flavors for branch '$name'"
+        for flavor in ${FLAVORS[$name]}; do
+            case $flavor in
+            open | proprietary | grid) ;;
+            *) die "branch $name: unknown flavor '$flavor'" ;;
+            esac
+        done
+        echo "branch $name: ${VERSION[$name]} (flavors: ${FLAVORS[$name]})"
+    done
+}
+# write_branch_files: write the two files nvidia-branch-resolve.sh picks the instance's branch from at boot, in
+# /etc/nvidia-driver-trees:
 #   nvidia-branches         one branch name per line, the default branch first, e.g. "lts" then "pb"
 #   nvidia-branch-families  one "<family> <branch>" line per family in nvidia_driver_branch_families_al2023, e.g. "g7 pb"
-# Packer passes the families as "family=branch" pairs. Each must name a branch above, so a typo in the map fails the
-# build instead of failing every boot of that family.
+#
+# Packer passes the families in NVIDIA_DRIVER_BRANCH_FAMILIES as "family=branch" pairs. Each must name a branch
+# read_driver_branches read, so a typo in the map fails the build instead of failing every boot of that family.
+write_branch_files() {
+    local conf=${NVIDIA_TREES_CONF:-/etc/nvidia-driver-trees} pair family branch family_lines=()
+    for pair in ${NVIDIA_DRIVER_BRANCH_FAMILIES:-}; do
+        [[ $pair =~ ^[a-z0-9-]+=[a-z0-9-]+$ ]] || die "bad family '$pair' in NVIDIA_DRIVER_BRANCH_FAMILIES (want family=branch, lowercase)"
+        family=${pair%%=*}
+        branch=${pair#*=}
+        [[ -n ${FLAVORS[$branch]:-} ]] || die "family $family: branch '$branch' isn't in nvidia_driver_branches_al2023"
+        family_lines+=("$family $branch")
+    done
 
-CONF=${NVIDIA_TREES_CONF:-/etc/nvidia-driver-trees}
+    sudo mkdir -p "$conf"
+    printf '%s\n' "${NAMES[@]}" | sudo tee "$conf/nvidia-branches" >/dev/null
+    if [[ ${#family_lines[@]} -gt 0 ]]; then
+        printf '%s\n' "${family_lines[@]}" | sudo tee "$conf/nvidia-branch-families" >/dev/null
+    else
+        sudo truncate -s 0 "$conf/nvidia-branch-families"
+    fi
+    echo "branches: ${NAMES[*]}; families: ${family_lines[*]:-none} (written to $conf)"
+}
 
-FAMILY_LINES=()
-for pair in ${NVIDIA_DRIVER_BRANCH_FAMILIES:-}; do
-    [[ $pair =~ ^[a-z0-9-]+=[a-z0-9-]+$ ]] || die "bad family '$pair' in NVIDIA_DRIVER_BRANCH_FAMILIES (want family=branch, lowercase)"
-    family=${pair%%=*}
-    branch=${pair#*=}
-    [[ -n ${FLAVORS[$branch]:-} ]] || die "family $family: branch '$branch' isn't in nvidia_driver_branches_al2023"
-    FAMILY_LINES+=("$family $branch")
-done
+# pinned_version KEY: the version NVIDIA_DRIVER_VERSION pins for KEY, by exact key, so _al2023 doesn't match _al2023_pb
+pinned_version() {
+    awk -F'"' -v key="$1" '$1 ~ "^" key " *= *$" {print $2}' "$NVIDIA_DRIVER_VERSION_FILE"
+}
 
-sudo mkdir -p "$CONF"
-printf '%s\n' "${NAMES[@]}" | sudo tee "$CONF/nvidia-branches" >/dev/null
-if [[ ${#FAMILY_LINES[@]} -gt 0 ]]; then
-    printf '%s\n' "${FAMILY_LINES[@]}" | sudo tee "$CONF/nvidia-branch-families" >/dev/null
-else
-    sudo truncate -s 0 "$CONF/nvidia-branch-families"
-fi
-echo "branches: ${NAMES[*]}; families: ${FAMILY_LINES[*]:-none} (written to $CONF)"
+# download_branch_packages NAME PACKAGE...: download branch NAME's version of the version-specific PACKAGEs, the
+# DKMS source packages its flavors build from, and check every signature.
+#
+# Each branch's packages are downloaded in one dnf transaction, so dnf resolves them together and every dependency comes
+# out at the branch's version, plus the other dependencies the host doesn't have yet (such as 595's egl-wayland2). The
+# default branch's packages are the native install's, already installed, so they're downloaded with reinstall.
+download_branch_packages() {
+    local name=$1 version=${VERSION[$1]} download_dir=$TREES_BUILD_DIR/download/$1 dkms_dir=$TREES_BUILD_DIR/dkms/$1
+    shift
+    local package flavor rpm_file result action=install
+    local package_specs=() dkms_packages=() rpm_files=()
+    sudo mkdir -p "$download_dir" "$dkms_dir"
 
-echo "build-nvidia-trees: done"
+    for package in "$@"; do package_specs+=("$package-$version"); done
+    if [[ $name == "${NAMES[0]}" ]]; then
+        action=reinstall
+    fi
+    sudo dnf -y "$action" --downloadonly --downloaddir="$download_dir" "${package_specs[@]}"
+
+    # dnf has to resolve a kmod-nvidia-*-dkms package, since nvidia-kmod-common requires nvidia-kmod at the same version
+    # and only those provide it, so they can't be excluded from the transaction. They're build inputs, downloaded per
+    # flavor below, so the resolved copy is removed.
+    sudo rm -f "$download_dir"/kmod-nvidia-*-dkms-*.rpm
+    echo "branch $name: packages:"
+    rpm -qp --nosignature --qf '  %{NAME} %{VERSION}\n' "$download_dir"/*.rpm | sort
+
+    # The DKMS source packages each branch builds its kernel modules from, one per flavor it lists. They conflict with
+    # each other, so they're downloaded without dependency resolution. The GRID flavor comes from the GRID runfile
+    # instead.
+    for flavor in ${FLAVORS[$name]}; do
+        case $flavor in
+        open) dkms_packages+=("kmod-nvidia-open-dkms-$version") ;;
+        proprietary) dkms_packages+=("kmod-nvidia-latest-dkms-$version") ;;
+        esac
+    done
+    [[ ${#dkms_packages[@]} -eq 0 ]] ||
+        sudo dnf -y download --destdir="$dkms_dir" "${dkms_packages[@]}"
+
+    # dnf checks the packages only against the repo metadata, which isn't signed (repo_gpgcheck=0), and the packages are
+    # unpacked rather than installed, so no install transaction checks their signatures either. Each one must be signed
+    # by a key the native install imported. rpmkeys exits 0 for an unsigned package, so the output is matched.
+    shopt -s nullglob
+    rpm_files=("$download_dir"/*.rpm "$dkms_dir"/*.rpm)
+    shopt -u nullglob
+    for rpm_file in "${rpm_files[@]}"; do
+        result=$(rpmkeys --checksig "$rpm_file") || die "branch $name: $result"
+        [[ $result == *"signatures OK" ]] || die "branch $name: not signed by an imported key: $result"
+    done
+    echo "branch $name: ${#rpm_files[@]} packages signed by an imported key"
+}
