@@ -150,7 +150,8 @@ if [ "$platform" = "al2023_gpu" ]; then
     nvidia_driver_pinned_major=$(awk -F '"' '/^ *lts *=/ { print $2 }' <<<"$nvidia_driver_majors")
     nvidia_driver_pb_major=$(awk -F '"' '/^ *pb *=/ { print $2 }' <<<"$nvidia_driver_majors")
     # A branch's version must also be in the GRID bucket only if the branch builds the grid flavor
-    # (nvidia_driver_branches_al2023). lts always does; pb doesn't, since no family on pb uses GRID.
+    # (nvidia_driver_branches_al2023). lts always does; pb does only if grid is in its flavors. This check never
+    # lowers a pin, so pb's pin must already be in every GRID bucket when grid is added back to its flavors.
     nvidia_driver_pb_grid=false
     if sed -n '/^variable "nvidia_driver_branches_al2023" {/,/^}/p' variables.pkr.hcl | grep -Eq '^ *pb *= *\{.*"grid"'; then
         nvidia_driver_pb_grid=true
@@ -171,7 +172,8 @@ if [[ $platform == al2023* ]]; then
     if [[ $platform == *gpu ]]; then
         # dnf check-upgrade only reports the single latest version across all majors,
         # so it can't detect updates within a pinned major. Instead, query the installed
-        # version and all available within the pinned major, then intersect with GRID bucket locally.
+        # version and all available within each branch's pinned major, then intersect with the GRID bucket locally
+        # for each branch that builds the grid flavor.
         gpu_cmd_installed="dnf repoquery --installed --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda"
         gpu_cmd_all="dnf repoquery --releasever=latest --disableplugin=versionlock --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda | grep '^${nvidia_driver_pinned_major}[.]' | sort -V"
         gpu_cmd_all_pb="dnf repoquery --releasever=latest --disableplugin=versionlock --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda | grep '^${nvidia_driver_pb_major}[.]' | sort -V"
