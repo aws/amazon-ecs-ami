@@ -52,31 +52,54 @@ read_driver_branches() {
         echo "branch $name: ${VERSION[$name]} (flavors: ${FLAVORS[$name]})"
     done
 }
-# write_branch_files: write the files nvidia-branch-resolve.sh picks the instance's branch from at boot, in
+# write_branch_files: write the files nvidia-branch-resolve.sh reads at boot to pick the instance's branch, into
 # /etc/nvidia-driver-trees:
-#   nvidia-branches          one branch name per line, the default branch first, e.g. "lts" then "pb"
-#   nvidia-devices-<branch>  one PCI device ID per line, each GPU the branch's open kernel modules support, e.g. "2c3a"
-#
-# The device IDs come from the supported-gpus.json in the branch's downloaded nvidia-driver package: every GPU it lists
-# with the kernelopen feature, except those it supports only on a legacy branch. So each list matches the exact version
-# the branch's tree is built from, and a new GPU needs no change here. Called after download_branch_packages.
+#   nvidia-branches          the branch names, one per line, the default branch first (e.g. "lts", then "pb")
+#   nvidia-devices-<branch>  the GPUs the branch's open kernel modules support, one PCI device ID per line (e.g. "2c3a")
+# Called after download_branch_packages, since it reads each branch's downloaded nvidia-driver package.
 write_branch_files() {
-    local conf=${NVIDIA_TREES_CONF:-/etc/nvidia-driver-trees} name devices
-    local - # pipefail for this function only, so a failed rpm2cpio or cpio fails the step too
-    set -o pipefail
-    sudo mkdir -p "$conf"
-    printf '%s\n' "${NAMES[@]}" | sudo tee "$conf/nvidia-branches" >/dev/null
+    local conf_dir=${NVIDIA_TREES_CONF:-/etc/nvidia-driver-trees} name device_list
+    sudo mkdir -p "$conf_dir"
+    printf '%s\n' "${NAMES[@]}" | sudo tee "$conf_dir/nvidia-branches" >/dev/null
+
     for name in "${NAMES[@]}"; do
-        devices=$conf/nvidia-devices-$name
-        rpm2cpio "$TREES_BUILD_DIR/download/$name/nvidia-driver-${VERSION[$name]}"-*.rpm |
-            cpio -i --quiet --to-stdout ./usr/share/doc/nvidia-driver/supported-gpus.json |
-            python3 -c 'import json, sys
-chips = json.load(sys.stdin)["chips"]
-for devid in sorted({c["devid"].lower()[2:] for c in chips if "kernelopen" in c["features"] and not c.get("legacybranch")}):
-    print(devid)' | sudo tee "$devices" >/dev/null || die "branch $name: cannot read supported-gpus.json from its nvidia-driver package"
-        [[ -s $devices ]] || die "branch $name: its supported-gpus.json lists no GPUs for the open kernel modules"
-        echo "branch $name: $(wc -l <"$devices") GPUs supported by the open kernel modules (written to $devices)"
+        device_list=$conf_dir/nvidia-devices-$name
+        write_device_list "$TREES_BUILD_DIR/download/$name/nvidia-driver-${VERSION[$name]}"-*.rpm "$device_list" ||
+            die "branch $name: cannot read the supported GPUs from its nvidia-driver package"
+        # An empty list would mean the branch serves no GPU, so a broken or changed file fails the build here
+        [[ -s $device_list ]] || die "branch $name: its nvidia-driver package lists no GPUs for the open kernel modules"
     done
+}
+
+# Python, since jq isn't on the build host. supported-gpus.json lists each GPU as
+#   {"devid": "0x2C3A", "name": "...", "features": ["kernelopen", ...], "legacybranch": "580.xx"}
+# A GPU is kept if:
+#   - "kernelopen" is in its features: the open kernel modules support it
+#   - it has no "legacybranch": NVIDIA hasn't moved it to an older driver series, so this version supports it
+# Each kept device ID is printed the way lspci shows it: lowercase, without "0x" ("2c3a").
+PRINT_OPEN_MODULE_DEVICE_IDS='
+import json, sys
+
+gpus = json.load(sys.stdin)["chips"]
+device_ids = set()
+for gpu in gpus:
+    if "kernelopen" in gpu["features"] and not gpu.get("legacybranch"):
+        device_ids.add(gpu["devid"].lower().removeprefix("0x"))
+for device_id in sorted(device_ids):
+    print(device_id)
+'
+
+# write_device_list DRIVER_PACKAGE DEVICE_LIST: write the PCI device ID of each GPU the open kernel modules support to
+# DEVICE_LIST, one per line, from supported-gpus.json, the list of supported GPUs NVIDIA ships in every nvidia-driver
+# package. Reading it from the package means each list matches the exact driver version the tree is built from, so a
+# new GPU or a new driver version needs no change here.
+write_device_list() {
+    local driver_package=$1 device_list=$2
+    local - # pipefail for this function only, so a failure anywhere in the pipeline fails it
+    set -o pipefail
+    # Take only supported-gpus.json out of the package, without unpacking the rest
+    rpm2cpio "$driver_package" | cpio -i --quiet --to-stdout ./usr/share/doc/nvidia-driver/supported-gpus.json |
+        python3 -c "$PRINT_OPEN_MODULE_DEVICE_IDS" | sudo tee "$device_list" >/dev/null
 }
 
 # pinned_version KEY: the version NVIDIA_DRIVER_VERSION pins for KEY, by exact key, so _al2023 doesn't match _al2023_pb
