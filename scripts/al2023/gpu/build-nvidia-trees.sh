@@ -108,15 +108,25 @@ download_branch_packages() {
     echo "branch $name: ${#rpm_files[@]} packages signed by an imported key"
 }
 
-# unpack_branch NAME: unpack branch NAME's downloaded packages into its tree. They're unpacked, not installed, because
-# one host can't install two versions of the same package.
+# unpack_branch BRANCH: unpack each of the branch's downloaded packages into its tree, /opt/nvidia/<branch>. The tree
+# ends up holding the driver's files at the same paths an install would put them under /, e.g.
+# /opt/nvidia/pb/usr/bin/nvidia-smi. The packages are unpacked, not installed, because one host can't install two
+# versions of the same package.
 unpack_branch() {
-    local name=$1 tree=$TREES_DIR/$1 rpm_file
+    local branch=$1 package
+    local tree_dir=$TREES_DIR/$branch
+    sudo mkdir -p "$tree_dir"
+    for package in "$TREES_BUILD_DIR/download/$branch"/*.rpm; do
+        unpack_package "$package" "$tree_dir" || die "branch $branch: cannot unpack $package"
+    done
+}
+
+# unpack_package PACKAGE DIR: unpack the files in an RPM package into DIR, without installing it. rpm2cpio turns the
+# package into a cpio archive, and cpio extracts it (-i), creating directories as needed (-d) and keeping each file's
+# modification time from the package (-m), as an install would.
+unpack_package() {
+    local package=$1 dir=$2
     local - # pipefail for this function only, so a failed rpm2cpio fails the unpack too
     set -o pipefail
-    sudo mkdir -p "$tree"
-    for rpm_file in "$TREES_BUILD_DIR/download/$name"/*.rpm; do
-        rpm2cpio "$rpm_file" | (cd "$tree" && sudo cpio -idmu --quiet) || die "branch $name: cannot unpack $rpm_file"
-    done
-    echo "branch $name: tree is $(sudo du -sh "$tree" | cut -f1)"
+    rpm2cpio "$package" | (cd "$dir" && sudo cpio -idm --quiet)
 }
