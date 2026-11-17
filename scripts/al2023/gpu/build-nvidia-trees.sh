@@ -121,12 +121,14 @@ unpack_branch() {
     done
 }
 
-# unpack_package PACKAGE DIR: unpack the files in an RPM package into DIR, without installing it. rpm2cpio turns the
-# package into a cpio archive, and cpio extracts it (-i), creating directories as needed (-d) and keeping each file's
-# modification time from the package (-m), as an install would.
+# unpack_package PACKAGE TARGET_DIR: unpack the files in an RPM package into TARGET_DIR, without installing it.
+# rpm2cpio turns the package into a cpio archive, and cpio extracts it (-i), creating directories as needed (-d) and
+# keeping each file's modification time from the package (-m), as an install would.
 unpack_package() {
-    local package=$1 dir=$2
+    local package=$1 target_dir=$2
     local - # pipefail for this function only, so a failed rpm2cpio fails the unpack too
     set -o pipefail
-    rpm2cpio "$package" | (cd "$dir" && sudo cpio -idm --quiet)
+    # cpio extracts into the current directory, so cd into TARGET_DIR first; the parentheses run that in a subshell,
+    # so the build's own current directory doesn't change
+    rpm2cpio "$package" | (cd "$target_dir" && sudo cpio -idm --quiet)
 }
