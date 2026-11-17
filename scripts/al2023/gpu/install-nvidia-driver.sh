@@ -201,8 +201,6 @@ if [[ ${NVIDIA_DRIVER_TREES:-false} == "true" ]]; then
   for branch in "${NAMES[@]}"; do
     download_branch_packages "$branch" "${VERSION_SPECIFIC_PACKAGES[@]}"
   done
-  # Write the files nvidia-branch-resolve.sh picks each instance's branch from at boot
-  write_branch_files
   sudo rm -rf "$TREES_BUILD_DIR"
 fi
 
