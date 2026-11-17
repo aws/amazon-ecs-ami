@@ -58,16 +58,20 @@ read_driver_branches() {
 #   nvidia-devices-<branch>  the GPUs the branch's open kernel modules support, one PCI device ID per line (e.g. "2c3a")
 # Called after download_branch_packages, since it reads each branch's downloaded nvidia-driver package.
 write_branch_files() {
-    local conf_dir=${NVIDIA_TREES_CONF:-/etc/nvidia-driver-trees} name device_list
-    sudo mkdir -p "$conf_dir"
-    printf '%s\n' "${NAMES[@]}" | sudo tee "$conf_dir/nvidia-branches" >/dev/null
+    local config_dir=${NVIDIA_TREES_CONFIG_DIR:-/etc/nvidia-driver-trees} branch device_list
+    sudo mkdir -p "$config_dir"
+    # Write NAMES (from read_driver_branches, default branch first) one per line. sudo tee writes the file as root,
+    # which /etc needs; >/dev/null drops the copy tee would also print.
+    printf '%s\n' "${NAMES[@]}" | sudo tee "$config_dir/nvidia-branches" >/dev/null
 
-    for name in "${NAMES[@]}"; do
-        device_list=$conf_dir/nvidia-devices-$name
-        write_device_list "$TREES_BUILD_DIR/download/$name/nvidia-driver-${VERSION[$name]}"-*.rpm "$device_list" ||
-            die "branch $name: cannot read the supported GPUs from its nvidia-driver package"
-        # An empty list would mean the branch serves no GPU, so a broken or changed file fails the build here
-        [[ -s $device_list ]] || die "branch $name: its nvidia-driver package lists no GPUs for the open kernel modules"
+    for branch in "${NAMES[@]}"; do
+        device_list=$config_dir/nvidia-devices-$branch
+        # The * matches the package's release and architecture, e.g. nvidia-driver-595.91.07-1.amzn2023.x86_64.rpm
+        write_device_list "$TREES_BUILD_DIR/download/$branch/nvidia-driver-${VERSION[$branch]}"-*.rpm "$device_list" ||
+            die "branch $branch: cannot read the supported GPUs from its nvidia-driver package"
+        # -s: the file isn't empty. An empty list would mean the branch serves no GPU, so a broken or changed
+        # supported-gpus.json fails the build here instead of sending every instance to another branch.
+        [[ -s $device_list ]] || die "branch $branch: its nvidia-driver package lists no GPUs for the open modules"
     done
 }
 
@@ -97,7 +101,8 @@ write_device_list() {
     local driver_package=$1 device_list=$2
     local - # pipefail for this function only, so a failure anywhere in the pipeline fails it
     set -o pipefail
-    # Take only supported-gpus.json out of the package, without unpacking the rest
+    # rpm2cpio turns the package into a cpio archive; cpio extracts (-i) only supported-gpus.json from it and writes
+    # it to the pipe (--to-stdout) instead of to disk. The filter's device IDs go into DEVICE_LIST, as root.
     rpm2cpio "$driver_package" | cpio -i --quiet --to-stdout ./usr/share/doc/nvidia-driver/supported-gpus.json |
         python3 -c "$PRINT_OPEN_MODULE_DEVICE_IDS" | sudo tee "$device_list" >/dev/null
 }

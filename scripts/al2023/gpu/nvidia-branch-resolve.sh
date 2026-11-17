@@ -7,11 +7,16 @@
 # from build-nvidia-trees.sh's write_branch_files. lspci reads the GPUs from sysfs, which needs no network, so this
 # can run early in boot. Nothing runs this yet: the AMI doesn't install it, and nvidia_driver_trees_al2023 is off by
 # default.
+
+# Stop on any failed command (-e), including one inside a pipeline (pipefail) or a function (-E), and on any unset
+# variable (-u)
 set -Eeuo pipefail
 
-CONF_DIR=${NVIDIA_TREES_CONF:-/etc/nvidia-driver-trees} # the build's branch lists
-TREES_DIR=${NVIDIA_TREES_DIR:-/opt/nvidia}              # one driver tree per branch
-RUN_DIR=${NVIDIA_TREES_RUN:-/run/nvidia-driver-trees}   # where the chosen branch is written
+# The three directories, each overridable so tests can use temporary ones. The chosen branch goes under /run, which is
+# cleared every boot, so the branch is picked again after a stop/start onto an instance type with another GPU.
+CONFIG_DIR=${NVIDIA_TREES_CONFIG_DIR:-/etc/nvidia-driver-trees} # the branch lists the build wrote
+TREES_DIR=${NVIDIA_TREES_DIR:-/opt/nvidia}                      # one driver tree per branch
+RUN_DIR=${NVIDIA_TREES_RUN_DIR:-/run/nvidia-driver-trees}       # where the chosen branch is written
 
 die() {
     echo "ERROR: $*" >&2
@@ -20,20 +25,25 @@ die() {
 
 # 1. Read the branch names, default first, and check each branch's GPU list. A malformed file fails this step rather
 #    than sending the instance to the default branch.
-[[ -f $CONF_DIR/nvidia-branches ]] || die "missing $CONF_DIR/nvidia-branches"
-awk 'NF != 1 {exit 1}' "$CONF_DIR/nvidia-branches" || die "$CONF_DIR/nvidia-branches: want one branch name per line"
-mapfile -t branches <"$CONF_DIR/nvidia-branches"
-[[ ${#branches[@]} -gt 0 ]] || die "no branches in $CONF_DIR/nvidia-branches"
+[[ -f $CONFIG_DIR/nvidia-branches ]] || die "missing $CONFIG_DIR/nvidia-branches"
+# NF is the number of words on a line: every line must be exactly one branch name
+awk 'NF != 1 {exit 1}' "$CONFIG_DIR/nvidia-branches" || die "$CONFIG_DIR/nvidia-branches: want one branch name per line"
+# Read the file into an array, one branch per element (-t drops each line's newline)
+mapfile -t branches <"$CONFIG_DIR/nvidia-branches"
+[[ ${#branches[@]} -gt 0 ]] || die "no branches in $CONFIG_DIR/nvidia-branches"
 for branch in "${branches[@]}"; do
-    device_list=$CONF_DIR/nvidia-devices-$branch
+    device_list=$CONFIG_DIR/nvidia-devices-$branch
     [[ -f $device_list ]] || die "missing $device_list"
+    # grep -v -x finds any whole line that isn't 4 lowercase hex digits; -q only reports whether there is one
     if grep -qvx '[0-9a-f]\{4\}' "$device_list"; then
         die "$device_list: want one 4-digit lowercase PCI device ID per line"
     fi
 done
 
-# 2. Read the PCI device ID of each attached NVIDIA GPU: vendor 10de, class 0300 (VGA controller, like G4dn's T4) or
-#    0302 (3D controller, like P5's H100). lspci -n -mm prints one line per device, with the device ID in field 4.
+# 2. Read the PCI device ID of each attached NVIDIA GPU. lspci -d picks vendor 10de (NVIDIA) and class 0300 (VGA
+#    controller, like G4dn's T4) or 0302 (3D controller, like P5's H100); -n prints IDs instead of names, and -mm one
+#    quoted line per device, e.g. on G7:  2f:00.0 "0302" "10de" "2c3a" -ra1 "10de" "21f4"
+#    awk takes the 4th field, the device ID, without its quotes ("2c3a" -> 2c3a).
 mapfile -t gpu_device_ids < <({
     lspci -n -mm -d 10de::0300
     lspci -n -mm -d 10de::0302
@@ -44,7 +54,8 @@ chosen_branch=${branches[0]}
 for branch in "${branches[@]}"; do
     supports_every_gpu=true
     for gpu_device_id in "${gpu_device_ids[@]}"; do
-        grep -qx "$gpu_device_id" "$CONF_DIR/nvidia-devices-$branch" || supports_every_gpu=false
+        # -x: the whole line must match, so "2c3a" doesn't match a longer ID
+        grep -qx "$gpu_device_id" "$CONFIG_DIR/nvidia-devices-$branch" || supports_every_gpu=false
     done
     if [[ $supports_every_gpu == true ]]; then
         chosen_branch=$branch
