@@ -155,10 +155,17 @@ function archive-grid-kmod() {
         --kernel-module-type open \
         --silent
 
+    # Keep a copy of the DKMS source, then uninstall the runfile driver.
+    sudo cp -a /usr/src/nvidia-$NVIDIA_DRIVER_FULL_VERSION /usr/src/nvidia-grid-$NVIDIA_DRIVER_FULL_VERSION
+    sudo ./nvidia-installer --uninstall --silent
+
+    # Install vGPU license daemon from the runfile
+    echo "Installing nvidia-gridd for vGPU licensing..."
+    sudo install -m 0755 nvidia-gridd /usr/bin/
+    sudo install -m 0644 init-scripts/systemd/nvidia-gridd.service /etc/systemd/system/
+
     # Rename DKMS package to nvidia-grid to avoid conflicts with other variants
-    sudo dkms remove "nvidia/$NVIDIA_DRIVER_FULL_VERSION" --all
-    sudo sed -i 's/PACKAGE_NAME="nvidia"/PACKAGE_NAME="nvidia-grid"/' /usr/src/nvidia-$NVIDIA_DRIVER_FULL_VERSION/dkms.conf
-    sudo mv /usr/src/nvidia-$NVIDIA_DRIVER_FULL_VERSION /usr/src/nvidia-grid-$NVIDIA_DRIVER_FULL_VERSION
+    sudo sed -i 's/PACKAGE_NAME="nvidia"/PACKAGE_NAME="nvidia-grid"/' /usr/src/nvidia-grid-$NVIDIA_DRIVER_FULL_VERSION/dkms.conf
     sudo dkms add -m nvidia-grid -v $NVIDIA_DRIVER_FULL_VERSION
     sudo dkms build -m nvidia-grid -v $NVIDIA_DRIVER_FULL_VERSION
     sudo dkms install -m nvidia-grid -v $NVIDIA_DRIVER_FULL_VERSION

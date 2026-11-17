@@ -59,7 +59,12 @@ main() {
     fi
 
     echo "Loading NVIDIA kernel module: ${module_name}"
-    exec kmod-util load "${module_name}"
+    kmod-util load "${module_name}"
+
+    # Start the nvidia-gridd service if using GRID drivers
+    if [[ ${module_name} == "nvidia-grid" ]]; then
+        systemctl start --no-block nvidia-gridd.service
+    fi
 }
 
 main "$@"
