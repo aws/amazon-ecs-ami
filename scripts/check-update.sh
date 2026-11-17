@@ -73,7 +73,9 @@ handle_nvidia_version() {
         fi
     fi
 
-    # Update the pb driver tree's version entry if available (AL2023 only)
+    # Update the pb driver tree's version entry if available (AL2023 only): replace the value on the line
+    #   nvidia_driver_version_al2023_pb = "<version>"
+    # in NVIDIA_DRIVER_VERSION, the same way the lts entry above is updated
     if [ -n "$nvidia_pb_version" ] && [ "$ami_variant" = "al2023" ]; then
         if grep -q "^${nvidia_version_key}_pb = " NVIDIA_DRIVER_VERSION; then
             if ! sed -i "s/^${nvidia_version_key}_pb = .*/${nvidia_version_key}_pb = \"${nvidia_pb_version}\"/" NVIDIA_DRIVER_VERSION; then
