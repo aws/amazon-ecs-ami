@@ -8,8 +8,8 @@ packer {
 }
 
 locals {
-  packages_al2    = "amazon-efs-utils-${var.efs_utils_version} ec2-net-utils acpid amazon-ssm-agent yum-plugin-upgrade-helper iproute-tc"
-  packages_al2023 = "amazon-efs-utils-${var.efs_utils_version} amazon-ssm-agent amazon-ec2-net-utils acpid iproute-tc ec2-instance-connect"
+  packages_al2    = "amazon-efs-utils ec2-net-utils acpid amazon-ssm-agent yum-plugin-upgrade-helper iproute-tc"
+  packages_al2023 = "amazon-efs-utils amazon-ssm-agent amazon-ec2-net-utils acpid iproute-tc ec2-instance-connect"
 }
 
 variable "ami_name_prefix_al2" {
@@ -97,12 +97,6 @@ variable "exec_ssm_version" {
   type        = string
   default     = "3.3.5700.0"
   description = "SSM binary version to build ECS exec support with."
-}
-
-variable "efs_utils_version" {
-  type        = string
-  description = "amazon-efs-utils version to build AMI with. Pinned so the AMI does not pick up efs-utils 4.0.0."
-  default     = "3.*"
 }
 
 variable "source_ami_al2" {
