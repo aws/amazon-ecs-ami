@@ -226,7 +226,7 @@ echo ib_umad | sudo tee /etc/modules-load.d/ib_umad.conf
 ### Dynamic Driver Loading Setup ###
 # Install boot-time service that detects GPU hardware and loads the right driver
 # This service runs early in boot to ensure the correct driver is loaded before applications start
-sudo mv /tmp/nvidia-kmod-load.sh /etc/ecs/
+sudo mv /tmp/nvidia-driver-load.sh /etc/ecs/
 sudo mv /tmp/nvidia-kmod-load.service /etc/systemd/system/nvidia-kmod-load.service
 
 ### GPU Clock Pinning Setup ###
