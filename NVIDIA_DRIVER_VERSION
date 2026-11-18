@@ -15,6 +15,6 @@
 # variables.pkr.hcl.
 
 nvidia_driver_version_al2 = "550.163.01"
-nvidia_driver_version_al2023 = "580.178.04"
-nvidia_driver_version_al2023_pb = "595.91.07"
+nvidia_driver_version_al2023 = "595.91.07"
+nvidia_driver_version_al2023_lts = "580.178.04"
 cuda_version_al2 = "12.4.1"

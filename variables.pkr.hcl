@@ -276,10 +276,10 @@ variable "nvidia_driver_majors_al2023" {
 
 variable "nvidia_driver_branches_al2023" {
   type        = map(object({ flavors = list(string) }))
-  description = "NVIDIA driver branches for AL2023 GPU AMIs, by name, and the kernel module flavors (open, proprietary, grid) each builds. lts is the default branch, the natively installed driver, which builds all three; every other branch is built as a driver tree when nvidia_driver_trees_al2023 is on. Each branch's full version is in NVIDIA_DRIVER_VERSION, within its major in nvidia_driver_majors_al2023."
+  description = "NVIDIA driver branches for AL2023 GPU AMIs, by name, and the kernel module flavors (open, proprietary, grid) each builds. pb is the default branch, the natively installed driver, used by every GPU except the ones in NVIDIA_LTS_SUBDEVICES in scripts/al2023/gpu/nvidia-driver-load.sh. lts is built as a driver tree when nvidia_driver_trees_al2023 is on, with only the proprietary flavor, for the GPUs pb no longer supports (P3, P3dn and G3). Each branch's full version is in NVIDIA_DRIVER_VERSION, within its major in nvidia_driver_majors_al2023."
   default = {
-    lts = { flavors = ["open", "proprietary", "grid"] }
-    pb  = { flavors = ["open"] }
+    lts = { flavors = ["proprietary"] }
+    pb  = { flavors = ["open", "grid"] }
   }
 }
 

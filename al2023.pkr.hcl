@@ -11,9 +11,9 @@ locals {
   merged_tags = merge("${local.default_tags}", "${var.tags}")
   # Regions where the GRID driver S3 bucket is unavailable
   skip_grid_driver_regions = "eusc-de-east-1,eu-isoe-west-1"
-  # NVIDIA driver branches: lts is the native install's, the others are driver trees. The shell scripts get them as
-  # "name=flavor,flavor" pairs, the default branch first.
-  nvidia_driver_default_branch = "lts"
+  # NVIDIA driver branches: pb is the default, the native install's, and the others are driver trees. The shell scripts
+  # get them as "name=flavor,flavor" pairs, the default branch first.
+  nvidia_driver_default_branch = "pb"
   nvidia_driver_branches = join(" ", concat(
     ["${local.nvidia_driver_default_branch}=${join(",", var.nvidia_driver_branches_al2023[local.nvidia_driver_default_branch].flavors)}"],
     [for name, branch in var.nvidia_driver_branches_al2023 : "${name}=${join(",", branch.flavors)}" if name != local.nvidia_driver_default_branch]
