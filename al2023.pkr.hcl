@@ -209,7 +209,7 @@ build {
     sources = [
       "scripts/al2023/gpu/kmod-util",
       "scripts/al2023/gpu/nvidia-kmod-load.service",
-      "scripts/al2023/gpu/nvidia-kmod-load.sh",
+      "scripts/al2023/gpu/nvidia-driver-load.sh",
       "scripts/al2023/gpu/set-nvidia-clocks",
       "scripts/al2023/gpu/set-nvidia-clocks.service",
       "scripts/al2023/gpu/nvidia-mps.service",

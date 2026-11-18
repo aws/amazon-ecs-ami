@@ -19,15 +19,12 @@ readonly NVIDIA_PROPRIETARY_SUBDEVICES=(
   "1db5:1249" # P3dn instances
   "13f2:113a" # G3 instances
 )
-# GPUs that need the PB driver branch (595) instead of the default LTS (580), for the per-version driver trees. List a
-# GPU only once it's qualified on PB, and only if PB builds the flavor it loads (nvidia_driver_branches_al2023).
-#
-# Picking a driver branch isn't loading a kernel module, but it's in this script anyway: this is the one script that
-# already checks the GPU at every boot, and the branch decides which kernel modules load. A list in
-# build-nvidia-trees.sh or variables.pkr.hcl would need a separate boot script to read it, since those only run at
-# build time, when the instance's GPU isn't known.
-readonly NVIDIA_PB_SUBDEVICES=(
-  "2c3a:21f4" # G7 instances
+# GPUs that need the LTS driver branch (580) instead of the default PB (595): P3 and G3 instances, whose GPUs NVIDIA
+# no longer supports after 580
+readonly NVIDIA_LTS_SUBDEVICES=(
+  "1db1:1212" # P3 instances
+  "1db5:1249" # P3dn instances
+  "13f2:113a" # G3 instances
 )
 
 # Helper function to check if any device matches a given array of subdevice IDs
@@ -56,9 +53,9 @@ device-supports-grid() {
   device-supports-module-type NVIDIA_GRID_SUBDEVICES
 }
 
-# Check if any device needs the PB driver branch (G7 instances)
-device-needs-pb() {
-  device-supports-module-type NVIDIA_PB_SUBDEVICES
+# Check if any device needs the LTS driver branch (P3 and G3 instances)
+device-needs-lts() {
+  device-supports-module-type NVIDIA_LTS_SUBDEVICES
 }
 
 # Determine and load the appropriate NVIDIA kernel module
@@ -73,15 +70,14 @@ main() {
     module_name="nvidia" # Fallback to open-source kmod for all other devices
   fi
 
-  # With the per-version driver trees (nvidia_driver_trees_al2023), record which branch's tree this instance uses.
-  # Nothing reads it yet. The check is for the LTS tree, not /opt/nvidia, because nvlsm installs into /opt/nvidia too.
+  # Only on AMIs built with the per-version driver trees (nvidia_driver_trees_al2023), which put one tree per branch
+  # under /opt/nvidia (checking lts's, since nvlsm also installs into /opt/nvidia): pick this instance's branch,
+  # pb unless the GPU needs lts.
   if [[ -d /opt/nvidia/lts ]]; then
-    local branch="lts"
-    if device-needs-pb; then
-      branch="pb"
+    local branch="pb"
+    if device-needs-lts; then
+      branch="lts"
     fi
-    mkdir -p /run/nvidia-driver-trees
-    echo "${branch}" >/run/nvidia-driver-trees/branch
   fi
 
   echo "Loading NVIDIA kernel module: ${module_name}"
