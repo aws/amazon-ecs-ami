@@ -22,9 +22,10 @@ readonly NVIDIA_PROPRIETARY_SUBDEVICES=(
 # GPUs that need the PB driver branch (595) instead of the default LTS (580), for the per-version driver trees. List a
 # GPU only once it's qualified on PB, and only if PB builds the flavor it loads (nvidia_driver_branches_al2023).
 #
-# The list is here, not in build-nvidia-trees.sh or variables.pkr.hcl, because those only run at build time, when the
-# instance's GPU isn't known: they would need a separate boot script to read the list. This script already checks the
-# GPU at every boot.
+# Picking a driver branch isn't loading a kernel module, but it's in this script anyway: this is the one script that
+# already checks the GPU at every boot, and the branch decides which kernel modules load. A list in
+# build-nvidia-trees.sh or variables.pkr.hcl would need a separate boot script to read it, since those only run at
+# build time, when the instance's GPU isn't known.
 readonly NVIDIA_PB_SUBDEVICES=(
   "2c3a:21f4" # G7 instances
 )
