@@ -52,6 +52,7 @@ handle_nvidia_version() {
         for field in "${fields[@]}"; do
             case "$field" in
             nvidia:*)
+                # AL2's driver version (AL2023 reports each branch as nvidia_<branch>: below)
                 nvidia_version="${field#nvidia:}"
                 ;;
             nvidia_*:*)

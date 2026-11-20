@@ -164,7 +164,7 @@ if [[ $platform == al2023* ]]; then
         # dnf check-upgrade only reports the single latest version across all majors, so it can't detect updates within
         # a major. Instead, query all versions available within each branch's major; they're compared with the
         # branch's version in NVIDIA_DRIVER_VERSION below (pb's also intersected with the GRID bucket), rather than with
-        # the published AMI's installed driver, since the driver trees don't install a driver natively.
+        # the published AMI's installed driver, since lts isn't installed on the AMI.
         gpu_cmd_all_pb="dnf repoquery --releasever=latest --disableplugin=versionlock --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda | grep '^${nvidia_driver_pb_major}[.]' | sort -V"
         gpu_cmd_all_lts="dnf repoquery --releasever=latest --disableplugin=versionlock --arch=x86_64 --queryformat '%{version}' nvidia-driver-cuda | grep '^${nvidia_driver_lts_major}[.]' | sort -V"
         command_params="commands=[\"echo REPO_VERSIONS_PB=\$(${gpu_cmd_all_pb} | paste -sd,)\",\"echo REPO_VERSIONS_LTS=\$(${gpu_cmd_all_lts} | paste -sd,)\"]"
@@ -265,7 +265,8 @@ if [ "$platform" = "al2023_gpu" ]; then
     #   nvidia_driver_version_al2023_pb = "595.91.07"
     # awk splits on double quotes: the 1st field must be exactly the key, and the 2nd is the version
     nvidia_driver_pb_version=$(awk -F '"' '$1 ~ /^nvidia_driver_version_al2023_pb *= *$/ { print $2 }' NVIDIA_DRIVER_VERSION)
-    nvidia_driver_pb_repo_versions_csv=$(echo "$std_output" | grep "^REPO_VERSIONS_PB=" | cut -d'=' -f2)
+    # The pb repo versions the check instance reported, comma-separated
+    nvidia_driver_pb_repo_versions_csv=$(echo "$std_output" | grep "^REPO_VERSIONS_PB=" | cut -d'=' -f2 || true)
 
     if [ -z "$nvidia_driver_pb_version" ] || [ -z "$nvidia_driver_pb_repo_versions_csv" ]; then
         echo "ERROR: Could not determine pb's NVIDIA driver version or its available versions"
@@ -319,17 +320,17 @@ if [ "$platform" = "al2023_gpu" ]; then
         output="$output nvidia_pb:$nvidia_driver_pb_latest_version"
     fi
 
-    # lts: the newest version within lts's major in the repo. lts builds only the proprietary flavor, so its version
-    # doesn't need to be in the GRID bucket.
     # lts's pin in NVIDIA_DRIVER_VERSION, read the same way as pb's
     nvidia_driver_lts_version=$(awk -F '"' '$1 ~ /^nvidia_driver_version_al2023_lts *= *$/ { print $2 }' NVIDIA_DRIVER_VERSION)
     # The lts repo versions the check instance reported, comma-separated
     nvidia_driver_lts_repo_versions_csv=$(echo "$std_output" | grep "^REPO_VERSIONS_LTS=" | cut -d'=' -f2 || true)
+
     if [ -z "$nvidia_driver_lts_version" ] || [ -z "$nvidia_driver_lts_repo_versions_csv" ]; then
         echo "ERROR: Could not determine lts's NVIDIA driver version or its available versions"
         exit 1
     fi
-    # The newest of them
+
+    # The newest lts repo version. lts builds only the proprietary flavor, so it doesn't need to be in the GRID bucket.
     nvidia_driver_lts_latest_version=$(echo "$nvidia_driver_lts_repo_versions_csv" | tr ',' '\n' | grep -v '^$' | sort -V | tail -1)
     nvidia_driver_lts_newer=$(printf '%s\n%s' "$nvidia_driver_lts_version" "$nvidia_driver_lts_latest_version" | sort -V | tail -1)
     if [ "$nvidia_driver_lts_newer" != "$nvidia_driver_lts_version" ]; then
