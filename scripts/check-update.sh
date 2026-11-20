@@ -78,10 +78,12 @@ handle_nvidia_version() {
     # Update each AL2023 driver branch's version entry, the line
     #   nvidia_driver_version_al2023_<branch> = "<version>"
     # in NVIDIA_DRIVER_VERSION, the same way the entry above is updated
-    local branch
+    local branch branch_key branch_version
     for branch in "${!nvidia_branch_versions[@]}"; do
-        if [ "$ami_variant" = "al2023" ] && grep -q "^${nvidia_version_key}_${branch} = " NVIDIA_DRIVER_VERSION; then
-            if ! sed -i "s/^${nvidia_version_key}_${branch} = .*/${nvidia_version_key}_${branch} = \"${nvidia_branch_versions[$branch]}\"/" NVIDIA_DRIVER_VERSION; then
+        branch_key="${nvidia_version_key}_${branch}"
+        branch_version="${nvidia_branch_versions[$branch]}"
+        if [ "$ami_variant" = "al2023" ] && grep -q "^${branch_key} = " NVIDIA_DRIVER_VERSION; then
+            if ! sed -i "s/^${branch_key} = .*/${branch_key} = \"${branch_version}\"/" NVIDIA_DRIVER_VERSION; then
                 echo "Failed to update the ${branch} NVIDIA driver version in NVIDIA_DRIVER_VERSION file"
             fi
         fi

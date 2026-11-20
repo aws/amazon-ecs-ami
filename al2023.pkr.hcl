@@ -11,8 +11,10 @@ locals {
   merged_tags = merge("${local.default_tags}", "${var.tags}")
   # Regions where the GRID driver S3 bucket is unavailable
   skip_grid_driver_regions = "eusc-de-east-1,eu-isoe-west-1"
-  # NVIDIA driver branches, as "name=flavor,flavor" pairs for the shell scripts
-  nvidia_driver_branches = join(" ", [for name, branch in var.nvidia_driver_branches_al2023 : "${name}=${join(",", branch.flavors)}"])
+  # Each NVIDIA driver branch as "name=flavor,flavor", e.g. "pb=open,grid"
+  nvidia_driver_branch_pairs = [for name, branch in var.nvidia_driver_branches_al2023 : "${name}=${join(",", branch.flavors)}"]
+  # All branches, space-separated, for the shell scripts
+  nvidia_driver_branches = join(" ", local.nvidia_driver_branch_pairs)
 }
 
 source "amazon-ebs" "al2023" {

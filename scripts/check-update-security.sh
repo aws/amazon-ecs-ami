@@ -319,7 +319,10 @@ if [ "$platform" = "al2023_gpu" ]; then
     # its version doesn't need to be in the GRID bucket. An lts problem prints a warning and skips lts, so it never
     # holds back pb updates.
     nvidia_driver_lts_version=$(awk -F '"' '$1 ~ /^nvidia_driver_version_al2023_lts *= *$/ { print $2 }' NVIDIA_DRIVER_VERSION)
-    nvidia_driver_lts_latest_version=$(echo "$std_output" | grep "^REPO_VERSIONS_LTS=" | cut -d'=' -f2 | tr ',' '\n' | grep -v '^$' | sort -V | tail -1 || true)
+    # The lts repo versions the check instance reported, comma-separated
+    nvidia_driver_lts_repo_versions_csv=$(echo "$std_output" | grep "^REPO_VERSIONS_LTS=" | cut -d'=' -f2 || true)
+    # The newest of them
+    nvidia_driver_lts_latest_version=$(echo "$nvidia_driver_lts_repo_versions_csv" | tr ',' '\n' | grep -v '^$' | sort -V | tail -1 || true)
     if [ -z "$nvidia_driver_lts_major" ] || [ -z "$nvidia_driver_lts_version" ] || [ -z "$nvidia_driver_lts_latest_version" ]; then
         echo "WARNING: Could not determine the lts NVIDIA driver's major, version or repo versions; not checking lts" >&2
     else
