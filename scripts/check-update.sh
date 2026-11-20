@@ -27,6 +27,7 @@ handle_nvidia_version() {
     fi
 
     local nvidia_version=""
+    local -A nvidia_branch_versions=() # AL2023: each driver branch's version, by branch name
     local cuda_version=""
     local nvidia_version_key="nvidia_driver_version_${ami_variant}"
     local cuda_version_key="cuda_version_${ami_variant}"
@@ -39,6 +40,7 @@ handle_nvidia_version() {
         # possible shapes, in any token order:
         #   "true"                                    (update exists, no version)
         #   "true nvidia:<nvidia_version>"            (driver only)
+        #   "true nvidia_<branch>:<version> ..."      (al2023_gpu, one token per driver branch, e.g. nvidia_pb:)
         #   "true nvidia:<...> cuda:<cuda_version>"   (al2_gpu, driver + cuda)
         #   "true cuda:<cuda_version>"                (al2_gpu, cuda only)
         # Read the fields after "true" and classify each strictly by its prefix.
@@ -50,7 +52,13 @@ handle_nvidia_version() {
         for field in "${fields[@]}"; do
             case "$field" in
             nvidia:*)
+                # AL2's driver version (AL2023 reports each branch as nvidia_<branch>: below)
                 nvidia_version="${field#nvidia:}"
+                ;;
+            nvidia_*:*)
+                # nvidia_pb:595.112.07 -> nvidia_branch_versions[pb]=595.112.07
+                local branch_name=${field%%:*}
+                nvidia_branch_versions[${branch_name#nvidia_}]="${field#*:}"
                 ;;
             cuda:*)
                 cuda_version="${field#cuda:}"
@@ -67,6 +75,20 @@ handle_nvidia_version() {
             fi
         fi
     fi
+
+    # Update each AL2023 driver branch's version entry, the line
+    #   nvidia_driver_version_al2023_<branch> = "<version>"
+    # in NVIDIA_DRIVER_VERSION, the same way the entry above is updated
+    local branch branch_key branch_version
+    for branch in "${!nvidia_branch_versions[@]}"; do
+        branch_key="${nvidia_version_key}_${branch}"
+        branch_version="${nvidia_branch_versions[$branch]}"
+        if [ "$ami_variant" = "al2023" ] && grep -q "^${branch_key} = " NVIDIA_DRIVER_VERSION; then
+            if ! sed -i "s/^${branch_key} = .*/${branch_key} = \"${branch_version}\"/" NVIDIA_DRIVER_VERSION; then
+                echo "Failed to update the ${branch} NVIDIA driver version in NVIDIA_DRIVER_VERSION file"
+            fi
+        fi
+    done
 
     # Update CUDA version entry if available (AL2 only)
     if [ -n "$cuda_version" ] && [ "$ami_variant" = "al2" ]; then
