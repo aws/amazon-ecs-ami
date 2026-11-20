@@ -53,7 +53,6 @@ fi
 # AL2023 nvidia repo AND the S3 GRID bucket within the pinned major,
 # and tracked in the NVIDIA_DRIVER_VERSION file uploaded by Packer.
 
-# The native install below installs pb's version, until the driver trees replace it
 NVIDIA_DRIVER_FULL_VERSION=$(grep "^nvidia_driver_version_al2023_pb = " /tmp/NVIDIA_DRIVER_VERSION | awk -F'"' '{print $2}')
 if [[ -z "$NVIDIA_DRIVER_FULL_VERSION" ]]; then
   echo "ERROR: Could not read nvidia_driver_version_al2023_pb from /tmp/NVIDIA_DRIVER_VERSION"

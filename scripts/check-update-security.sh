@@ -141,7 +141,7 @@ instance_id=$(aws ec2 run-instances \
     --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value='$platform-check-update-security'}]' |
     jq -r '.Instances[0].InstanceId')
 
-# Read the pb (default) and lts major versions for AL2023 GPU filtering, from nvidia_driver_majors_al2023
+# Read the pb and lts major versions for AL2023 GPU filtering, from nvidia_driver_majors_al2023
 nvidia_driver_pb_major=""
 nvidia_driver_lts_major=""
 if [ "$platform" = "al2023_gpu" ]; then
@@ -149,6 +149,10 @@ if [ "$platform" = "al2023_gpu" ]; then
     nvidia_driver_lts_major=$(sed -n '/^variable "nvidia_driver_majors_al2023" {/,/^}/p' variables.pkr.hcl | awk -F '"' '/^ *lts *=/ { print $2 }')
     if [ -z "$nvidia_driver_pb_major" ]; then
         echo "ERROR: Could not read the pb major of nvidia_driver_majors_al2023 from variables.pkr.hcl"
+        exit 1
+    fi
+    if [ -z "$nvidia_driver_lts_major" ]; then
+        echo "ERROR: Could not read the lts major of nvidia_driver_majors_al2023 from variables.pkr.hcl"
         exit 1
     fi
 fi
@@ -315,21 +319,21 @@ if [ "$platform" = "al2023_gpu" ]; then
         output="$output nvidia_pb:$nvidia_driver_pb_latest_version"
     fi
 
-    # The lts driver tree: the newest version within lts's major in the repo. lts builds only the proprietary flavor, so
-    # its version doesn't need to be in the GRID bucket. An lts problem prints a warning and skips lts, so it never
-    # holds back pb updates.
+    # lts: the newest version within lts's major in the repo. lts builds only the proprietary flavor, so its version
+    # doesn't need to be in the GRID bucket.
+    # lts's pin in NVIDIA_DRIVER_VERSION, read the same way as pb's
     nvidia_driver_lts_version=$(awk -F '"' '$1 ~ /^nvidia_driver_version_al2023_lts *= *$/ { print $2 }' NVIDIA_DRIVER_VERSION)
     # The lts repo versions the check instance reported, comma-separated
     nvidia_driver_lts_repo_versions_csv=$(echo "$std_output" | grep "^REPO_VERSIONS_LTS=" | cut -d'=' -f2 || true)
+    if [ -z "$nvidia_driver_lts_version" ] || [ -z "$nvidia_driver_lts_repo_versions_csv" ]; then
+        echo "ERROR: Could not determine lts's NVIDIA driver version or its available versions"
+        exit 1
+    fi
     # The newest of them
-    nvidia_driver_lts_latest_version=$(echo "$nvidia_driver_lts_repo_versions_csv" | tr ',' '\n' | grep -v '^$' | sort -V | tail -1 || true)
-    if [ -z "$nvidia_driver_lts_major" ] || [ -z "$nvidia_driver_lts_version" ] || [ -z "$nvidia_driver_lts_latest_version" ]; then
-        echo "WARNING: Could not determine the lts NVIDIA driver's major, version or repo versions; not checking lts" >&2
-    else
-        nvidia_driver_lts_newer=$(printf '%s\n%s' "$nvidia_driver_lts_version" "$nvidia_driver_lts_latest_version" | sort -V | tail -1)
-        if [ "$nvidia_driver_lts_newer" != "$nvidia_driver_lts_version" ]; then
-            output="$output nvidia_lts:$nvidia_driver_lts_latest_version"
-        fi
+    nvidia_driver_lts_latest_version=$(echo "$nvidia_driver_lts_repo_versions_csv" | tr ',' '\n' | grep -v '^$' | sort -V | tail -1)
+    nvidia_driver_lts_newer=$(printf '%s\n%s' "$nvidia_driver_lts_version" "$nvidia_driver_lts_latest_version" | sort -V | tail -1)
+    if [ "$nvidia_driver_lts_newer" != "$nvidia_driver_lts_version" ]; then
+        output="$output nvidia_lts:$nvidia_driver_lts_latest_version"
     fi
 
     if [ "$output" = "true" ]; then
