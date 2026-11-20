@@ -258,10 +258,9 @@ if [ "$platform" = "al2023_gpu" ]; then
     fi
 
     # pb's pin in NVIDIA_DRIVER_VERSION, a line like
-    #   nvidia_driver_version_al2023 = "595.91.07"
-    # awk splits on double quotes: the 1st field must be exactly the key (so _al2023 doesn't match _al2023_lts), and the
-    # 2nd is the version
-    nvidia_driver_pb_version=$(awk -F '"' '$1 ~ /^nvidia_driver_version_al2023 *= *$/ { print $2 }' NVIDIA_DRIVER_VERSION)
+    #   nvidia_driver_version_al2023_pb = "595.91.07"
+    # awk splits on double quotes: the 1st field must be exactly the key, and the 2nd is the version
+    nvidia_driver_pb_version=$(awk -F '"' '$1 ~ /^nvidia_driver_version_al2023_pb *= *$/ { print $2 }' NVIDIA_DRIVER_VERSION)
     nvidia_driver_pb_repo_versions_csv=$(echo "$std_output" | grep "^REPO_VERSIONS_PB=" | cut -d'=' -f2)
 
     if [ -z "$nvidia_driver_pb_version" ] || [ -z "$nvidia_driver_pb_repo_versions_csv" ]; then
@@ -313,7 +312,7 @@ if [ "$platform" = "al2023_gpu" ]; then
     output="true"
     nvidia_driver_pb_newer=$(printf '%s\n%s' "$nvidia_driver_pb_version" "$nvidia_driver_pb_latest_version" | sort -V | tail -1)
     if [ "$nvidia_driver_pb_newer" != "$nvidia_driver_pb_version" ]; then
-        output="$output nvidia:$nvidia_driver_pb_latest_version"
+        output="$output nvidia_pb:$nvidia_driver_pb_latest_version"
     fi
 
     # The lts driver tree: the newest version within lts's major in the repo. lts builds only the proprietary flavor, so
