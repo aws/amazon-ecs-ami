@@ -57,8 +57,9 @@ pinned_version() {
 # DKMS source packages its flavors build from, and check every signature.
 #
 # Each branch's packages are downloaded in one dnf transaction, so dnf resolves them together and every dependency comes
-# out at the branch's version, plus the other dependencies the host doesn't have yet (such as 595's egl-wayland2). The
-# A branch whose version is already installed is downloaded with reinstall: dnf install skips installed packages.
+# out at the branch's version, plus the other dependencies the host doesn't have yet (egl-wayland for 580, egl-wayland2
+# for 595). A branch whose version is already installed is downloaded with reinstall: dnf install skips installed
+# packages.
 download_branch_packages() {
     local name=$1 version=${VERSION[$1]} download_dir=$TREES_BUILD_DIR/download/$1 dkms_dir=$TREES_BUILD_DIR/dkms/$1
     shift
