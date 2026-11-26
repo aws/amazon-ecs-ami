@@ -14,16 +14,14 @@ die() {
 
 # read_driver_branches: fill NAMES, FLAVORS and VERSION from NVIDIA_DRIVER_BRANCHES and NVIDIA_DRIVER_VERSION.
 #
-# Packer passes nvidia_driver_branches_al2023 in order as "name=flavor,flavor" pairs; the first branch is the default,
-# the natively installed driver. Each branch's full version is pinned in NVIDIA_DRIVER_VERSION, which check-update.sh
-# keeps current: nvidia_driver_version_al2023 for the default branch, nvidia_driver_version_al2023_<name> for the
-# others.
-NAMES=()                         # branch names, in order; NAMES[0] is the default branch
+# Packer passes nvidia_driver_branches_al2023 as "name=flavor,flavor" pairs. Each branch's full version is pinned in
+# NVIDIA_DRIVER_VERSION as nvidia_driver_version_al2023_<name>, which check-update.sh keeps current; a branch without
+# one fails the build.
+NAMES=()                         # branch names
 declare -A FLAVORS=() VERSION=() # flavors and version of each branch, by name
 read_driver_branches() {
     local pair name flavor
-    # Each "lts=open,proprietary,grid" pair adds "lts" to NAMES and "open proprietary grid" to FLAVORS[lts], keeping
-    # packer's order so the default branch comes first.
+    # Each "pb=open,grid" pair adds "pb" to NAMES and "open grid" to FLAVORS[pb]
     for pair in ${NVIDIA_DRIVER_BRANCHES:-}; do
         name=${pair%%=*}
         NAMES+=("$name")
@@ -32,9 +30,8 @@ read_driver_branches() {
     done
     [[ ${#NAMES[@]} -gt 0 ]] || die "no branches in NVIDIA_DRIVER_BRANCHES"
 
-    # VERSION[lts] from nvidia_driver_version_al2023, VERSION[pb] from nvidia_driver_version_al2023_pb
-    VERSION[${NAMES[0]}]=$(pinned_version nvidia_driver_version_al2023)
-    for name in "${NAMES[@]:1}"; do
+    # VERSION[pb] from nvidia_driver_version_al2023_pb, VERSION[lts] from nvidia_driver_version_al2023_lts
+    for name in "${NAMES[@]}"; do
         VERSION[$name]=$(pinned_version "nvidia_driver_version_al2023_$name")
     done
 
@@ -60,8 +57,9 @@ pinned_version() {
 # DKMS source packages its flavors build from, and check every signature.
 #
 # Each branch's packages are downloaded in one dnf transaction, so dnf resolves them together and every dependency comes
-# out at the branch's version, plus the other dependencies the host doesn't have yet (such as 595's egl-wayland2). The
-# default branch's packages are the native install's, already installed, so they're downloaded with reinstall.
+# out at the branch's version, plus the other dependencies the host doesn't have yet (egl-wayland for 580, egl-wayland2
+# for 595). A branch whose version is already installed is downloaded with reinstall: dnf install skips installed
+# packages.
 download_branch_packages() {
     local name=$1 version=${VERSION[$1]} download_dir=$TREES_BUILD_DIR/download/$1 dkms_dir=$TREES_BUILD_DIR/dkms/$1
     shift
@@ -70,7 +68,7 @@ download_branch_packages() {
     sudo mkdir -p "$download_dir" "$dkms_dir"
 
     for package in "$@"; do package_specs+=("$package-$version"); done
-    if [[ $name == "${NAMES[0]}" ]]; then
+    if [[ $(rpm -q --qf '%{VERSION}' nvidia-driver-cuda 2>/dev/null) == "$version" ]]; then
         action=reinstall
     fi
     sudo dnf -y "$action" --downloadonly --downloaddir="$download_dir" "${package_specs[@]}"
