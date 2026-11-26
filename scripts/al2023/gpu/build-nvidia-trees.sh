@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Functions that build a per-version NVIDIA driver tree for each branch in nvidia_driver_branches_al2023, under
 # /opt/nvidia/<branch>. install-nvidia-driver.sh sources this file and calls them after the native install, only when
-# nvidia_driver_trees_al2023 is on (off by default). So far they download and check each branch's packages and remove
-# them again. Nothing reads the trees yet: the native driver still runs the AMI.
+# nvidia_driver_trees_al2023 is on (off by default). So far they download and check each branch's packages and unpack
+# them into the branch's tree. Nothing reads the trees yet: the native driver still runs the AMI.
 
 TREES_BUILD_DIR=/opt/nvidia-build # scratch space for the build, removed at the end
+TREES_DIR=/opt/nvidia             # the trees, one per branch
 NVIDIA_DRIVER_VERSION_FILE=${NVIDIA_DRIVER_VERSION_FILE:-/tmp/NVIDIA_DRIVER_VERSION}
 
 die() {
@@ -103,4 +104,29 @@ download_branch_packages() {
         [[ $result == *"signatures OK" ]] || die "branch $name: not signed by an imported key: $result"
     done
     echo "branch $name: ${#rpm_files[@]} packages signed by an imported key"
+}
+
+# unpack_branch BRANCH: unpack each of the branch's downloaded packages into its tree, /opt/nvidia/<branch>. The tree
+# ends up holding the driver's files at the same paths an install would put them under /, e.g.
+# /opt/nvidia/pb/usr/bin/nvidia-smi. The packages are unpacked, not installed, because one host can't install two
+# versions of the same package.
+unpack_branch() {
+    local branch=$1 package
+    local tree_dir=$TREES_DIR/$branch
+    sudo mkdir -p "$tree_dir"
+    for package in "$TREES_BUILD_DIR/download/$branch"/*.rpm; do
+        unpack_package "$package" "$tree_dir" || die "branch $branch: cannot unpack $package"
+    done
+}
+
+# unpack_package PACKAGE TARGET_DIR: unpack the files in an RPM package into TARGET_DIR, without installing it.
+# rpm2cpio turns the package into a cpio archive, and cpio extracts it (-i), creating directories as needed (-d) and
+# keeping each file's modification time from the package (-m), as an install would.
+unpack_package() {
+    local package=$1 target_dir=$2
+    local - # pipefail for this function only, so a failed rpm2cpio fails the unpack too
+    set -o pipefail
+    # cpio extracts into the current directory, so cd into TARGET_DIR first; the parentheses run that in a subshell,
+    # so the build's own current directory doesn't change
+    rpm2cpio "$package" | (cd "$target_dir" && sudo cpio -idm --quiet)
 }
