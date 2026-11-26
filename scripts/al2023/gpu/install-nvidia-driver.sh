@@ -198,10 +198,12 @@ if [[ ${NVIDIA_DRIVER_TREES:-false} == "true" ]]; then
   echo "version-specific packages: ${#VERSION_SPECIFIC_PACKAGES[@]} (${VERSION_SPECIFIC_PACKAGES[*]})"
   source /tmp/build-nvidia-trees.sh
   read_driver_branches
-  # Download and check each branch's packages, then unpack them into the branch's tree
+  # Download and check each branch's packages, unpack them into the branch's tree, and build the branch's kernel
+  # modules into it
   for branch in "${NAMES[@]}"; do
     download_branch_packages "$branch" "${VERSION_SPECIFIC_PACKAGES[@]}"
     unpack_branch "$branch"
+    build_branch_modules "$branch" "$RUNNING_KERNEL" "$skip_grid_driver"
   done
   sudo rm -rf "$TREES_BUILD_DIR"
 fi
